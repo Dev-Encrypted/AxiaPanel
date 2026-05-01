@@ -823,6 +823,7 @@ pub fn router() -> Router<AppState> {
         .route("/api/php/extensions/install", post(sites::install_php_extension))
         // Agent endpoints (no cookie auth — uses Bearer token from servers table)
         .route("/api/agent/version", get(agent_updates::latest_version))
+        .route("/api/agent/binary", get(agent_updates::download_binary))
         .route("/api/agent/checkin", post(agent_checkin::checkin))
         .route("/api/agent/commands", get(agent_commands::poll))
         .route("/api/agent/commands/result", post(agent_commands::report_result))
@@ -838,6 +839,7 @@ pub fn router() -> Router<AppState> {
         .route("/api/extensions/{id}/events", get(extensions::events))
         // Servers
         .route("/api/servers", get(servers::list).post(servers::create))
+        .route("/api/servers/bootstrap-ssh", post(servers::bootstrap_ssh))
         .route("/api/servers/{id}", get(servers::get_one).put(servers::update).delete(servers::remove))
         .route("/api/servers/{id}/test", post(servers::test_connection))
         .route("/api/servers/{id}/rotate-token", post(servers::rotate_token))

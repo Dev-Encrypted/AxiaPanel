@@ -9,12 +9,32 @@ interface CreateForm {
   ip_address: string;
 }
 
+interface SshForm {
+  name: string;
+  host: string;
+  port: string;
+  user: string;
+  private_key: string;
+  passphrase: string;
+}
+
 export default function Servers() {
   const { user } = useAuth();
   if (!user || user.role !== "admin") return <Navigate to="/" replace />;
   const { servers, refreshServers } = useServer();
   const [creating, setCreating] = useState(false);
+  const [createMode, setCreateMode] = useState<"manual" | "ssh">("ssh");
   const [form, setForm] = useState<CreateForm>({ name: "", ip_address: "" });
+  const [sshForm, setSshForm] = useState<SshForm>({
+    name: "",
+    host: "",
+    port: "22",
+    user: "root",
+    private_key: "",
+    passphrase: "",
+  });
+  const [bootstrapping, setBootstrapping] = useState(false);
+  const [bootstrapStatus, setBootstrapStatus] = useState<string>("");
   const [installScript, setInstallScript] = useState<string | null>(null);
   const [error, setError] = useState("");
   const [testing, setTesting] = useState<string | null>(null);
@@ -40,6 +60,41 @@ export default function Servers() {
       setError(e instanceof ApiError ? e.message : "Falha ao criar servidor");
     }
   }, [form, refreshServers]);
+
+  const handleBootstrapSsh = useCallback(async () => {
+    if (!sshForm.name.trim() || !sshForm.host.trim() || !sshForm.private_key.trim()) {
+      setError("Preencha nome, host e chave privada SSH");
+      return;
+    }
+    setError("");
+    setBootstrapping(true);
+    setBootstrapStatus("Conectando via SSH e instalando o agent (isso leva 1-3 min)...");
+    try {
+      const res = await api.post<{ id: string; name: string; cert_fingerprint: string; message: string }>(
+        "/servers/bootstrap-ssh",
+        {
+          name: sshForm.name.trim(),
+          host: sshForm.host.trim(),
+          port: parseInt(sshForm.port) || 22,
+          user: sshForm.user.trim() || "root",
+          private_key: sshForm.private_key,
+          passphrase: sshForm.passphrase || undefined,
+        },
+      );
+      setBootstrapStatus(`✓ ${res.message} — fingerprint: ${res.cert_fingerprint.slice(0, 16)}...`);
+      setSshForm({ name: "", host: "", port: "22", user: "root", private_key: "", passphrase: "" });
+      await refreshServers();
+      setTimeout(() => {
+        setCreating(false);
+        setBootstrapStatus("");
+      }, 2500);
+    } catch (e) {
+      setError(e instanceof ApiError ? e.message : "Falha no bootstrap SSH");
+      setBootstrapStatus("");
+    } finally {
+      setBootstrapping(false);
+    }
+  }, [sshForm, refreshServers]);
 
   const handleDelete = useCallback((id: string, name: string) => {
     setPendingDelete({ id, name });
@@ -166,49 +221,167 @@ export default function Servers() {
       {creating && (
         <div className="bg-dark-800 border border-dark-600 rounded-lg p-5 space-y-4">
           <h2 className="text-lg font-bold text-dark-50 font-mono">Adicionar Servidor Remoto</h2>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <div>
-              <label className="block text-sm text-dark-200 mb-1">Nome do Servidor</label>
-              <input
-                value={form.name}
-                onChange={(e) => setForm((f) => ({ ...f, name: e.target.value }))}
-                placeholder="Servidor de Produção"
-                className="w-full px-3 py-2 bg-dark-900 border border-dark-600 rounded-lg text-dark-50 text-sm focus:border-rust-500 focus:outline-none"
-              />
-            </div>
-            <div>
-              <label className="block text-sm text-dark-200 mb-1">Endereço IP</label>
-              <input
-                value={form.ip_address}
-                onChange={(e) => setForm((f) => ({ ...f, ip_address: e.target.value }))}
-                placeholder="192.168.1.100"
-                className="w-full px-3 py-2 bg-dark-900 border border-dark-600 rounded-lg text-dark-50 text-sm focus:border-rust-500 focus:outline-none"
-              />
-            </div>
-          </div>
-          <div className="flex gap-3">
-            <button onClick={handleCreate} className="px-4 py-2 bg-rust-500 text-dark-950 rounded-lg text-sm font-bold hover:bg-rust-400 transition-colors">
-              Criar Servidor
+
+          {/* Mode toggle */}
+          <div className="flex gap-2 border-b border-dark-600 pb-3">
+            <button
+              onClick={() => { setCreateMode("ssh"); setError(""); setInstallScript(null); }}
+              className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
+                createMode === "ssh" ? "bg-rust-500 text-dark-950" : "bg-dark-700 text-dark-200 hover:bg-dark-600"
+              }`}
+            >
+              Auto-instalar via SSH
             </button>
-            <button onClick={() => setCreating(false)} className="px-4 py-2 bg-dark-700 text-dark-200 rounded-lg text-sm hover:bg-dark-600 transition-colors">
-              Cancelar
+            <button
+              onClick={() => { setCreateMode("manual"); setError(""); setBootstrapStatus(""); }}
+              className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
+                createMode === "manual" ? "bg-rust-500 text-dark-950" : "bg-dark-700 text-dark-200 hover:bg-dark-600"
+              }`}
+            >
+              Manual (gerar comando)
             </button>
           </div>
 
-          {installScript && (
-            <div className="mt-4 space-y-2">
-              <p className="text-sm text-dark-200">Execute este comando no servidor remoto para instalar o agent DockPanel:</p>
-              <div className="relative">
-                <pre className="bg-dark-950 border border-dark-600 rounded-lg p-4 text-sm text-rust-400 font-mono overflow-x-auto whitespace-pre-wrap">{installScript}</pre>
+          {createMode === "ssh" ? (
+            <>
+              <p className="text-xs text-dark-300">
+                O painel conecta via SSH ao servidor com a chave privada fornecida, instala o Docker, baixa o agent
+                e configura o systemd automaticamente. A chave NÃO é armazenada — usada apenas durante o bootstrap.
+              </p>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div>
+                  <label className="block text-sm text-dark-200 mb-1">Nome do Servidor</label>
+                  <input
+                    value={sshForm.name}
+                    onChange={(e) => setSshForm((f) => ({ ...f, name: e.target.value }))}
+                    placeholder="prod-web-1"
+                    disabled={bootstrapping}
+                    className="w-full px-3 py-2 bg-dark-900 border border-dark-600 rounded-lg text-dark-50 text-sm focus:border-rust-500 focus:outline-none disabled:opacity-50"
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm text-dark-200 mb-1">Host / IP</label>
+                  <input
+                    value={sshForm.host}
+                    onChange={(e) => setSshForm((f) => ({ ...f, host: e.target.value }))}
+                    placeholder="203.0.113.42 ou srv.exemplo.com"
+                    disabled={bootstrapping}
+                    className="w-full px-3 py-2 bg-dark-900 border border-dark-600 rounded-lg text-dark-50 text-sm focus:border-rust-500 focus:outline-none disabled:opacity-50"
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm text-dark-200 mb-1">Porta SSH</label>
+                  <input
+                    value={sshForm.port}
+                    onChange={(e) => setSshForm((f) => ({ ...f, port: e.target.value }))}
+                    placeholder="22"
+                    disabled={bootstrapping}
+                    className="w-full px-3 py-2 bg-dark-900 border border-dark-600 rounded-lg text-dark-50 text-sm focus:border-rust-500 focus:outline-none disabled:opacity-50"
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm text-dark-200 mb-1">Usuário SSH</label>
+                  <input
+                    value={sshForm.user}
+                    onChange={(e) => setSshForm((f) => ({ ...f, user: e.target.value }))}
+                    placeholder="root"
+                    disabled={bootstrapping}
+                    className="w-full px-3 py-2 bg-dark-900 border border-dark-600 rounded-lg text-dark-50 text-sm focus:border-rust-500 focus:outline-none disabled:opacity-50"
+                  />
+                  <p className="text-[10px] text-dark-400 mt-1">Precisa ser root ou ter sudo NOPASSWD</p>
+                </div>
+              </div>
+              <div>
+                <label className="block text-sm text-dark-200 mb-1">Chave Privada SSH (PEM)</label>
+                <textarea
+                  value={sshForm.private_key}
+                  onChange={(e) => setSshForm((f) => ({ ...f, private_key: e.target.value }))}
+                  placeholder={"-----BEGIN OPENSSH PRIVATE KEY-----\n...\n-----END OPENSSH PRIVATE KEY-----"}
+                  rows={6}
+                  disabled={bootstrapping}
+                  className="w-full px-3 py-2 bg-dark-900 border border-dark-600 rounded-lg text-dark-50 text-xs font-mono focus:border-rust-500 focus:outline-none disabled:opacity-50"
+                />
+              </div>
+              <div>
+                <label className="block text-sm text-dark-200 mb-1">Passphrase da chave (opcional)</label>
+                <input
+                  type="password"
+                  value={sshForm.passphrase}
+                  onChange={(e) => setSshForm((f) => ({ ...f, passphrase: e.target.value }))}
+                  disabled={bootstrapping}
+                  className="w-full px-3 py-2 bg-dark-900 border border-dark-600 rounded-lg text-dark-50 text-sm focus:border-rust-500 focus:outline-none disabled:opacity-50"
+                />
+              </div>
+              {bootstrapStatus && (
+                <div className="px-4 py-3 bg-accent-500/10 border border-accent-500/30 rounded-lg text-sm text-accent-300">
+                  {bootstrapping && <span className="inline-block w-3 h-3 mr-2 border-2 border-accent-400 border-t-transparent rounded-full animate-spin" />}
+                  {bootstrapStatus}
+                </div>
+              )}
+              <div className="flex gap-3">
                 <button
-                  onClick={() => navigator.clipboard.writeText(installScript)}
-                  className="absolute top-2 right-2 px-2 py-1 bg-dark-700 text-dark-200 rounded text-xs hover:bg-dark-600 transition-colors"
+                  onClick={handleBootstrapSsh}
+                  disabled={bootstrapping}
+                  className="px-4 py-2 bg-rust-500 text-dark-950 rounded-lg text-sm font-bold hover:bg-rust-400 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
                 >
-                  Copiar
+                  {bootstrapping ? "Instalando..." : "Adicionar e Instalar Agent"}
+                </button>
+                <button
+                  onClick={() => setCreating(false)}
+                  disabled={bootstrapping}
+                  className="px-4 py-2 bg-dark-700 text-dark-200 rounded-lg text-sm hover:bg-dark-600 transition-colors disabled:opacity-50"
+                >
+                  Cancelar
                 </button>
               </div>
-              <p className="text-xs text-dark-400">Após a instalação, clique em "Testar" para verificar se o agent está rodando.</p>
-            </div>
+            </>
+          ) : (
+            <>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div>
+                  <label className="block text-sm text-dark-200 mb-1">Nome do Servidor</label>
+                  <input
+                    value={form.name}
+                    onChange={(e) => setForm((f) => ({ ...f, name: e.target.value }))}
+                    placeholder="Servidor de Produção"
+                    className="w-full px-3 py-2 bg-dark-900 border border-dark-600 rounded-lg text-dark-50 text-sm focus:border-rust-500 focus:outline-none"
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm text-dark-200 mb-1">Endereço IP</label>
+                  <input
+                    value={form.ip_address}
+                    onChange={(e) => setForm((f) => ({ ...f, ip_address: e.target.value }))}
+                    placeholder="192.168.1.100"
+                    className="w-full px-3 py-2 bg-dark-900 border border-dark-600 rounded-lg text-dark-50 text-sm focus:border-rust-500 focus:outline-none"
+                  />
+                </div>
+              </div>
+              <div className="flex gap-3">
+                <button onClick={handleCreate} className="px-4 py-2 bg-rust-500 text-dark-950 rounded-lg text-sm font-bold hover:bg-rust-400 transition-colors">
+                  Criar Servidor
+                </button>
+                <button onClick={() => setCreating(false)} className="px-4 py-2 bg-dark-700 text-dark-200 rounded-lg text-sm hover:bg-dark-600 transition-colors">
+                  Cancelar
+                </button>
+              </div>
+
+              {installScript && (
+                <div className="mt-4 space-y-2">
+                  <p className="text-sm text-dark-200">Execute este comando no servidor remoto para instalar o agent AxiaPanel:</p>
+                  <div className="relative">
+                    <pre className="bg-dark-950 border border-dark-600 rounded-lg p-4 text-sm text-rust-400 font-mono overflow-x-auto whitespace-pre-wrap">{installScript}</pre>
+                    <button
+                      onClick={() => navigator.clipboard.writeText(installScript)}
+                      className="absolute top-2 right-2 px-2 py-1 bg-dark-700 text-dark-200 rounded text-xs hover:bg-dark-600 transition-colors"
+                    >
+                      Copiar
+                    </button>
+                  </div>
+                  <p className="text-xs text-dark-400">Após a instalação, clique em "Testar" para verificar se o agent está rodando.</p>
+                </div>
+              )}
+            </>
           )}
         </div>
       )}

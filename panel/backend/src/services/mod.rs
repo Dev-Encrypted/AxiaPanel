@@ -19,4 +19,5 @@ pub mod server_monitor;
 pub mod system_log;
 pub mod uptime;
 pub mod security_hardening;
+pub mod ssh_bootstrap;
 pub mod telemetry_collector;

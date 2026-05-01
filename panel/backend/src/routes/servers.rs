@@ -500,3 +500,191 @@ pub async fn uptime(
         bucket_minutes: 10,
     }))
 }
+
+#[derive(serde::Deserialize)]
+pub struct BootstrapSshRequest {
+    pub name: String,
+    pub host: String,
+    #[serde(default = "default_ssh_port")]
+    pub port: u16,
+    #[serde(default = "default_ssh_user")]
+    pub user: String,
+    pub private_key: String,
+    pub passphrase: Option<String>,
+}
+
+fn default_ssh_port() -> u16 { 22 }
+fn default_ssh_user() -> String { "root".to_string() }
+
+/// POST /api/servers/bootstrap-ssh — Add a remote server by connecting via SSH
+/// and installing the agent automatically. Returns when the agent is up and
+/// the cert fingerprint has been pinned.
+pub async fn bootstrap_ssh(
+    State(state): State<AppState>,
+    AdminUser(claims): AdminUser,
+    Json(body): Json<BootstrapSshRequest>,
+) -> Result<(StatusCode, Json<serde_json::Value>), ApiError> {
+    use crate::services::ssh_bootstrap::{self, SshSession};
+
+    let name = body.name.trim();
+    if name.is_empty() || name.len() > 100 {
+        return Err(err(StatusCode::BAD_REQUEST, "O nome deve ter de 1 a 100 caracteres"));
+    }
+    let host = body.host.trim();
+    if host.is_empty() || host.len() > 253 {
+        return Err(err(StatusCode::BAD_REQUEST, "Host inválido"));
+    }
+    if !(1..=65535).contains(&body.port) {
+        return Err(err(StatusCode::BAD_REQUEST, "Porta inválida"));
+    }
+    let user = body.user.trim();
+    if user.is_empty() || user.len() > 32 {
+        return Err(err(StatusCode::BAD_REQUEST, "Usuário SSH inválido"));
+    }
+    if body.private_key.trim().is_empty() {
+        return Err(err(StatusCode::BAD_REQUEST, "Chave privada SSH é obrigatória"));
+    }
+
+    // Generate agent token
+    let agent_token = format!(
+        "{}{}",
+        Uuid::new_v4().to_string().replace('-', ""),
+        Uuid::new_v4().to_string().replace('-', ""),
+    );
+    let agent_token_hash = crate::helpers::hash_agent_token(&agent_token);
+    let agent_url = format!("https://{}:9443", host);
+
+    // Insert server row in pending state
+    let server: Server = sqlx::query_as(
+        "INSERT INTO servers (user_id, name, ip_address, agent_token, agent_token_hash, agent_url, status, is_local) \
+         VALUES ($1, $2, $3, $4, $5, $6, 'pending', false) RETURNING *",
+    )
+    .bind(claims.sub)
+    .bind(name)
+    .bind(host)
+    .bind(&agent_token)
+    .bind(&agent_token_hash)
+    .bind(&agent_url)
+    .fetch_one(&state.db)
+    .await
+    .map_err(|e| internal_error("create server (ssh bootstrap)", e))?;
+
+    let panel_url = if state.config.base_url.is_empty() {
+        return Err(err(
+            StatusCode::BAD_REQUEST,
+            "BASE_URL não configurada — defina em /etc/dockpanel/api.env",
+        ));
+    } else {
+        state.config.base_url.clone()
+    };
+
+    // Connect via SSH
+    let mut session = SshSession::connect(
+        host,
+        body.port,
+        user,
+        &body.private_key,
+        body.passphrase.as_deref(),
+    )
+    .await
+    .map_err(|e| {
+        // Rollback the inserted row on connection failure
+        let id = server.id;
+        let db = state.db.clone();
+        tokio::spawn(async move {
+            let _ = sqlx::query("DELETE FROM servers WHERE id = $1").bind(id).execute(&db).await;
+        });
+        err(StatusCode::BAD_GATEWAY, &format!("Falha SSH: {e}"))
+    })?;
+
+    // Detect remote arch
+    let arch_result = session
+        .exec("uname -m", None, 30)
+        .await
+        .map_err(|e| err(StatusCode::BAD_GATEWAY, &format!("Falha ao detectar arquitetura: {e}")))?;
+    let arch = match arch_result.stdout.trim() {
+        "x86_64" => "amd64",
+        "aarch64" | "arm64" => "arm64",
+        other => {
+            return Err(err(
+                StatusCode::BAD_REQUEST,
+                &format!("Arquitetura não suportada: {other}"),
+            ));
+        }
+    };
+
+    // Run the bootstrap script
+    let script = ssh_bootstrap::bootstrap_script(
+        &panel_url,
+        &agent_token,
+        &server.id.to_string(),
+        arch,
+    );
+    let exec = session
+        .exec("bash -s", Some(script.as_bytes()), 600)
+        .await
+        .map_err(|e| err(StatusCode::BAD_GATEWAY, &format!("Falha no bootstrap: {e}")))?;
+
+    if exec.exit_code != 0 {
+        let id = server.id;
+        let db = state.db.clone();
+        tokio::spawn(async move {
+            let _ = sqlx::query("DELETE FROM servers WHERE id = $1").bind(id).execute(&db).await;
+        });
+        let _ = session.close().await;
+        let tail = exec.stderr.lines().rev().take(10).collect::<Vec<_>>().into_iter().rev().collect::<Vec<_>>().join("\n");
+        return Err(err(
+            StatusCode::BAD_GATEWAY,
+            &format!("Bootstrap falhou (exit {}): {}", exec.exit_code, tail),
+        ));
+    }
+
+    // Last line of stdout is the cert fingerprint (lowercase hex, 64 chars)
+    let fingerprint: String = exec.stdout.lines().rev().find(|l| {
+        let s = l.trim();
+        s.len() == 64 && s.chars().all(|c| c.is_ascii_hexdigit())
+    }).map(|s| s.trim().to_string()).unwrap_or_default();
+
+    let _ = session.close().await;
+
+    if fingerprint.is_empty() {
+        return Err(err(
+            StatusCode::BAD_GATEWAY,
+            "Bootstrap executou mas não retornou o cert fingerprint",
+        ));
+    }
+
+    // Update server row: pin fingerprint, mark online
+    sqlx::query(
+        "UPDATE servers SET status = 'online', cert_fingerprint = $1, last_seen_at = NOW() WHERE id = $2",
+    )
+    .bind(&fingerprint)
+    .bind(server.id)
+    .execute(&state.db)
+    .await
+    .map_err(|e| internal_error("update server post-bootstrap", e))?;
+
+    activity::log_activity(
+        &state.db,
+        claims.sub,
+        &claims.email,
+        "server.bootstrap_ssh",
+        Some("server"),
+        Some(name),
+        None,
+        None,
+    )
+    .await;
+
+    Ok((
+        StatusCode::CREATED,
+        Json(serde_json::json!({
+            "id": server.id,
+            "name": server.name,
+            "host": host,
+            "status": "online",
+            "cert_fingerprint": fingerprint,
+            "message": "Servidor adicionado e agent instalado com sucesso",
+        })),
+    ))
+}

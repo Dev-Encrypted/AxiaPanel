@@ -49,3 +49,7 @@ url = "2"
 serde_yaml_ng = "0.10"
 hkdf = "0.12"
 zeroize = { version = "1", features = ["derive"] }
+# SSH client for agent bootstrap on remote servers
+russh = "0.45"
+russh-keys = "0.45"
+async-trait = "0.1"
