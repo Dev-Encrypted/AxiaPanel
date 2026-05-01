@@ -1,4 +1,4 @@
-import { useState, useEffect, FormEvent, useCallback, type ReactNode } from "react";
+import { useState, useEffect, FormEvent, useCallback } from "react";
 import { useNavigate, Link, Navigate } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
 import { useBranding } from "../context/BrandingContext";
@@ -19,35 +19,79 @@ function bufferToBase64url(buf: ArrayBuffer): string {
   return btoa(binary).replace(/\+/g, "-").replace(/\//g, "_").replace(/=+$/, "");
 }
 
-// Logo mark — used in both hero and mobile header
-function LogoMark({ size = "md" }: { size?: "sm" | "md" | "lg" }) {
-  const sizeClasses = size === "lg" ? "w-16 h-16" : size === "sm" ? "w-10 h-10" : "w-12 h-12";
-  const iconClasses = size === "lg" ? "w-9 h-9" : size === "sm" ? "w-6 h-6" : "w-7 h-7";
+/* ─── Custom geometric sigils (no off-the-shelf icon library) ─── */
+
+function SigilEmail() {
   return (
-    <div className={`inline-flex items-center justify-center ${sizeClasses} login-logo-mark logo-icon-glow shrink-0`}>
-      <svg className={`${iconClasses} text-white`} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
-        <path d="M5 16h4" strokeLinecap="square" />
-        <path d="M5 12h8" strokeLinecap="square" />
-        <path d="M5 8h6" strokeLinecap="square" />
-        <rect x="16" y="7" width="4" height="4" fill="currentColor" stroke="none" />
-        <rect x="16" y="13" width="4" height="4" fill="currentColor" stroke="none" />
-      </svg>
-    </div>
+    <svg className="auth-sigil" viewBox="0 0 20 20" width="14" height="14" fill="none" stroke="currentColor" strokeWidth="1.25">
+      <rect x="2.5" y="5" width="15" height="10" />
+      <polyline points="2.5,5 10,11 17.5,5" />
+      <line x1="2.5" y1="15" x2="7.5" y2="10" strokeDasharray="0.8 1.4" />
+      <line x1="17.5" y1="15" x2="12.5" y2="10" strokeDasharray="0.8 1.4" />
+    </svg>
   );
 }
 
-// Feature row used in hero panel
-function HeroFeature({ icon, title, desc }: { icon: ReactNode; title: string; desc: string }) {
+function SigilLock() {
+  // Concentric rings — abstract "encrypted" sigil instead of a padlock
   return (
-    <div className="flex items-start gap-3">
-      <div className="w-8 h-8 shrink-0 flex items-center justify-center login-hero-feature-icon mt-0.5">
-        {icon}
-      </div>
-      <div className="min-w-0">
-        <p className="text-sm font-semibold login-hero-feature-title">{title}</p>
-        <p className="text-xs login-hero-feature-desc mt-0.5 leading-relaxed">{desc}</p>
-      </div>
-    </div>
+    <svg className="auth-sigil" viewBox="0 0 20 20" width="14" height="14" fill="none" stroke="currentColor" strokeWidth="1.25">
+      <circle cx="10" cy="10" r="8" />
+      <circle cx="10" cy="10" r="5" />
+      <circle cx="10" cy="10" r="2" />
+      <line x1="10" y1="2" x2="10" y2="0.5" />
+      <line x1="10" y1="19.5" x2="10" y2="18" />
+      <line x1="2" y1="10" x2="0.5" y2="10" />
+      <line x1="19.5" y1="10" x2="18" y2="10" />
+    </svg>
+  );
+}
+
+function SigilToken() {
+  // Six-cell ribbon — for 2FA code
+  return (
+    <svg className="auth-sigil" viewBox="0 0 20 20" width="14" height="14" fill="none" stroke="currentColor" strokeWidth="1.25">
+      <rect x="1.5" y="6.5" width="2.5" height="7" />
+      <rect x="4.5" y="6.5" width="2.5" height="7" />
+      <rect x="7.5" y="6.5" width="2.5" height="7" />
+      <rect x="10.5" y="6.5" width="2.5" height="7" fill="currentColor" />
+      <rect x="13.5" y="6.5" width="2.5" height="7" />
+      <rect x="16.5" y="6.5" width="2" height="7" />
+    </svg>
+  );
+}
+
+function SigilKey() {
+  // Custom passkey mark: square with a notch + dot, no off-the-shelf "key" icon
+  return (
+    <svg viewBox="0 0 20 20" width="14" height="14" fill="none" stroke="currentColor" strokeWidth="1.25">
+      <rect x="2.5" y="5" width="9" height="10" />
+      <line x1="11.5" y1="10" x2="17.5" y2="10" />
+      <line x1="14.5" y1="10" x2="14.5" y2="13" />
+      <line x1="17.5" y1="10" x2="17.5" y2="13" />
+      <circle cx="6.5" cy="9.5" r="1.25" />
+    </svg>
+  );
+}
+
+function LogoSigil({ size = 28 }: { size?: number }) {
+  // Brand sigil — no rectangle-with-bars cliché. Square + offset square + bisector.
+  return (
+    <svg className="auth-logo-sigil" viewBox="0 0 32 32" width={size} height={size} fill="none" stroke="currentColor" strokeWidth="1.5">
+      <rect x="4" y="4" width="14" height="14" />
+      <rect x="14" y="14" width="14" height="14" fill="currentColor" stroke="none" />
+      <line x1="4" y1="18" x2="28" y2="18" />
+      <line x1="14" y1="4" x2="14" y2="28" />
+    </svg>
+  );
+}
+
+function FrameMark() {
+  // L-shaped corner registration mark used in print
+  return (
+    <svg viewBox="0 0 12 12" width="10" height="10" fill="none" stroke="currentColor" strokeWidth="1.25" aria-hidden="true">
+      <polyline points="0,4 0,0 4,0" />
+    </svg>
   );
 }
 
@@ -66,7 +110,6 @@ export default function Login() {
   const [twoFaCode, setTwoFaCode] = useState("");
   const [passkeySupported, setPasskeySupported] = useState(false);
 
-  // Check if WebAuthn is available
   useEffect(() => {
     if (window.PublicKeyCredential) {
       setPasskeySupported(true);
@@ -121,7 +164,6 @@ export default function Login() {
     }
   }, []);
 
-  // Check if setup is needed (no users exist)
   useEffect(() => {
     fetch("/api/auth/setup-status")
       .then(r => r.json())
@@ -130,9 +172,9 @@ export default function Login() {
   }, []);
 
   if (loading) return (
-    <div className="min-h-screen flex items-center justify-center login-shell">
-      <div className="w-7 h-7 border-2 border-dark-600 border-t-rust-500 rounded-full animate-spin" />
-    </div>
+    <main className="auth-page flex items-center justify-center">
+      <div className="auth-loading">CARREGANDO</div>
+    </main>
   );
   if (user) return <Navigate to="/" replace />;
   if (needsSetup) return <Navigate to="/setup" replace />;
@@ -169,192 +211,123 @@ export default function Login() {
     }
   };
 
-  // Brand display name (split for "AxiaPanel" so we can color it)
-  const brandLabel = !branding.hideBranding && (
-    branding.panelName === "AxiaPanel" ? (
-      <><span className="text-rust-500">Axia</span><span className="login-brand-fg">Panel</span></>
-    ) : (
-      <span className="login-brand-fg">{branding.panelName}</span>
-    )
-  );
+  const brandName = branding.panelName || "AxiaPanel";
 
   return (
-    <main className="login-shell min-h-screen w-full grid lg:grid-cols-[1.05fr_1fr]">
-      {/* ── HERO PANEL (desktop only) ───────────────────────────── */}
-      <aside className="login-hero hidden lg:flex flex-col justify-between p-12 relative overflow-hidden">
-        {/* Decorative bg */}
-        <div className="login-hero-bg absolute inset-0 pointer-events-none" aria-hidden="true" />
-        <div className="login-hero-grid absolute inset-0 pointer-events-none" aria-hidden="true" />
+    <main className="auth-page">
+      {/* Corner registration marks */}
+      <span className="auth-frame auth-frame-tl"><FrameMark /></span>
+      <span className="auth-frame auth-frame-tr" style={{ transform: "rotate(90deg)" }}><FrameMark /></span>
+      <span className="auth-frame auth-frame-bl" style={{ transform: "rotate(-90deg)" }}><FrameMark /></span>
+      <span className="auth-frame auth-frame-br" style={{ transform: "rotate(180deg)" }}><FrameMark /></span>
 
-        {/* Logo + brand */}
-        <div className="relative flex items-center gap-3">
+      {/* Top bar */}
+      <header className="auth-topbar">
+        <Link to="/" className="auth-brand" aria-label={brandName}>
           {branding.logoUrl ? (
-            <img src={branding.logoUrl} alt={branding.panelName} className="h-10 w-auto max-h-10 object-contain" />
+            <img src={branding.logoUrl} alt={brandName} className="h-7 w-auto max-h-7 object-contain" />
           ) : (
-            <LogoMark size="sm" />
+            <LogoSigil size={26} />
           )}
-          {brandLabel && (
-            <span className="text-base font-semibold tracking-tight">
-              {brandLabel}
+          {!branding.hideBranding && (
+            <span className="auth-brand-name">
+              {brandName === "AxiaPanel" ? (
+                <>AXIA<span className="auth-brand-faint">PANEL</span></>
+              ) : (
+                brandName.toUpperCase()
+              )}
             </span>
           )}
+        </Link>
+
+        <div className="auth-chip" aria-hidden="true">
+          <span className="auth-chip-bracket">[</span>
+          <span className="auth-chip-key">SYS</span>
+          <span className="auth-chip-sep">:</span>
+          <span className="auth-chip-val">READY</span>
+          <span className="auth-chip-bracket">]</span>
         </div>
+      </header>
 
-        {/* Hero copy */}
-        <div className="relative max-w-md">
-          <p className="login-hero-eyebrow text-xs font-medium uppercase tracking-[0.18em] mb-4">
-            Painel de gestão
-          </p>
-          <h1 className="text-4xl font-semibold tracking-tight leading-[1.1] mb-4">
-            <span className="login-hero-title-fg">Servidores sob</span>
-            <br />
-            <span className="login-hero-title-accent">controle total.</span>
-          </h1>
-          <p className="login-hero-subtitle text-sm leading-relaxed">
-            Implante sites, gerencie bancos e monitore tudo em um só lugar — com segurança de nível
-            empresarial e a velocidade do Rust.
-          </p>
-
-          <div className="mt-9 space-y-4">
-            <HeroFeature
-              title="Implantação em segundos"
-              desc="Git push para deploy automatizado, com rollback instantâneo se algo der errado."
-              icon={
-                <svg className="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                  <path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z" />
-                </svg>
-              }
-            />
-            <HeroFeature
-              title="Backups que funcionam"
-              desc="Snapshots agendados, replicação off-site e restauração com um clique."
-              icon={
-                <svg className="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                  <path d="M21 12a9 9 0 1 1-9-9c2.4 0 4.6.94 6.2 2.5L21 8" />
-                  <path d="M21 3v5h-5" />
-                </svg>
-              }
-            />
-            <HeroFeature
-              title="Visibilidade total"
-              desc="Métricas em tempo real, alertas inteligentes e logs centralizados."
-              icon={
-                <svg className="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                  <path d="M3 12h4l3-9 4 18 3-9h4" />
-                </svg>
-              }
-            />
-          </div>
-        </div>
-
-        {/* Footer */}
-        <div className="relative flex items-center justify-between text-xs">
-          <span className="login-hero-footer-text inline-flex items-center gap-2">
-            <span className="login-status-dot" aria-hidden="true" />
-            Todos os sistemas operacionais
-          </span>
-          <span className="login-hero-footer-meta">
-            Powered by Rust · v2.7
-          </span>
-        </div>
-      </aside>
-
-      {/* ── FORM PANEL ──────────────────────────────────────────── */}
-      <section className="login-panel flex items-center justify-center px-5 py-10 sm:px-8 relative">
-        <div className="w-full max-w-sm relative">
-          {/* Mobile branding — only visible below lg */}
-          <div className="lg:hidden flex flex-col items-center text-center mb-8">
-            {branding.logoUrl ? (
-              <img src={branding.logoUrl} alt={branding.panelName} className="h-12 w-auto max-h-12 object-contain mb-3" />
-            ) : (
-              <LogoMark size="md" />
-            )}
-            {brandLabel && (
-              <h2 className="text-base font-semibold tracking-tight mt-3">
-                {brandLabel}
-              </h2>
-            )}
+      {/* Stage */}
+      <section className="auth-stage">
+        <div className="auth-card">
+          {/* Section number */}
+          <div className="auth-section">
+            <span className="auth-section-num">01</span>
+            <span className="auth-section-rule" />
+            <span className="auth-section-name">
+              {twoFaToken ? "Verificação" : "Acesso"}
+            </span>
           </div>
 
           {/* Heading */}
-          <div className="mb-7">
-            <h2 className="text-2xl font-semibold tracking-tight login-panel-heading">
-              {twoFaToken ? "Verificação em duas etapas" : "Bem-vindo de volta"}
-            </h2>
-            <p className="text-sm login-panel-subheading mt-1.5">
-              {twoFaToken
-                ? "Digite o código do seu aplicativo autenticador"
-                : "Entre com sua conta para acessar o painel"}
-            </p>
-          </div>
+          <h1 className="auth-heading">
+            {twoFaToken ? "Verifique sua identidade." : "Entre no painel."}
+          </h1>
+          <p className="auth-subheading">
+            {twoFaToken
+              ? "Forneça o código de seis dígitos do seu autenticador."
+              : "Identifique-se para continuar."}
+          </p>
 
-          {/* Error banner */}
+          {/* Error */}
           {error && (
-            <div role="alert" className="login-error mb-5 text-sm px-4 py-3 flex items-start gap-2.5">
-              <svg className="w-4 h-4 mt-0.5 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                <circle cx="12" cy="12" r="10" />
-                <line x1="12" y1="8" x2="12" y2="12" />
-                <line x1="12" y1="16" x2="12.01" y2="16" />
-              </svg>
-              <span className="leading-relaxed">{error}</span>
+            <div role="alert" className="auth-error">
+              <span className="auth-error-tag">ERR</span>
+              <span className="auth-error-msg">{error}</span>
             </div>
           )}
 
           {/* 2FA Form */}
           {twoFaToken ? (
-            <form onSubmit={handle2fa} className="space-y-5 login-form-anim">
-              <div>
-                <label htmlFor="totp-code" className="block text-sm font-medium login-label mb-1.5">
-                  Código de 6 dígitos
-                </label>
-                <input
-                  id="totp-code"
-                  type="text"
-                  inputMode="numeric"
-                  autoComplete="one-time-code"
-                  value={twoFaCode}
-                  onChange={(e) => setTwoFaCode(e.target.value.replace(/\D/g, "").slice(0, 8))}
-                  required
-                  autoFocus
-                  className="login-input w-full px-4 py-3 text-center tracking-[0.5em] font-mono text-lg"
-                  placeholder="000000"
-                />
-                <p className="text-xs login-hint mt-2">
-                  Aceitamos também códigos de recuperação.
-                </p>
-              </div>
+            <form onSubmit={handle2fa} className="auth-form">
+              <FieldRow
+                label="CÓDIGO"
+                meta="6 DÍGITOS"
+                sigil={<SigilToken />}
+                input={
+                  <input
+                    id="totp-code"
+                    type="text"
+                    inputMode="numeric"
+                    autoComplete="one-time-code"
+                    value={twoFaCode}
+                    onChange={(e) => setTwoFaCode(e.target.value.replace(/\D/g, "").slice(0, 8))}
+                    required
+                    autoFocus
+                    placeholder="······"
+                    className="auth-input auth-input-mono"
+                  />
+                }
+              />
 
               <button
                 type="submit"
                 disabled={submitting || twoFaCode.length < 6}
-                className="login-btn-primary w-full py-3 text-sm font-medium"
+                className="auth-btn auth-btn-primary"
               >
-                {submitting ? (
-                  <span className="inline-flex items-center justify-center gap-2">
-                    <span className="w-4 h-4 border-2 border-white/40 border-t-white rounded-full animate-spin" />
-                    Verificando…
-                  </span>
-                ) : "Verificar código"}
+                <span>{submitting ? "VERIFICANDO" : "VERIFICAR"}</span>
+                <span className="auth-btn-mark" aria-hidden="true">→</span>
               </button>
 
               <button
                 type="button"
                 onClick={() => { setTwoFaToken(""); setTwoFaCode(""); setError(""); }}
-                className="login-btn-link w-full py-2 text-sm"
+                className="auth-btn auth-btn-ghost"
               >
-                ← Voltar para login
+                <span aria-hidden="true">←</span>
+                <span>VOLTAR</span>
               </button>
             </form>
           ) : (
             /* Login Form */
-            <form onSubmit={handleSubmit} className="space-y-5 login-form-anim">
-              <div>
-                <label htmlFor="login-email" className="block text-sm font-medium login-label mb-1.5">Email</label>
-                <div className="login-input-wrap">
-                  <svg className="login-input-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                    <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z" />
-                    <polyline points="22,6 12,13 2,6" />
-                  </svg>
+            <form onSubmit={handleSubmit} className="auth-form">
+              <FieldRow
+                label="EMAIL"
+                meta="01"
+                sigil={<SigilEmail />}
+                input={
                   <input
                     id="login-email"
                     type="email"
@@ -362,114 +335,135 @@ export default function Login() {
                     onChange={(e) => setEmail(e.target.value)}
                     required
                     autoFocus
-                    className="login-input login-input-with-icon w-full px-4 py-3"
-                    placeholder="seu@email.com"
+                    placeholder="seu@dominio.com"
+                    className="auth-input"
                   />
-                </div>
-              </div>
+                }
+              />
 
-              <div>
-                <div className="flex items-center justify-between mb-1.5">
-                  <label htmlFor="login-password" className="block text-sm font-medium login-label">Senha</label>
-                  <Link to="/forgot-password" className="login-link-subtle text-xs">
-                    Esqueceu?
+              <FieldRow
+                label="SENHA"
+                meta="02"
+                sigil={<SigilLock />}
+                trailing={
+                  <Link to="/forgot-password" className="auth-field-link">
+                    esqueci →
                   </Link>
-                </div>
-                <div className="login-input-wrap">
-                  <svg className="login-input-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                    <rect x="3" y="11" width="18" height="11" rx="2" ry="2" />
-                    <path d="M7 11V7a5 5 0 0 1 10 0v4" />
-                  </svg>
+                }
+                input={
                   <input
                     id="login-password"
                     type="password"
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
                     required
-                    className="login-input login-input-with-icon w-full px-4 py-3"
                     placeholder="••••••••"
+                    className="auth-input"
                   />
-                </div>
-              </div>
+                }
+              />
 
               <button
                 type="submit"
                 disabled={submitting}
-                className="login-btn-primary w-full py-3 text-sm font-medium"
+                className="auth-btn auth-btn-primary"
               >
-                {submitting ? (
-                  <span className="inline-flex items-center justify-center gap-2">
-                    <span className="w-4 h-4 border-2 border-white/40 border-t-white rounded-full animate-spin" />
-                    Entrando…
-                  </span>
-                ) : "Entrar"}
+                <span>{submitting ? "ENTRANDO" : "ENTRAR"}</span>
+                <span className="auth-btn-mark" aria-hidden="true">→</span>
               </button>
 
               {passkeySupported && (
                 <>
-                  <div className="login-divider">
-                    <span>ou</span>
+                  <div className="auth-or">
+                    <span className="auth-or-rule" />
+                    <span className="auth-or-text">OU</span>
+                    <span className="auth-or-rule" />
                   </div>
                   <button
                     type="button"
                     onClick={handlePasskeyLogin}
                     disabled={submitting}
-                    className="login-btn-secondary w-full py-3 text-sm font-medium inline-flex items-center justify-center gap-2"
+                    className="auth-btn auth-btn-ghost"
                   >
-                    <svg className="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                      <path d="M2 18v3c0 .6.4 1 1 1h4v-3h3v-3h2l1.4-1.4a6.5 6.5 0 1 0-4-4Z" />
-                      <circle cx="16.5" cy="7.5" r=".5" fill="currentColor" />
-                    </svg>
-                    Usar passkey
+                    <SigilKey />
+                    <span>USAR PASSKEY</span>
                   </button>
                 </>
               )}
+
+              {/* OAuth */}
+              {branding.oauthProviders.length > 0 && (
+                <div className="auth-oauth">
+                  <p className="auth-oauth-label">PROVEDORES EXTERNOS</p>
+                  <div className="auth-oauth-row">
+                    {branding.oauthProviders.includes("google") && (
+                      <a href="/api/auth/oauth/google" className="auth-oauth-btn" aria-label="Entrar com Google">
+                        <svg className="w-3.5 h-3.5" viewBox="0 0 24 24"><path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92a5.06 5.06 0 0 1-2.2 3.32v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.1z" fill="#4285F4"/><path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853"/><path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z" fill="#FBBC05"/><path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" fill="#EA4335"/></svg>
+                        <span>GOOGLE</span>
+                      </a>
+                    )}
+                    {branding.oauthProviders.includes("github") && (
+                      <a href="/api/auth/oauth/github" className="auth-oauth-btn" aria-label="Entrar com GitHub">
+                        <svg className="w-3.5 h-3.5" fill="currentColor" viewBox="0 0 24 24"><path d="M12 2C6.477 2 2 6.484 2 12.017c0 4.425 2.865 8.18 6.839 9.504.5.092.682-.217.682-.483 0-.237-.008-.868-.013-1.703-2.782.605-3.369-1.343-3.369-1.343-.454-1.158-1.11-1.466-1.11-1.466-.908-.62.069-.608.069-.608 1.003.07 1.531 1.032 1.531 1.032.892 1.53 2.341 1.088 2.91.832.092-.647.35-1.088.636-1.338-2.22-.253-4.555-1.113-4.555-4.951 0-1.093.39-1.988 1.029-2.688-.103-.253-.446-1.272.098-2.65 0 0 .84-.27 2.75 1.026A9.564 9.564 0 0 1 12 6.844a9.59 9.59 0 0 1 2.504.337c1.909-1.296 2.747-1.027 2.747-1.027.546 1.379.202 2.398.1 2.651.64.7 1.028 1.595 1.028 2.688 0 3.848-2.339 4.695-4.566 4.943.359.309.678.92.678 1.855 0 1.338-.012 2.419-.012 2.747 0 .268.18.58.688.482A10.02 10.02 0 0 0 22 12.017C22 6.484 17.522 2 12 2z"/></svg>
+                        <span>GITHUB</span>
+                      </a>
+                    )}
+                    {branding.oauthProviders.includes("gitlab") && (
+                      <a href="/api/auth/oauth/gitlab" className="auth-oauth-btn" aria-label="Entrar com GitLab">
+                        <svg className="w-3.5 h-3.5" fill="currentColor" viewBox="0 0 24 24"><path d="m23.6 9.593-.033-.086L20.3.98a.851.851 0 0 0-.336-.384.859.859 0 0 0-.995.053.874.874 0 0 0-.29.387l-2.2 6.723H7.528L5.328 1.036a.857.857 0 0 0-.29-.387.86.86 0 0 0-.994-.053.854.854 0 0 0-.337.384L.44 9.507l-.033.086a6.066 6.066 0 0 0 2.012 7.01l.01.008.028.02 4.984 3.73 2.466 1.866 1.502 1.135a1.012 1.012 0 0 0 1.22 0l1.502-1.135 2.466-1.866 5.012-3.75.013-.01a6.072 6.072 0 0 0 2.008-7.008z"/></svg>
+                        <span>GITLAB</span>
+                      </a>
+                    )}
+                  </div>
+                </div>
+              )}
             </form>
           )}
-
-          {/* OAuth Buttons */}
-          {branding.oauthProviders.length > 0 && !twoFaToken && (
-            <div className="mt-5">
-              <div className="login-divider">
-                <span>ou continue com</span>
-              </div>
-              <div className={`grid gap-2 ${branding.oauthProviders.length > 1 ? 'grid-cols-2' : 'grid-cols-1'}`}>
-                {branding.oauthProviders.includes("google") && (
-                  <a href="/api/auth/oauth/google" className="login-btn-oauth flex items-center justify-center gap-2 py-2.5 text-sm font-medium">
-                    <svg className="w-4 h-4" viewBox="0 0 24 24"><path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92a5.06 5.06 0 0 1-2.2 3.32v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.1z" fill="#4285F4"/><path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853"/><path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z" fill="#FBBC05"/><path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" fill="#EA4335"/></svg>
-                    Google
-                  </a>
-                )}
-                {branding.oauthProviders.includes("github") && (
-                  <a href="/api/auth/oauth/github" className="login-btn-oauth login-btn-oauth-dark flex items-center justify-center gap-2 py-2.5 text-sm font-medium">
-                    <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 24 24"><path d="M12 2C6.477 2 2 6.484 2 12.017c0 4.425 2.865 8.18 6.839 9.504.5.092.682-.217.682-.483 0-.237-.008-.868-.013-1.703-2.782.605-3.369-1.343-3.369-1.343-.454-1.158-1.11-1.466-1.11-1.466-.908-.62.069-.608.069-.608 1.003.07 1.531 1.032 1.531 1.032.892 1.53 2.341 1.088 2.91.832.092-.647.35-1.088.636-1.338-2.22-.253-4.555-1.113-4.555-4.951 0-1.093.39-1.988 1.029-2.688-.103-.253-.446-1.272.098-2.65 0 0 .84-.27 2.75 1.026A9.564 9.564 0 0 1 12 6.844a9.59 9.59 0 0 1 2.504.337c1.909-1.296 2.747-1.027 2.747-1.027.546 1.379.202 2.398.1 2.651.64.7 1.028 1.595 1.028 2.688 0 3.848-2.339 4.695-4.566 4.943.359.309.678.92.678 1.855 0 1.338-.012 2.419-.012 2.747 0 .268.18.58.688.482A10.02 10.02 0 0 0 22 12.017C22 6.484 17.522 2 12 2z"/></svg>
-                    GitHub
-                  </a>
-                )}
-                {branding.oauthProviders.includes("gitlab") && (
-                  <a href="/api/auth/oauth/gitlab" className="login-btn-oauth flex items-center justify-center gap-2 py-2.5 text-sm font-medium" style={{ backgroundColor: "#FC6D26", color: "#ffffff", borderColor: "#FC6D26" }}>
-                    <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 24 24"><path d="m23.6 9.593-.033-.086L20.3.98a.851.851 0 0 0-.336-.384.859.859 0 0 0-.995.053.874.874 0 0 0-.29.387l-2.2 6.723H7.528L5.328 1.036a.857.857 0 0 0-.29-.387.86.86 0 0 0-.994-.053.854.854 0 0 0-.337.384L.44 9.507l-.033.086a6.066 6.066 0 0 0 2.012 7.01l.01.008.028.02 4.984 3.73 2.466 1.866 1.502 1.135a1.012 1.012 0 0 0 1.22 0l1.502-1.135 2.466-1.866 5.012-3.75.013-.01a6.072 6.072 0 0 0 2.008-7.008z"/></svg>
-                    GitLab
-                  </a>
-                )}
-              </div>
-            </div>
-          )}
-
-          {/* Sign-up + footer */}
-          <p className="text-center text-sm login-footer-text mt-7">
-            Não tem uma conta?{" "}
-            <Link to="/register" className="login-link-strong">
-              Cadastre-se
-            </Link>
-          </p>
-
-          {/* Mobile-only mini footer */}
-          <p className="lg:hidden text-center text-[10px] login-footer-meta mt-8 tracking-wider uppercase">
-            Powered by Rust
-          </p>
         </div>
       </section>
+
+      {/* Footer */}
+      <footer className="auth-footer">
+        <div className="auth-footer-meta">
+          <span>{brandName.toUpperCase()}</span>
+          <span className="auth-footer-dot">·</span>
+          <span>v2.7</span>
+          <span className="auth-footer-dot">·</span>
+          <span>RUST</span>
+        </div>
+        <Link to="/register" className="auth-footer-link">
+          <span aria-hidden="true">+</span> CADASTRAR CONTA
+        </Link>
+      </footer>
     </main>
+  );
+}
+
+/* ─── Shared field row ─── */
+
+function FieldRow({
+  label,
+  meta,
+  sigil,
+  input,
+  trailing,
+}: {
+  label: string;
+  meta?: string;
+  sigil: React.ReactNode;
+  input: React.ReactNode;
+  trailing?: React.ReactNode;
+}) {
+  return (
+    <div className="auth-field">
+      <div className="auth-field-head">
+        <span className="auth-field-label">{label}</span>
+        {trailing ? trailing : meta ? <span className="auth-field-meta">{meta}</span> : null}
+      </div>
+      <div className="auth-field-body">
+        <span className="auth-field-sigil" aria-hidden="true">{sigil}</span>
+        {input}
+      </div>
+    </div>
   );
 }
