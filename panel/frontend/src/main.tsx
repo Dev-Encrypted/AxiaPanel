@@ -12,7 +12,12 @@ import "./index.css";
 
 // Theme initialization — runs before first paint, migrates old values
 (() => {
-  const stored = localStorage.getItem("dp-theme");
+  let stored = localStorage.getItem("dp-theme");
+  // One-shot migration: AxiaPanel defaults to light. Old installs had midnight as default.
+  if (localStorage.getItem("dp-theme-migrated-axia") !== "1") {
+    stored = "arctic";
+    localStorage.setItem("dp-theme-migrated-axia", "1");
+  }
   let theme = stored || "arctic";
   if (theme === "dark") theme = "midnight";
   if (theme === "light") theme = "arctic";
