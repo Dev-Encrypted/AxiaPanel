@@ -17,7 +17,7 @@ app.get('/api/health', (_req, res) => {
   res.json({ status: 'ok', timestamp: new Date().toISOString() });
 });
 
-// Pricing — DockPanel is free and open source
+// Pricing — AxiaPanel is free and open source
 app.get('/api/pricing', (_req, res) => {
   res.json({
     plan: 'free',
@@ -27,5 +27,5 @@ app.get('/api/pricing', (_req, res) => {
 });
 
 app.listen(PORT, '0.0.0.0', () => {
-  console.log(`DockPanel API running on port ${PORT}`);
+  console.log(`AxiaPanel API running on port ${PORT}`);
 });

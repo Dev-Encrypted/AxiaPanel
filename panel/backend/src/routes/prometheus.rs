@@ -4,7 +4,7 @@
 // generated once; Prometheus is configured with bearer-token auth:
 //
 //   scrape_configs:
-//     - job_name: 'dockpanel'
+//     - job_name: 'axiapanel'
 //       metrics_path: /api/metrics
 //       bearer_token: dpms_...
 //       static_configs:
@@ -186,7 +186,7 @@ pub async fn update_settings(
 // ── Helpers ─────────────────────────────────────────────────────────────
 
 fn generate_token() -> String {
-    // 256 bits of entropy via two UUIDs. "dpms_" = DockPanel Metrics Scrape.
+    // 256 bits of entropy via two UUIDs. "dpms_" = AxiaPanel Metrics Scrape.
     format!(
         "dpms_{}{}",
         Uuid::new_v4().simple(),

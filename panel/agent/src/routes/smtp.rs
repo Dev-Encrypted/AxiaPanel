@@ -40,7 +40,7 @@ async fn configure(
         return Err(err(StatusCode::BAD_REQUEST, "Host is required"));
     }
 
-    let from_name = body.from_name.as_deref().unwrap_or("DockPanel");
+    let from_name = body.from_name.as_deref().unwrap_or("AxiaPanel");
     let encryption = body.encryption.as_deref().unwrap_or("starttls");
 
     smtp::configure(
@@ -65,7 +65,7 @@ async fn test_email(
         return Err(err(StatusCode::BAD_REQUEST, "Valid email address required"));
     }
 
-    let from_name = body.from_name.as_deref().unwrap_or("DockPanel");
+    let from_name = body.from_name.as_deref().unwrap_or("AxiaPanel");
 
     let message = smtp::send_test(&body.to, &body.from, from_name)
         .await

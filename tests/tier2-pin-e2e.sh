@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# DockPanel Tier 2 Cert Pin E2E Test Suite
+# AxiaPanel Tier 2 Cert Pin E2E Test Suite
 #
 # Exercises the full Phase 3 #3 Tier 2 flow end-to-end:
 #   - Trust-On-First-Use (TOFU) fingerprint capture via /api/agent/checkin
@@ -16,17 +16,17 @@
 #     CryptoProvider is not installed, the API process panics at ClientConfig
 #     build time instead of handling the request)
 #
-# Auth strategy: if DOCKPANEL_TEST_PASSWORD is set, logs in via the panel's
+# Auth strategy: if AXIAPANEL_TEST_PASSWORD is set, logs in via the panel's
 # /api/auth/login endpoint; otherwise mints a short-lived admin JWT locally
-# from the JWT_SECRET in /etc/dockpanel/api.env. The CSRF-gate sub-test
+# from the JWT_SECRET in /etc/axiapanel/api.env. The CSRF-gate sub-test
 # works in either mode because the minted token is equally valid as a
 # cookie. Inserts a synthetic "online" server row so the local server is
 # never disturbed, and always cleans up via an EXIT trap.
 set -uo pipefail
 
-API="${DOCKPANEL_API_URL:-http://127.0.0.1:3080}"
-ADMIN_EMAIL="${DOCKPANEL_TEST_EMAIL:-admin@dockpanel.dev}"
-ADMIN_PASSWORD="${DOCKPANEL_TEST_PASSWORD:-}"
+API="${AXIAPANEL_API_URL:-http://127.0.0.1:3080}"
+ADMIN_EMAIL="${AXIAPANEL_TEST_EMAIL:-admin@axiapanel.dev}"
+ADMIN_PASSWORD="${AXIAPANEL_TEST_PASSWORD:-}"
 
 PASS=0 FAIL=0 SKIP=0 TOTAL=0
 
@@ -38,11 +38,11 @@ sect()  { echo; echo "── $1 ──"; }
 psql_exec() {
     # -q suppresses psql's command tags (e.g. "INSERT 0 1") so INSERT ... RETURNING
     # returns ONLY the returned row.
-    docker exec dockpanel-postgres psql -U dockpanel -d dockpanel -qtAc "$1" 2>/dev/null
+    docker exec axiapanel-postgres psql -U axiapanel -d axiapanel -qtAc "$1" 2>/dev/null
 }
 
 echo "═══════════════════════════════════════════════"
-echo "  DockPanel Tier 2 Cert Pin E2E Test Suite"
+echo "  AxiaPanel Tier 2 Cert Pin E2E Test Suite"
 echo "═══════════════════════════════════════════════"
 
 # ── Resolve admin user ────────────────────────────────────────────────────
@@ -54,8 +54,8 @@ fi
 
 # ── Obtain admin JWT ──────────────────────────────────────────────────────
 # Strategy:
-#   1. If DOCKPANEL_TEST_PASSWORD is set, log in via /api/auth/login → cookie.
-#   2. Otherwise, if /etc/dockpanel/api.env is readable, mint a short-lived
+#   1. If AXIAPANEL_TEST_PASSWORD is set, log in via /api/auth/login → cookie.
+#   2. Otherwise, if /etc/axiapanel/api.env is readable, mint a short-lived
 #      admin JWT locally using the panel's JWT_SECRET. This lets the test
 #      run as part of dev smoke-checks without hard-coding a password.
 # The token is used as a Bearer header (CSRF-exempt). The CSRF-gate test
@@ -68,8 +68,8 @@ if [ -n "$ADMIN_PASSWORD" ]; then
         | grep -oP 'token=\K[^;]+')
     BEARER_TOKEN="$COOKIE_TOKEN"
 fi
-if [ -z "$BEARER_TOKEN" ] && [ -r /etc/dockpanel/api.env ]; then
-    JWT_SECRET=$(grep -E '^JWT_SECRET=' /etc/dockpanel/api.env | cut -d= -f2-)
+if [ -z "$BEARER_TOKEN" ] && [ -r /etc/axiapanel/api.env ]; then
+    JWT_SECRET=$(grep -E '^JWT_SECRET=' /etc/axiapanel/api.env | cut -d= -f2-)
     if [ -n "$JWT_SECRET" ]; then
         # Pass secret + UID + email via env so no interpolation into the
         # Python source (safe against any odd characters in the secret).
@@ -88,7 +88,7 @@ PYEOF
 fi
 if [ -z "$BEARER_TOKEN" ]; then
     echo "FATAL: Could not obtain an admin token."
-    echo "       Set DOCKPANEL_TEST_PASSWORD=<password> or run with read access to /etc/dockpanel/api.env."
+    echo "       Set AXIAPANEL_TEST_PASSWORD=<password> or run with read access to /etc/axiapanel/api.env."
     exit 1
 fi
 BEARER="Authorization: Bearer $BEARER_TOKEN"

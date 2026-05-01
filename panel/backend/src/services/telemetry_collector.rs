@@ -5,7 +5,7 @@
 //! 2. Stores error/warning events in the telemetry_events table
 //! 3. Sends unsent events to the configured remote endpoint (opt-in)
 //! 4. Cleans up old events based on retention settings
-//! 5. Checks GitHub Releases for DockPanel updates
+//! 5. Checks GitHub Releases for AxiaPanel updates
 
 use crate::services::agent::AgentClient;
 use sqlx::PgPool;
@@ -16,7 +16,7 @@ const UPDATE_CHECK_INTERVAL: Duration = Duration::from_secs(21600); // 6 hours
 const RETENTION_DAYS: i64 = 30;
 const MAX_BATCH_SIZE: i64 = 50;
 const GITHUB_RELEASES_URL: &str =
-    "https://api.github.com/repos/ovexro/dockpanel/releases/latest";
+    "https://api.github.com/repos/ovexro/axiapanel/releases/latest";
 
 /// Record a telemetry event (callable from anywhere in the backend).
 pub async fn record_event(
@@ -189,7 +189,7 @@ async fn send_pending_events(pool: &PgPool, endpoint: &str) {
 
     // Get system info snapshot
     let system_info = serde_json::json!({
-        "dockpanel_version": env!("CARGO_PKG_VERSION"),
+        "axiapanel_version": env!("CARGO_PKG_VERSION"),
         "installation_id": installation_id,
     });
 
@@ -221,7 +221,7 @@ async fn send_pending_events(pool: &PgPool, endpoint: &str) {
         client
             .post(endpoint)
             .header("Content-Type", "application/json")
-            .header("User-Agent", format!("DockPanel/{}", env!("CARGO_PKG_VERSION")))
+            .header("User-Agent", format!("AxiaPanel/{}", env!("CARGO_PKG_VERSION")))
             .json(&payload)
             .send(),
     )
@@ -305,7 +305,7 @@ async fn check_for_updates(pool: &PgPool) {
         Duration::from_secs(15),
         client
             .get(GITHUB_RELEASES_URL)
-            .header("User-Agent", format!("DockPanel/{}", env!("CARGO_PKG_VERSION")))
+            .header("User-Agent", format!("AxiaPanel/{}", env!("CARGO_PKG_VERSION")))
             .header("Accept", "application/vnd.github+json")
             .send(),
     )
@@ -401,7 +401,7 @@ async fn check_for_updates(pool: &PgPool) {
     .await;
 
     tracing::info!(
-        "DockPanel update available: v{current_version} -> v{latest_version}"
+        "AxiaPanel update available: v{current_version} -> v{latest_version}"
     );
 }
 

@@ -18,9 +18,9 @@ pub struct PhoneHomeConfig {
 impl PhoneHomeConfig {
     /// Read from environment variables. Returns None if not configured.
     pub fn from_env() -> Option<Self> {
-        let url = std::env::var("DOCKPANEL_CENTRAL_URL").ok()?;
-        let token = std::env::var("DOCKPANEL_SERVER_TOKEN").ok()?;
-        let id = std::env::var("DOCKPANEL_SERVER_ID").ok()?;
+        let url = std::env::var("AXIAPANEL_CENTRAL_URL").ok()?;
+        let token = std::env::var("AXIAPANEL_SERVER_TOKEN").ok()?;
+        let id = std::env::var("AXIAPANEL_SERVER_ID").ok()?;
 
         if url.is_empty() || token.is_empty() || id.is_empty() {
             return None;
@@ -297,7 +297,7 @@ async fn auto_update_loop(config: PhoneHomeConfig) {
                 tracing::info!("Agent updated, restarting via systemd...");
                 // Restart self via systemd
                 let _ = safe_command("systemctl")
-                    .args(["restart", "dockpanel-agent"])
+                    .args(["restart", "axiapanel-agent"])
                     .status()
                     .await;
                 // If systemctl not available, exit and let the service manager restart us
@@ -344,7 +344,7 @@ async fn check_and_update(
 
     // Download new binary to temp file with random suffix to prevent symlink attacks
     let random_suffix: u64 = rand::random();
-    let tmp_path_owned = format!("/tmp/dockpanel-agent-new-{:016x}", random_suffix);
+    let tmp_path_owned = format!("/tmp/axiapanel-agent-new-{:016x}", random_suffix);
     let tmp_path = tmp_path_owned.as_str();
     let resp = client
         .get(download_url)

@@ -175,7 +175,7 @@ pub async fn callback(
     // Fetch user info
     let userinfo_resp = http.get(provider.userinfo_url)
         .header("Authorization", format!("Bearer {access_token}"))
-        .header("User-Agent", "DockPanel")
+        .header("User-Agent", "AxiaPanel")
         .send()
         .await
         .map_err(|e| err(StatusCode::BAD_GATEWAY, &format!("Falha ao buscar userinfo: {e}")))?;
@@ -195,7 +195,7 @@ pub async fn callback(
                 // Fetch from /user/emails endpoint
                 let emails_resp = http.get("https://api.github.com/user/emails")
                     .header("Authorization", format!("Bearer {access_token}"))
-                    .header("User-Agent", "DockPanel")
+                    .header("User-Agent", "AxiaPanel")
                     .send().await.ok();
                 if let Some(resp) = emails_resp {
                     let emails: Vec<serde_json::Value> = resp.json().await.unwrap_or_default();

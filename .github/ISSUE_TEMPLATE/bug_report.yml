@@ -30,8 +30,8 @@ body:
   - type: input
     id: version
     attributes:
-      label: DockPanel version
-      description: "Run: dockpanel --version"
+      label: AxiaPanel version
+      description: "Run: axiapanel --version"
       placeholder: "v2.0.2"
     validations:
       required: true
@@ -53,5 +53,5 @@ body:
     id: logs
     attributes:
       label: Relevant logs
-      description: "Run: journalctl -u dockpanel-api -n 50 --no-pager"
+      description: "Run: journalctl -u axiapanel-api -n 50 --no-pager"
       render: shell

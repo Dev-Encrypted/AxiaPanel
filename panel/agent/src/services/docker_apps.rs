@@ -1828,7 +1828,7 @@ static TEMPLATES: &[AppTemplateDef] = &[
         default_port: 9042,
         container_port: "9042/tcp",
         env_vars: &[
-            EnvVarDef { name: "CASSANDRA_CLUSTER_NAME", label: "Cluster Name", default: "DockPanelCluster", required: false, secret: false },
+            EnvVarDef { name: "CASSANDRA_CLUSTER_NAME", label: "Cluster Name", default: "AxiaPanelCluster", required: false, secret: false },
         ],
         volumes: &["/var/lib/cassandra"],
     },
@@ -2204,7 +2204,7 @@ static TEMPLATES: &[AppTemplateDef] = &[
         container_port: "41641/udp",
         env_vars: &[
             EnvVarDef { name: "TS_AUTHKEY", label: "Auth Key", default: "", required: true, secret: true },
-            EnvVarDef { name: "TS_HOSTNAME", label: "Hostname", default: "dockpanel", required: false, secret: false },
+            EnvVarDef { name: "TS_HOSTNAME", label: "Hostname", default: "axiapanel", required: false, secret: false },
         ],
         volumes: &["/var/lib/tailscale"],
     },
@@ -2421,7 +2421,7 @@ pub async fn deploy_app(
         return Err(format!("Image pull timed out for {}", template.image));
     }
 
-    let container_name = format!("dockpanel-app-{name}");
+    let container_name = format!("axiapanel-app-{name}");
 
     // Build environment variables: merge template defaults with user-supplied values
     let mut env_list: Vec<String> = Vec::new();
@@ -2454,14 +2454,14 @@ pub async fn deploy_app(
     // Volume binds — create dirs and canonicalize to prevent symlink TOCTOU
     let mut binds: Vec<String> = Vec::new();
     for vol in template.volumes {
-        let host_dir = format!("/var/lib/dockpanel/apps/{name}{vol}");
+        let host_dir = format!("/var/lib/axiapanel/apps/{name}{vol}");
         // Create directory before canonicalize (it must exist)
         std::fs::create_dir_all(&host_dir).ok();
         // Canonicalize to resolve any symlinks, then verify it's still under the allowed prefix
         let resolved = std::fs::canonicalize(&host_dir)
             .map_err(|e| format!("Volume path {host_dir} inaccessible: {e}"))?;
         let resolved_str = resolved.to_string_lossy();
-        if !resolved_str.starts_with("/var/lib/dockpanel/apps/") {
+        if !resolved_str.starts_with("/var/lib/axiapanel/apps/") {
             return Err(format!("Volume path {host_dir} escapes allowed prefix after canonicalization"));
         }
         binds.push(format!("{resolved_str}:{vol}"));
@@ -2470,7 +2470,7 @@ pub async fn deploy_app(
     // NOTE: Portainer Docker socket auto-mount was removed for security.
     // Mounting the host Docker socket gives full host escape capabilities.
     // If Portainer needs Docker access, the admin should configure it separately
-    // via docker-compose or manual volume mounts outside of DockPanel.
+    // via docker-compose or manual volume mounts outside of AxiaPanel.
 
     let mut host_config = bollard::service::HostConfig {
         port_bindings: Some(port_bindings),
@@ -2556,18 +2556,18 @@ pub async fn deploy_app(
         host_config: Some(host_config),
         labels: Some({
             let mut labels = HashMap::from([
-                ("dockpanel.managed".to_string(), "true".to_string()),
+                ("axiapanel.managed".to_string(), "true".to_string()),
                 (
-                    "dockpanel.app.template".to_string(),
+                    "axiapanel.app.template".to_string(),
                     template.id.to_string(),
                 ),
-                ("dockpanel.app.name".to_string(), name.to_string()),
+                ("axiapanel.app.name".to_string(), name.to_string()),
             ]);
             if let Some(domain) = domain {
-                labels.insert("dockpanel.app.domain".to_string(), domain.to_string());
+                labels.insert("axiapanel.app.domain".to_string(), domain.to_string());
             }
             if let Some(uid) = user_id {
-                labels.insert("dockpanel.user.id".to_string(), uid.to_string());
+                labels.insert("axiapanel.user.id".to_string(), uid.to_string());
             }
             labels
         }),
@@ -2614,13 +2614,13 @@ pub async fn deploy_app(
     })
 }
 
-/// List all deployed apps (containers with dockpanel.app.template label).
+/// List all deployed apps (containers with axiapanel.app.template label).
 pub async fn list_deployed_apps() -> Result<Vec<DeployedApp>, String> {
     let docker =
         Docker::connect_with_local_defaults().map_err(|e| format!("Docker connect failed: {e}"))?;
 
     let mut filters = HashMap::new();
-    filters.insert("label", vec!["dockpanel.managed=true"]);
+    filters.insert("label", vec!["axiapanel.managed=true"]);
 
     let containers = docker
         .list_containers(Some(ListContainersOptions {
@@ -2636,7 +2636,7 @@ pub async fn list_deployed_apps() -> Result<Vec<DeployedApp>, String> {
         .filter_map(|c| {
             let labels = c.labels.as_ref()?;
             // Only include containers that have the app template label
-            let template = labels.get("dockpanel.app.template")?;
+            let template = labels.get("axiapanel.app.template")?;
             let id = c.id.as_ref()?;
 
             let port = c
@@ -2658,7 +2658,7 @@ pub async fn list_deployed_apps() -> Result<Vec<DeployedApp>, String> {
                 .map(|n| n.trim_start_matches('/').to_string())
                 .unwrap_or_default();
 
-            let domain = labels.get("dockpanel.app.domain").cloned();
+            let domain = labels.get("axiapanel.app.domain").cloned();
             let image = c.image.clone();
 
             // Extract volume mounts
@@ -2690,8 +2690,8 @@ pub async fn list_deployed_apps() -> Result<Vec<DeployedApp>, String> {
                 }
             });
 
-            let stack_id = labels.get("dockpanel.stack_id").cloned();
-            let user_id = labels.get("dockpanel.user.id").cloned();
+            let stack_id = labels.get("axiapanel.stack_id").cloned();
+            let user_id = labels.get("axiapanel.user.id").cloned();
 
             Some(DeployedApp {
                 container_id: id.clone(),
@@ -3126,7 +3126,7 @@ pub async fn update_app(container_id: &str) -> Result<UpdateResult, String> {
     let domain = config
         .labels
         .as_ref()
-        .and_then(|l| l.get("dockpanel.app.domain"))
+        .and_then(|l| l.get("axiapanel.app.domain"))
         .cloned();
     let old_port = extract_host_port(&host_config);
 
@@ -3256,14 +3256,14 @@ pub async fn get_app_env(container_id: &str) -> Result<Vec<(String, String)>, St
 pub async fn get_app_domain(container_id: &str) -> Option<String> {
     let docker = Docker::connect_with_local_defaults().ok()?;
     let info = docker.inspect_container(container_id, None).await.ok()?;
-    info.config?.labels?.get("dockpanel.app.domain").cloned()
+    info.config?.labels?.get("axiapanel.app.domain").cloned()
 }
 
 /// Get the app name label from a container, if set.
 pub async fn get_app_name(container_id: &str) -> Option<String> {
     let docker = Docker::connect_with_local_defaults().ok()?;
     let info = docker.inspect_container(container_id, None).await.ok()?;
-    info.config?.labels?.get("dockpanel.app.name").cloned()
+    info.config?.labels?.get("axiapanel.app.name").cloned()
 }
 
 /// Update a container's environment variables by recreating it with the new env.

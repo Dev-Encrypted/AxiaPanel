@@ -139,7 +139,7 @@ async fn check_nginx() -> Vec<DiagnosticFinding> {
         while let Ok(Some(entry)) = entries.next_entry().await {
             let path = entry.path();
             let filename = path.file_name().and_then(|n| n.to_str()).unwrap_or("").to_string();
-            if filename == "default" || filename == "dockpanel-panel.conf" || filename == "dockpanel.dev.conf" {
+            if filename == "default" || filename == "axiapanel-panel.conf" || filename == "axiapanel.dev.conf" {
                 continue;
             }
 
@@ -412,7 +412,7 @@ async fn check_services() -> Vec<DiagnosticFinding> {
 
 async fn check_ssl_expiry() -> Vec<DiagnosticFinding> {
     let mut findings = Vec::new();
-    let ssl_dir = "/etc/dockpanel/ssl";
+    let ssl_dir = "/etc/axiapanel/ssl";
 
     let mut entries = match tokio::fs::read_dir(ssl_dir).await {
         Ok(e) => e,
@@ -741,8 +741,8 @@ pub async fn apply_fix(fix_id: &str) -> Result<String, String> {
                 return Err("No path specified".into());
             }
             // Validate path starts with expected prefix
-            if !target.starts_with("/var/www/") && !target.starts_with("/etc/dockpanel/sites/") {
-                return Err("Path must be under /var/www/ or /etc/dockpanel/sites/".into());
+            if !target.starts_with("/var/www/") && !target.starts_with("/etc/axiapanel/sites/") {
+                return Err("Path must be under /var/www/ or /etc/axiapanel/sites/".into());
             }
             tokio::fs::create_dir_all(target)
                 .await

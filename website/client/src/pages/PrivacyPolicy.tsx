@@ -29,14 +29,14 @@ export default function PrivacyPolicy() {
           <section>
             <h2 className="text-lg font-semibold text-white">Overview</h2>
             <p className="mt-2">
-              DockPanel is a free, open-source, self-hosted server management panel. We are committed to
+              AxiaPanel is a free, open-source, self-hosted server management panel. We are committed to
               transparency about data practices. The short version: we collect almost nothing, and your
               server data never leaves your infrastructure.
             </p>
           </section>
 
           <section>
-            <h2 className="text-lg font-semibold text-white">Marketing Website (dockpanel.dev)</h2>
+            <h2 className="text-lg font-semibold text-white">Marketing Website (axiapanel.dev)</h2>
             <p className="mt-2">
               This marketing website does not use cookies, analytics, tracking pixels, or any third-party
               scripts. We do not collect personal information from visitors. No data is stored about your
@@ -45,9 +45,9 @@ export default function PrivacyPolicy() {
           </section>
 
           <section>
-            <h2 className="text-lg font-semibold text-white">DockPanel Software (Self-Hosted)</h2>
+            <h2 className="text-lg font-semibold text-white">AxiaPanel Software (Self-Hosted)</h2>
             <p className="mt-2">
-              When you install DockPanel on your own server, all data stays on your server. DockPanel does
+              When you install AxiaPanel on your own server, all data stays on your server. AxiaPanel does
               not phone home, send telemetry, or transmit any information to us or third parties. Your
               server configuration, site data, database credentials, and backups remain entirely under your
               control.
@@ -57,7 +57,7 @@ export default function PrivacyPolicy() {
           <section>
             <h2 className="text-lg font-semibold text-white">Cookies</h2>
             <p className="mt-2">
-              This website does not use cookies. The self-hosted DockPanel application uses a session cookie
+              This website does not use cookies. The self-hosted AxiaPanel application uses a session cookie
               solely for authentication purposes on your own server — this cookie is never shared with any
               external service.
             </p>
@@ -83,7 +83,7 @@ export default function PrivacyPolicy() {
           <section>
             <h2 className="text-lg font-semibold text-white">GitHub</h2>
             <p className="mt-2">
-              DockPanel's source code is hosted on GitHub. If you open issues, submit pull requests, or
+              AxiaPanel's source code is hosted on GitHub. If you open issues, submit pull requests, or
               interact with the repository, GitHub's privacy policy applies to those interactions.
             </p>
           </section>
@@ -93,7 +93,7 @@ export default function PrivacyPolicy() {
             <p className="mt-2">
               If you have questions about this privacy policy, you can open an issue on our{' '}
               <a
-                href="https://github.com/ovexro/dockpanel"
+                href="https://github.com/ovexro/axiapanel"
                 className="text-emerald-400 underline underline-offset-2 transition hover:text-emerald-300"
                 target="_blank"
                 rel="noopener noreferrer"

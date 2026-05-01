@@ -1,6 +1,6 @@
 # ACME Profiles & Renewal
 
-DockPanel issues and renews certificates via the ACME protocol
+AxiaPanel issues and renews certificates via the ACME protocol
 ([RFC 8555](https://datatracker.ietf.org/doc/rfc8555/)) with two 2026-ready
 extensions enabled by default:
 
@@ -11,7 +11,7 @@ extensions enabled by default:
   ([RFC 9773](https://datatracker.ietf.org/doc/rfc9773/)) — CA tells the
   client *when* to renew instead of the client guessing.
 
-Together they prepare DockPanel for Let's Encrypt's staged move to
+Together they prepare AxiaPanel for Let's Encrypt's staged move to
 shorter-lived certificates:
 
 | Date | Change |
@@ -32,7 +32,7 @@ its server directory, with the descriptions the CA publishes.
 
 Recommendations:
 
-- **`classic`** (DockPanel default) — 90-day certs today, 64-day in Feb
+- **`classic`** (AxiaPanel default) — 90-day certs today, 64-day in Feb
   2027, 45-day in Feb 2028. Widest compatibility. Pick this if you're
   unsure.
 - **`tlsserver`** — same as classic today; becomes **45-day on
@@ -60,7 +60,7 @@ The auto-healer runs every 120 seconds and does two things:
    and serial are attached as the ARI `replaces` hint so the CA can
    correlate the renewal with the original issuance.
 
-When the CA doesn't advertise ARI (or the fetch fails), DockPanel falls
+When the CA doesn't advertise ARI (or the fetch fails), AxiaPanel falls
 back to a profile-aware threshold:
 
 | Profile | Fallback: renew when `days_remaining` ≤ |
@@ -92,7 +92,7 @@ POST /api/ssl/{id}/renew            # force-renew (preserves site's profile)
 ## What's not done yet
 
 - **DNS-PERSIST-01** — Let's Encrypt targets a Q2 2026 production
-  rollout. DockPanel will land support after the LE production date is
+  rollout. AxiaPanel will land support after the LE production date is
   announced and the upstream `instant-acme` crate exposes a stable API.
   The current Cloudflare DNS-01 flow continues to work as before.
 - **Grafana dashboard JSON** for the cert-renewal metrics — planned with

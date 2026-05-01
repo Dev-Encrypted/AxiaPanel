@@ -49,9 +49,9 @@ cd panel/agent && cargo build --release 2>&1 | tail -1 && cd ../..
 cd panel/backend && cargo build --release 2>&1 | tail -1 && cd ../..
 cd panel/cli && cargo build --release 2>&1 | tail -1 && cd ../..
 
-cp panel/agent/target/release/dockpanel-agent "$DIST/dockpanel-agent-linux-amd64"
-cp panel/backend/target/release/dockpanel-api "$DIST/dockpanel-api-linux-amd64"
-cp panel/cli/target/release/dockpanel "$DIST/dockpanel-cli-linux-amd64"
+cp panel/agent/target/release/axiapanel-agent "$DIST/axiapanel-agent-linux-amd64"
+cp panel/backend/target/release/axiapanel-api "$DIST/axiapanel-api-linux-amd64"
+cp panel/cli/target/release/axiapanel "$DIST/axiapanel-cli-linux-amd64"
 
 # ─── Build ARM64 (cross-compile) ───
 echo -e "${YELLOW}Building aarch64...${NC}"
@@ -61,14 +61,14 @@ cd panel/agent && cargo build --release --target aarch64-unknown-linux-gnu 2>&1 
 cd panel/backend && cargo build --release --target aarch64-unknown-linux-gnu 2>&1 | tail -1 && cd ../..
 cd panel/cli && cargo build --release --target aarch64-unknown-linux-gnu 2>&1 | tail -1 && cd ../..
 
-cp panel/agent/target/aarch64-unknown-linux-gnu/release/dockpanel-agent "$DIST/dockpanel-agent-linux-arm64"
-cp panel/backend/target/aarch64-unknown-linux-gnu/release/dockpanel-api "$DIST/dockpanel-api-linux-arm64"
-cp panel/cli/target/aarch64-unknown-linux-gnu/release/dockpanel "$DIST/dockpanel-cli-linux-arm64"
+cp panel/agent/target/aarch64-unknown-linux-gnu/release/axiapanel-agent "$DIST/axiapanel-agent-linux-arm64"
+cp panel/backend/target/aarch64-unknown-linux-gnu/release/axiapanel-api "$DIST/axiapanel-api-linux-arm64"
+cp panel/cli/target/aarch64-unknown-linux-gnu/release/axiapanel "$DIST/axiapanel-cli-linux-arm64"
 
 # ─── Build frontend ───
 echo -e "${YELLOW}Building frontend...${NC}"
 cd panel/frontend && npm run build 2>&1 | tail -1 && cd ../..
-tar czf "$DIST/dockpanel-frontend.tar.gz" -C panel/frontend dist/
+tar czf "$DIST/axiapanel-frontend.tar.gz" -C panel/frontend dist/
 
 # ─── Generate SBOMs (SPDX JSON) ───
 echo -e "${YELLOW}Generating SBOMs...${NC}"
@@ -76,9 +76,9 @@ if ! command -v cargo-sbom >/dev/null 2>&1; then
   echo "  Installing cargo-sbom..."
   cargo install cargo-sbom --locked --version ^0.10 >/dev/null
 fi
-cargo sbom --project-directory panel/agent   --output-format spdx_json_2_3 > "$DIST/dockpanel-agent.spdx.json"
-cargo sbom --project-directory panel/backend --output-format spdx_json_2_3 > "$DIST/dockpanel-api.spdx.json"
-cargo sbom --project-directory panel/cli     --output-format spdx_json_2_3 > "$DIST/dockpanel-cli.spdx.json"
+cargo sbom --project-directory panel/agent   --output-format spdx_json_2_3 > "$DIST/axiapanel-agent.spdx.json"
+cargo sbom --project-directory panel/backend --output-format spdx_json_2_3 > "$DIST/axiapanel-api.spdx.json"
+cargo sbom --project-directory panel/cli     --output-format spdx_json_2_3 > "$DIST/axiapanel-cli.spdx.json"
 
 # ─── Generate checksums ───
 echo -e "${YELLOW}Generating checksums...${NC}"

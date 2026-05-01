@@ -487,7 +487,7 @@ export default function Settings() {
                 value={panelName}
                 onChange={(e) => setPanelName(e.target.value)}
                 className="w-full px-3 py-2 border border-dark-500 rounded-lg text-sm focus:ring-2 focus:ring-accent-500 focus:border-accent-500"
-                placeholder="DockPanel"
+                placeholder="AxiaPanel"
               />
             </div>
             <div className="flex justify-end">
@@ -733,7 +733,7 @@ export default function Settings() {
                 const data = await api.get<ExportConfig>("/settings/export");
                 const blob = new Blob([JSON.stringify(data, null, 2)], { type: "application/json" });
                 const url = URL.createObjectURL(blob);
-                const a = document.createElement("a"); a.href = url; a.download = "dockpanel-config.json"; a.click();
+                const a = document.createElement("a"); a.href = url; a.download = "axiapanel-config.json"; a.click();
                 URL.revokeObjectURL(url);
               } catch (err) { setMessage({ text: err instanceof Error ? err.message : "Falha ao exportar", type: "error" }); }
             }} className="px-4 py-2 bg-dark-700 text-dark-100 rounded-lg text-sm font-medium hover:bg-dark-600">Exportar Config</button>
@@ -1097,7 +1097,7 @@ export default function Settings() {
                   value={smtpFromName}
                   onChange={(e) => setSmtpFromName(e.target.value)}
                   className="w-full px-3 py-2 border border-dark-500 rounded-lg text-sm focus:ring-2 focus:ring-accent-500 focus:border-accent-500 outline-none"
-                  placeholder="DockPanel"
+                  placeholder="AxiaPanel"
                 />
               </div>
             </div>
@@ -2103,7 +2103,7 @@ export default function Settings() {
             <div>
               <label className="block text-sm font-medium text-dark-100 mb-1">Texto de Rodapé do Email</label>
               <input type="text" value={settings.email_footer || ""} onChange={e => setSettings({ ...settings, email_footer: e.target.value })}
-                placeholder="Enviado por DockPanel" className="w-full px-3 py-2 border border-dark-500 rounded-lg text-sm focus:ring-2 focus:ring-accent-500 outline-none" />
+                placeholder="Enviado por AxiaPanel" className="w-full px-3 py-2 border border-dark-500 rounded-lg text-sm focus:ring-2 focus:ring-accent-500 outline-none" />
               <p className="text-xs text-dark-300 mt-1">Texto personalizado adicionado ao final dos emails de notificação</p>
             </div>
             <div>
@@ -3011,7 +3011,7 @@ function PrometheusSettings({ setMessage }: { setMessage: (m: { text: string; ty
 
   const scrapeUrl = `${window.location.origin}/api/metrics`;
   const scrapeConfig = `scrape_configs:
-  - job_name: 'dockpanel'
+  - job_name: 'axiapanel'
     metrics_path: /api/metrics
     scheme: ${window.location.protocol.replace(":", "")}
     bearer_token: ${newToken ?? "<your-scrape-token>"}
@@ -3199,7 +3199,7 @@ function AcmeSettings({ setMessage }: { setMessage: (m: { text: string; type: st
           <h3 className="text-xs font-medium text-dark-300 uppercase font-mono tracking-widest">Profile ACME</h3>
         </div>
         <div className="p-5 text-sm text-dark-300">
-          A CA configurada não anuncia a extensão de profiles ACME — o DockPanel vai solicitar o profile padrão da CA.
+          A CA configurada não anuncia a extensão de profiles ACME — o AxiaPanel vai solicitar o profile padrão da CA.
         </div>
       </div>
     );

@@ -2,15 +2,15 @@ services:
   db:
     image: postgres:16-alpine
     environment:
-      POSTGRES_DB: dockpanel_panel
-      POSTGRES_USER: dockpanel
+      POSTGRES_DB: axiapanel_panel
+      POSTGRES_USER: axiapanel
       POSTGRES_PASSWORD: ${PANEL_DB_PASSWORD}
     volumes:
       - panel-pgdata:/var/lib/postgresql/data
     networks:
       - panel
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U dockpanel -d dockpanel_panel"]
+      test: ["CMD-SHELL", "pg_isready -U axiapanel -d axiapanel_panel"]
       interval: 5s
       timeout: 3s
       retries: 5
@@ -33,13 +33,13 @@ services:
     ports:
       - "127.0.0.1:3062:3000"
     environment:
-      DATABASE_URL: postgres://dockpanel:${PANEL_DB_PASSWORD}@db:5432/dockpanel_panel
+      DATABASE_URL: postgres://axiapanel:${PANEL_DB_PASSWORD}@db:5432/axiapanel_panel
       JWT_SECRET: ${PANEL_JWT_SECRET}
-      AGENT_SOCKET: /var/run/dockpanel/agent.sock
+      AGENT_SOCKET: /var/run/axiapanel/agent.sock
       AGENT_TOKEN: ${AGENT_TOKEN}
       RUST_LOG: info
     volumes:
-      - /var/run/dockpanel:/var/run/dockpanel:ro
+      - /var/run/axiapanel:/var/run/axiapanel:ro
     depends_on:
       db:
         condition: service_healthy

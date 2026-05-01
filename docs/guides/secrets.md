@@ -21,7 +21,7 @@ The Secrets Manager provides encrypted storage for sensitive configuration value
 ### From the CLI
 
 ```bash
-dockpanel secrets vault create production
+axiapanel secrets vault create production
 ```
 
 ## Add Secrets
@@ -38,8 +38,8 @@ The value is encrypted immediately and never stored in plaintext.
 ### From the CLI
 
 ```bash
-dockpanel secrets set production DATABASE_URL "postgres://user:pass@host/db"
-dockpanel secrets set production REDIS_URL "redis://localhost:6379"
+axiapanel secrets set production DATABASE_URL "postgres://user:pass@host/db"
+axiapanel secrets set production REDIS_URL "redis://localhost:6379"
 ```
 
 ## View and Update Secrets
@@ -66,12 +66,12 @@ Push all secrets from a vault directly into a running container's environment.
 3. Select the target container
 4. Click **Inject**
 
-DockPanel writes the secrets to the container's `.env` file and restarts it.
+AxiaPanel writes the secrets to the container's `.env` file and restarts it.
 
 ### From the CLI
 
 ```bash
-dockpanel secrets inject production --container my-app
+axiapanel secrets inject production --container my-app
 ```
 
 ## Pull Secrets (CI/CD)
@@ -80,7 +80,7 @@ Use the pull endpoint in your CI/CD pipeline to fetch secrets at deploy time:
 
 ```bash
 # Using the CLI
-dockpanel secrets pull production --format env > .env
+axiapanel secrets pull production --format env > .env
 
 # Using curl
 curl -H "Authorization: Bearer $TOKEN" \
@@ -93,7 +93,7 @@ curl -H "Authorization: Bearer $TOKEN" \
 ### Export a Vault
 
 ```bash
-dockpanel secrets export production > production-secrets.json
+axiapanel secrets export production > production-secrets.json
 ```
 
 The exported file contains encrypted values. Store it securely.
@@ -101,7 +101,7 @@ The exported file contains encrypted values. Store it securely.
 ### Import a Vault
 
 ```bash
-dockpanel secrets import staging < production-secrets.json
+axiapanel secrets import staging < production-secrets.json
 ```
 
 ## Auto-Inject

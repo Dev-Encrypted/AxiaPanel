@@ -3,7 +3,7 @@ use crate::safe_cmd::safe_command;
 
 use super::backups::BackupInfo;
 
-const BACKUP_DIR: &str = "/var/backups/dockpanel/volumes";
+const BACKUP_DIR: &str = "/var/backups/axiapanel/volumes";
 
 /// Validate backup filename.
 fn is_safe_filename(name: &str) -> bool {

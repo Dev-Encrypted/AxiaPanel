@@ -1,10 +1,10 @@
 [book]
-title = "DockPanel Documentation"
-authors = ["DockPanel"]
+title = "AxiaPanel Documentation"
+authors = ["AxiaPanel"]
 language = "en"
 src = "."
 
 [output.html]
 default-theme = "navy"
 preferred-dark-theme = "navy"
-git-repository-url = "https://github.com/ovexro/dockpanel"
+git-repository-url = "https://github.com/ovexro/axiapanel"

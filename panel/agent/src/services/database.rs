@@ -6,7 +6,7 @@ use bollard::container::{
 use bollard::Docker;
 use std::collections::HashMap;
 
-const DB_NETWORK: &str = "dockpanel-db";
+const DB_NETWORK: &str = "axiapanel-db";
 
 #[derive(serde::Serialize)]
 pub struct DbContainer {
@@ -69,7 +69,7 @@ pub async fn create_database(
         }
     }
 
-    let container_name = format!("dockpanel-db-{name}");
+    let container_name = format!("axiapanel-db-{name}");
 
     let mut port_bindings = HashMap::new();
     port_bindings.insert(
@@ -100,9 +100,9 @@ pub async fn create_database(
         exposed_ports: Some(exposed_ports),
         host_config: Some(host_config),
         labels: Some(HashMap::from([
-            ("dockpanel.managed".to_string(), "true".to_string()),
-            ("dockpanel.db.name".to_string(), name.to_string()),
-            ("dockpanel.db.engine".to_string(), engine.to_string()),
+            ("axiapanel.managed".to_string(), "true".to_string()),
+            ("axiapanel.db.name".to_string(), name.to_string()),
+            ("axiapanel.db.engine".to_string(), engine.to_string()),
         ])),
         ..Default::default()
     };
@@ -172,13 +172,13 @@ pub async fn remove_database(container_id: &str) -> Result<(), String> {
     Ok(())
 }
 
-/// List all DockPanel-managed database containers.
+/// List all AxiaPanel-managed database containers.
 pub async fn list_databases() -> Result<Vec<DbContainer>, String> {
     let docker =
         Docker::connect_with_local_defaults().map_err(|e| format!("Docker connect failed: {e}"))?;
 
     let mut filters = HashMap::new();
-    filters.insert("label", vec!["dockpanel.managed=true"]);
+    filters.insert("label", vec!["axiapanel.managed=true"]);
 
     let containers = docker
         .list_containers(Some(ListContainersOptions {
@@ -193,8 +193,8 @@ pub async fn list_databases() -> Result<Vec<DbContainer>, String> {
         .into_iter()
         .filter_map(|c| {
             let labels = c.labels.as_ref()?;
-            let _db_name = labels.get("dockpanel.db.name")?;
-            let engine = labels.get("dockpanel.db.engine")?;
+            let _db_name = labels.get("axiapanel.db.name")?;
+            let engine = labels.get("axiapanel.db.engine")?;
             let id = c.id.as_ref()?;
 
             let port = c
@@ -506,7 +506,7 @@ pub async fn reset_password(
     Ok(())
 }
 
-/// Ensure the dockpanel-db Docker network exists.
+/// Ensure the axiapanel-db Docker network exists.
 async fn ensure_network(docker: &Docker) -> Result<(), String> {
     use bollard::network::CreateNetworkOptions;
 

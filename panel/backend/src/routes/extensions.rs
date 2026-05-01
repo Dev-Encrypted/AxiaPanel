@@ -455,7 +455,7 @@ pub async fn test_webhook(
         "timestamp": timestamp,
         "delivery_id": delivery_id,
         "data": {
-            "message": "Este é um evento de teste do DockPanel.",
+            "message": "Este é um evento de teste do AxiaPanel.",
             "extension": name,
             "triggered_by": claims.email,
         },
@@ -482,9 +482,9 @@ pub async fn test_webhook(
         .unwrap_or_default()
         .post(&webhook_url)
         .header("Content-Type", "application/json")
-        .header("X-DockPanel-Event", "test")
-        .header("X-DockPanel-Delivery", &delivery_id)
-        .header("X-DockPanel-Signature", format!("sha256={signature}"))
+        .header("X-AxiaPanel-Event", "test")
+        .header("X-AxiaPanel-Delivery", &delivery_id)
+        .header("X-AxiaPanel-Signature", format!("sha256={signature}"))
         .body(payload_str.clone())
         .send()
         .await;

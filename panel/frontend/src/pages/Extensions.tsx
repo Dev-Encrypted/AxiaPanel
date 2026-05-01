@@ -152,7 +152,7 @@ export default function Extensions() {
       <div className="flex items-center justify-between">
         <div>
           <h1 className="text-2xl font-bold text-dark-50 font-mono">Extensions</h1>
-          <p className="text-sm text-dark-300 mt-1">Integrações via webhook que recebem eventos do DockPanel</p>
+          <p className="text-sm text-dark-300 mt-1">Integrações via webhook que recebem eventos do AxiaPanel</p>
         </div>
         <button onClick={() => { setCreating(!creating); setNewKey(null); setError(""); }} className="px-4 py-2 bg-rust-500 text-dark-950 rounded-lg text-sm font-bold hover:bg-rust-400 transition-colors">
           + Adicionar Extension

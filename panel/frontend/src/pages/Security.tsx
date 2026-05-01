@@ -1029,7 +1029,7 @@ export default function Security() {
                                             <button
                                               onClick={() => setPendingConfirm({
                                                 type: "quarantine",
-                                                label: `Colocar ${f.file_path} em quarentena? (move para /var/lib/dockpanel/quarantine/)`,
+                                                label: `Colocar ${f.file_path} em quarentena? (move para /var/lib/axiapanel/quarantine/)`,
                                                 data: { path: f.file_path }
                                               })}
                                               className="px-2 py-0.5 bg-warn-500/15 text-warn-400 rounded text-xs font-medium hover:bg-warn-500/25"

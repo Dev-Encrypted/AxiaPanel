@@ -1,6 +1,6 @@
 # CLI Reference
 
-The `dockpanel` CLI provides full command-line access to all panel operations. It communicates with the agent via Unix socket using the token stored at `/etc/dockpanel/agent.token`.
+The `axiapanel` CLI provides full command-line access to all panel operations. It communicates with the agent via Unix socket using the token stored at `/etc/axiapanel/agent.token`.
 
 ## Global Options
 
@@ -14,12 +14,12 @@ The `dockpanel` CLI provides full command-line access to all panel operations. I
 
 ---
 
-### `dockpanel status`
+### `axiapanel status`
 
 Show server status including CPU, memory, disk, and uptime.
 
 ```bash
-dockpanel status
+axiapanel status
 ```
 
 ```
@@ -39,17 +39,17 @@ Disk:        12.3 GB / 50.0 GB (24.6%)
 JSON output:
 
 ```bash
-dockpanel status -o json
+axiapanel status -o json
 ```
 
 ---
 
-### `dockpanel sites`
+### `axiapanel sites`
 
 List all Nginx sites.
 
 ```bash
-dockpanel sites
+axiapanel sites
 ```
 
 ```
@@ -62,15 +62,15 @@ blog.example.com      static     ✓      active
 Filter by domain:
 
 ```bash
-dockpanel sites -f blog
+axiapanel sites -f blog
 ```
 
-#### `dockpanel sites create`
+#### `axiapanel sites create`
 
 Create a new site.
 
 ```bash
-dockpanel sites create example.com --runtime php --ssl --ssl-email admin@example.com
+axiapanel sites create example.com --runtime php --ssl --ssl-email admin@example.com
 ```
 
 | Argument | Required | Default | Description |
@@ -88,12 +88,12 @@ Site created: example.com
   SSL:      provisioned (expires 2026-06-18)
 ```
 
-#### `dockpanel sites info`
+#### `axiapanel sites info`
 
 Show site details.
 
 ```bash
-dockpanel sites info example.com
+axiapanel sites info example.com
 ```
 
 ```
@@ -106,12 +106,12 @@ SSL:         active (expires 2026-06-18)
 Created:     2026-03-15 10:30:00
 ```
 
-#### `dockpanel sites delete`
+#### `axiapanel sites delete`
 
 Delete a site and its Nginx configuration.
 
 ```bash
-dockpanel sites delete example.com
+axiapanel sites delete example.com
 ```
 
 ```
@@ -120,12 +120,12 @@ Site deleted: example.com
 
 ---
 
-### `dockpanel db`
+### `axiapanel db`
 
 List databases.
 
 ```bash
-dockpanel db
+axiapanel db
 ```
 
 ```
@@ -137,15 +137,15 @@ analytics_db      postgres    5433    running    1.2 GB
 Filter by name:
 
 ```bash
-dockpanel db -f analytics
+axiapanel db -f analytics
 ```
 
-#### `dockpanel db create`
+#### `axiapanel db create`
 
 Create a new database in a Docker container.
 
 ```bash
-dockpanel db create blog_db --engine mysql --password "s3cureP@ss" --port 3307
+axiapanel db create blog_db --engine mysql --password "s3cureP@ss" --port 3307
 ```
 
 | Argument | Required | Description |
@@ -159,25 +159,25 @@ dockpanel db create blog_db --engine mysql --password "s3cureP@ss" --port 3307
 Database created: blog_db
   Engine:    mysql
   Port:      3307
-  Container: dockpanel-db-blog_db
+  Container: axiapanel-db-blog_db
 ```
 
-#### `dockpanel db delete`
+#### `axiapanel db delete`
 
 Delete a database container.
 
 ```bash
-dockpanel db delete abc123def456
+axiapanel db delete abc123def456
 ```
 
 ---
 
-### `dockpanel apps`
+### `axiapanel apps`
 
 List Docker apps.
 
 ```bash
-dockpanel apps
+axiapanel apps
 ```
 
 ```
@@ -190,15 +190,15 @@ n8n            n8nio/n8n:latest        5678    running    —
 Filter by name or domain:
 
 ```bash
-dockpanel apps -f grafana
+axiapanel apps -f grafana
 ```
 
-#### `dockpanel apps templates`
+#### `axiapanel apps templates`
 
 List all available app templates.
 
 ```bash
-dockpanel apps templates
+axiapanel apps templates
 ```
 
 ```
@@ -213,12 +213,12 @@ nextcloud         storage       Nextcloud        Self-hosted cloud storage
 (152 templates across 14 categories)
 ```
 
-#### `dockpanel apps deploy`
+#### `axiapanel apps deploy`
 
 Deploy an app from a template.
 
 ```bash
-dockpanel apps deploy ghost --name my-blog --port 2368 --domain blog.example.com --ssl-email admin@example.com
+axiapanel apps deploy ghost --name my-blog --port 2368 --domain blog.example.com --ssl-email admin@example.com
 ```
 
 | Argument | Required | Description |
@@ -238,60 +238,60 @@ Deploying ghost as "my-blog"...
 App deployed: my-blog (blog.example.com)
 ```
 
-#### `dockpanel apps stop`
+#### `axiapanel apps stop`
 
 ```bash
-dockpanel apps stop abc123def456
+axiapanel apps stop abc123def456
 ```
 
-#### `dockpanel apps start`
+#### `axiapanel apps start`
 
 ```bash
-dockpanel apps start abc123def456
+axiapanel apps start abc123def456
 ```
 
-#### `dockpanel apps restart`
+#### `axiapanel apps restart`
 
 ```bash
-dockpanel apps restart abc123def456
+axiapanel apps restart abc123def456
 ```
 
-#### `dockpanel apps remove`
+#### `axiapanel apps remove`
 
 ```bash
-dockpanel apps remove abc123def456
+axiapanel apps remove abc123def456
 ```
 
-#### `dockpanel apps logs`
+#### `axiapanel apps logs`
 
 View container logs.
 
 ```bash
-dockpanel apps logs abc123def456
+axiapanel apps logs abc123def456
 ```
 
-#### `dockpanel apps compose`
+#### `axiapanel apps compose`
 
 Deploy from a Docker Compose file.
 
 ```bash
-dockpanel apps compose /path/to/docker-compose.yml
+axiapanel apps compose /path/to/docker-compose.yml
 ```
 
 ---
 
-### `dockpanel services`
+### `axiapanel services`
 
 Check service health.
 
 ```bash
-dockpanel services
+axiapanel services
 ```
 
 ```
 SERVICE              STATUS      PID     MEMORY
-dockpanel-agent      ● running   1234    30 MB
-dockpanel-api        ● running   1235    27 MB
+axiapanel-agent      ● running   1234    30 MB
+axiapanel-api        ● running   1235    27 MB
 nginx                ● running   1236    12 MB
 docker               ● running   1237    45 MB
 php8.3-fpm           ● running   1238    18 MB
@@ -302,21 +302,21 @@ ufw                  ● active    —       —
 Filter by service name:
 
 ```bash
-dockpanel services -f nginx
+axiapanel services -f nginx
 ```
 
 ---
 
-### `dockpanel ssl`
+### `axiapanel ssl`
 
 SSL certificate management.
 
-#### `dockpanel ssl status`
+#### `axiapanel ssl status`
 
 Check certificate details for a domain.
 
 ```bash
-dockpanel ssl status example.com
+axiapanel ssl status example.com
 ```
 
 ```
@@ -330,12 +330,12 @@ Days Left:   85
 Auto-Renew:  yes
 ```
 
-#### `dockpanel ssl provision`
+#### `axiapanel ssl provision`
 
 Provision a Let's Encrypt certificate.
 
 ```bash
-dockpanel ssl provision example.com --email admin@example.com --runtime php
+axiapanel ssl provision example.com --email admin@example.com --runtime php
 ```
 
 | Argument | Required | Default | Description |
@@ -347,14 +347,14 @@ dockpanel ssl provision example.com --email admin@example.com --runtime php
 
 ---
 
-### `dockpanel backup`
+### `axiapanel backup`
 
 Backup management.
 
-#### `dockpanel backup create`
+#### `axiapanel backup create`
 
 ```bash
-dockpanel backup create example.com
+axiapanel backup create example.com
 ```
 
 ```
@@ -362,16 +362,16 @@ Creating backup for example.com...
 Backup created: example.com_2026-03-20_143022.tar.gz (45.2 MB)
 ```
 
-#### `dockpanel backup list`
+#### `axiapanel backup list`
 
 ```bash
-dockpanel backup list example.com
+axiapanel backup list example.com
 ```
 
-#### `dockpanel backup restore`
+#### `axiapanel backup restore`
 
 ```bash
-dockpanel backup restore example.com example.com_2026-03-20_143022.tar.gz
+axiapanel backup restore example.com example.com_2026-03-20_143022.tar.gz
 ```
 
 ```
@@ -379,20 +379,20 @@ Restoring example.com from example.com_2026-03-20_143022.tar.gz...
 Restore complete.
 ```
 
-#### `dockpanel backup delete`
+#### `axiapanel backup delete`
 
 ```bash
-dockpanel backup delete example.com example.com_2026-03-18_020000.tar.gz
+axiapanel backup delete example.com example.com_2026-03-18_020000.tar.gz
 ```
 
 ---
 
-### `dockpanel logs`
+### `axiapanel logs`
 
 View system and site logs.
 
 ```bash
-dockpanel logs
+axiapanel logs
 ```
 
 | Option | Default | Description |
@@ -407,26 +407,26 @@ Examples:
 
 ```bash
 # View system log
-dockpanel logs
+axiapanel logs
 
 # View Nginx error log for a site
-dockpanel logs -d example.com -t nginx -n 100
+axiapanel logs -d example.com -t nginx -n 100
 
 # Search for errors in auth log
-dockpanel logs -t auth -s "Failed password"
+axiapanel logs -t auth -s "Failed password"
 
 # Filter PHP logs
-dockpanel logs -t php -f "Fatal error" -n 200
+axiapanel logs -t php -f "Fatal error" -n 200
 ```
 
 ---
 
-### `dockpanel security`
+### `axiapanel security`
 
 Security overview.
 
 ```bash
-dockpanel security
+axiapanel security
 ```
 
 ```
@@ -441,12 +441,12 @@ SSH Password:    disabled
 Last Scan:       2026-03-19 02:00
 ```
 
-#### `dockpanel security scan`
+#### `axiapanel security scan`
 
 Run a security scan.
 
 ```bash
-dockpanel security scan
+axiapanel security scan
 ```
 
 ```
@@ -464,12 +464,12 @@ FINDINGS
 Score: 78/100 (3 findings)
 ```
 
-#### `dockpanel security firewall`
+#### `axiapanel security firewall`
 
 List firewall rules.
 
 ```bash
-dockpanel security firewall
+axiapanel security firewall
 ```
 
 ```
@@ -480,13 +480,13 @@ dockpanel security firewall
 4    allow     Anywhere       8443/tcp  tcp
 ```
 
-#### `dockpanel security firewall add`
+#### `axiapanel security firewall add`
 
 Add a firewall rule.
 
 ```bash
-dockpanel security firewall add --port 3000 --proto tcp --action allow
-dockpanel security firewall add --port 5432 --proto tcp --action allow --from 10.0.0.0/8
+axiapanel security firewall add --port 3000 --proto tcp --action allow
+axiapanel security firewall add --port 5432 --proto tcp --action allow --from 10.0.0.0/8
 ```
 
 | Option | Default | Description |
@@ -496,22 +496,22 @@ dockpanel security firewall add --port 5432 --proto tcp --action allow --from 10
 | `--action` | `allow` | Action: `allow` or `deny` |
 | `--from` | | Source IP or CIDR (optional) |
 
-#### `dockpanel security firewall remove`
+#### `axiapanel security firewall remove`
 
 Remove a rule by number.
 
 ```bash
-dockpanel security firewall remove 4
+axiapanel security firewall remove 4
 ```
 
 ---
 
-### `dockpanel top`
+### `axiapanel top`
 
 Show top processes by CPU usage.
 
 ```bash
-dockpanel top
+axiapanel top
 ```
 
 ```
@@ -519,18 +519,18 @@ PID      CPU%    MEM%    COMMAND
 1234     12.3    2.1     /usr/sbin/mysqld
 5678     8.7     1.4     php-fpm: pool www
 9012     3.2     0.8     nginx: worker process
-1357     2.1     1.2     dockpanel-agent
-2468     1.8     1.1     dockpanel-api
+1357     2.1     1.2     axiapanel-agent
+2468     1.8     1.1     axiapanel-api
 ```
 
 ---
 
-### `dockpanel php`
+### `axiapanel php`
 
 PHP version management.
 
 ```bash
-dockpanel php
+axiapanel php
 ```
 
 ```
@@ -539,24 +539,24 @@ VERSION    STATUS     FPM SOCKET
 8.3        installed  /run/php/php8.3-fpm.sock
 ```
 
-#### `dockpanel php install`
+#### `axiapanel php install`
 
 Install a PHP version.
 
 ```bash
-dockpanel php install 8.4
+axiapanel php install 8.4
 ```
 
 Supported versions: `8.1`, `8.2`, `8.3`, `8.4`.
 
 ---
 
-### `dockpanel diagnose`
+### `axiapanel diagnose`
 
 Run server diagnostics across 6 categories.
 
 ```bash
-dockpanel diagnose
+axiapanel diagnose
 ```
 
 ```
@@ -576,16 +576,16 @@ Score: 95/100 (1 warning)
 
 ---
 
-### `dockpanel export`
+### `axiapanel export`
 
 Export server configuration as YAML (Infrastructure as Code).
 
 ```bash
 # Print to stdout
-dockpanel export
+axiapanel export
 
 # Save to file
-dockpanel export -O config.yml
+axiapanel export -O config.yml
 ```
 
 Sample output:
@@ -613,16 +613,16 @@ apps:
 
 ---
 
-### `dockpanel apply`
+### `axiapanel apply`
 
 Apply server configuration from a YAML file.
 
 ```bash
 # Dry run (show what would change)
-dockpanel apply config.yml --dry-run
+axiapanel apply config.yml --dry-run
 
 # Apply changes
-dockpanel apply config.yml --email admin@example.com
+axiapanel apply config.yml --email admin@example.com
 ```
 
 | Argument | Required | Description |
@@ -643,19 +643,19 @@ DRY RUN — no changes will be made
 
 ---
 
-### `dockpanel completions`
+### `axiapanel completions`
 
 Generate shell completions.
 
 ```bash
 # Bash
-dockpanel completions bash > /etc/bash_completion.d/dockpanel
+axiapanel completions bash > /etc/bash_completion.d/axiapanel
 
 # Zsh
-dockpanel completions zsh > ~/.zfunc/_dockpanel
+axiapanel completions zsh > ~/.zfunc/_axiapanel
 
 # Fish
-dockpanel completions fish > ~/.config/fish/completions/dockpanel.fish
+axiapanel completions fish > ~/.config/fish/completions/axiapanel.fish
 ```
 
 Supported shells: `bash`, `zsh`, `fish`, `powershell`, `elvish`.

@@ -333,7 +333,7 @@ pub async fn preview(
     Ok(Json(serde_json::json!({
         "system": system_info,
         "installation_id": installation_id.map(|r| r.0).unwrap_or_else(|| "ainda não gerado".to_string()),
-        "dockpanel_version": env!("CARGO_PKG_VERSION"),
+        "axiapanel_version": env!("CARGO_PKG_VERSION"),
         "events": batch,
         "event_count": batch.len(),
         "note": "Isto é exatamente o que seria enviado ao endpoint configurado. Todos os PII foram removidos.",
@@ -432,7 +432,7 @@ pub async fn export_report(
         .collect();
 
     Ok(Json(serde_json::json!({
-        "dockpanel_version": env!("CARGO_PKG_VERSION"),
+        "axiapanel_version": env!("CARGO_PKG_VERSION"),
         "export_date": chrono::Utc::now().to_rfc3339(),
         "system": sys,
         "events": batch,
@@ -482,7 +482,7 @@ pub async fn clear_events(
 
 // ── Update Status ──────────────────────────────────────────────────────
 
-/// GET /api/telemetry/update-status — Check if a DockPanel update is available (admin only).
+/// GET /api/telemetry/update-status — Check if a AxiaPanel update is available (admin only).
 pub async fn update_status(
     State(state): State<AppState>,
     AdminUser(_claims): AdminUser,

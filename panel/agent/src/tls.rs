@@ -2,7 +2,7 @@
 //! and expose the SHA-256 fingerprint of the DER-encoded cert so the central
 //! panel can pin it (Trust On First Use).
 //!
-//! Cert location: `/etc/dockpanel/ssl/agent.{crt,key}`. `install-agent.sh`
+//! Cert location: `/etc/axiapanel/ssl/agent.{crt,key}`. `install-agent.sh`
 //! generates these at install time via openssl; this module generates them
 //! at first boot if missing (dev / direct-binary installs).
 
@@ -10,8 +10,8 @@ use axum_server::tls_rustls::RustlsConfig;
 use sha2::{Digest, Sha256};
 use std::path::Path;
 
-const CERT_PATH: &str = "/etc/dockpanel/ssl/agent.crt";
-const KEY_PATH: &str = "/etc/dockpanel/ssl/agent.key";
+const CERT_PATH: &str = "/etc/axiapanel/ssl/agent.crt";
+const KEY_PATH: &str = "/etc/axiapanel/ssl/agent.key";
 
 /// Load the on-disk cert + key, generating a fresh pair if either is missing.
 /// Returns the Rustls config ready for axum-server plus the hex SHA-256
@@ -47,11 +47,11 @@ pub fn fingerprint_from_pem(pem: &[u8]) -> Result<String, String> {
 }
 
 fn generate_self_signed() -> Result<(), String> {
-    let cert = rcgen::generate_simple_self_signed(vec!["dockpanel-agent".to_string()])
+    let cert = rcgen::generate_simple_self_signed(vec!["axiapanel-agent".to_string()])
         .map_err(|e| format!("rcgen: {e}"))?;
 
-    std::fs::create_dir_all("/etc/dockpanel/ssl")
-        .map_err(|e| format!("mkdir /etc/dockpanel/ssl: {e}"))?;
+    std::fs::create_dir_all("/etc/axiapanel/ssl")
+        .map_err(|e| format!("mkdir /etc/axiapanel/ssl: {e}"))?;
     std::fs::write(CERT_PATH, cert.cert.pem())
         .map_err(|e| format!("write {CERT_PATH}: {e}"))?;
     std::fs::write(KEY_PATH, cert.signing_key.serialize_pem())

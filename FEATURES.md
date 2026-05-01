@@ -1,8 +1,8 @@
-# DockPanel Feature Manifest
+# AxiaPanel Feature Manifest
 
 > **Last verified**: 2026-04-16 | **Version**: v2.7.17 | **Total**: 60+ major features, ~280 capabilities
 >
-> This file is the single source of truth for what DockPanel offers.
+> This file is the single source of truth for what AxiaPanel offers.
 > Update it whenever features are added, changed, or removed.
 
 ## Hosting
@@ -43,7 +43,7 @@
 | **Fail2Ban** | Jail management, ban/unban, panel jail | `routes/security.rs` | `security.rs` | (in Security) |
 | **SSH Hardening** | Disable password/root, change port, key management | `routes/security.rs` | `security.rs` | (in Security) |
 | **Security Scanning** | Automated audits with posture scoring | `routes/security_scans.rs` | — | (in Security) |
-| **Image Vulnerability Scanning** | Per-app CVE scanning with grype (self-contained install into `/var/lib/dockpanel/scanners/`), severity badge per app row, scheduled background rescans, soft deploy gate at critical/high/medium threshold. Defaults off. | `routes/image_scans.rs`, `services/image_scanner.rs` | `services/image_scanner.rs`, `routes/image_scan.rs` | `Apps.tsx` (badge + drawer), `Settings.tsx` (ImageScanSettings) |
+| **Image Vulnerability Scanning** | Per-app CVE scanning with grype (self-contained install into `/var/lib/axiapanel/scanners/`), severity badge per app row, scheduled background rescans, soft deploy gate at critical/high/medium threshold. Defaults off. | `routes/image_scans.rs`, `services/image_scanner.rs` | `services/image_scanner.rs`, `routes/image_scan.rs` | `Apps.tsx` (badge + drawer), `Settings.tsx` (ImageScanSettings) |
 | **Signed Releases + SBOM** | Every binary and SPDX 2.3 SBOM is signed in CI with cosign keyless via Sigstore (no long-lived key, recorded in Rekor transparency log). cargo-sbom emits per-crate SBOMs. Verification snippet in SECURITY.md. | — | — | — (release artifacts) |
 | **Per-Image SBOM Generation** | On-demand SPDX 2.3 JSON SBOM for any deployed app's image (syft, self-contained install). One-click "Download SBOM" button in each app's scan drawer. Persisted in `image_sbom` (JSONB). Defaults off. | `routes/sboms.rs` | `services/sbom_scanner.rs`, `routes/sbom.rs` | `Apps.tsx` (drawer button), `Settings.tsx` (SbomSettings) |
 | **Credential Encryption** | All stored credentials encrypted at rest with AES-256-GCM | `services/credential_crypto.rs` | — | — |
@@ -114,19 +114,19 @@
 
 | Command | Description |
 |---------|-------------|
-| `dockpanel status` | Server status (CPU, memory, disk, uptime) |
-| `dockpanel sites` | List all nginx sites |
-| `dockpanel db` | List databases |
-| `dockpanel apps` | List Docker apps |
-| `dockpanel diagnose` | Run smart diagnostics |
-| `dockpanel export -o config.yml` | Export server config as YAML |
-| `dockpanel apply config.yml` | Apply IaC config (with --dry-run) |
-| `dockpanel services` | Check service health |
-| `dockpanel ssl status <domain>` | SSL certificate status |
-| `dockpanel security` | Security overview |
-| `dockpanel security scan` | Run security scan |
-| `dockpanel logs -d <domain>` | View site logs |
-| `dockpanel top` | Top processes by CPU |
+| `axiapanel status` | Server status (CPU, memory, disk, uptime) |
+| `axiapanel sites` | List all nginx sites |
+| `axiapanel db` | List databases |
+| `axiapanel apps` | List Docker apps |
+| `axiapanel diagnose` | Run smart diagnostics |
+| `axiapanel export -o config.yml` | Export server config as YAML |
+| `axiapanel apply config.yml` | Apply IaC config (with --dry-run) |
+| `axiapanel services` | Check service health |
+| `axiapanel ssl status <domain>` | SSL certificate status |
+| `axiapanel security` | Security overview |
+| `axiapanel security scan` | Run security scan |
+| `axiapanel logs -d <domain>` | View site logs |
+| `axiapanel top` | Top processes by CPU |
 
 ## Performance & Caching
 

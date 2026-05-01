@@ -15,8 +15,8 @@ use tokio::net::UnixListener;
 use tokio::sync::Mutex;
 use tracing_subscriber::EnvFilter;
 
-const SOCKET_PATH: &str = "/var/run/dockpanel/agent.sock";
-const CONFIG_DIR: &str = "/etc/dockpanel";
+const SOCKET_PATH: &str = "/var/run/axiapanel/agent.sock";
+const CONFIG_DIR: &str = "/etc/axiapanel";
 
 #[tokio::main]
 async fn main() {
@@ -39,12 +39,12 @@ async fn main() {
     }
 
     // Ensure directories exist
-    std::fs::create_dir_all("/var/run/dockpanel").ok();
+    std::fs::create_dir_all("/var/run/axiapanel").ok();
     std::fs::create_dir_all(CONFIG_DIR).ok();
-    std::fs::create_dir_all("/etc/dockpanel/ssl").ok();
-    std::fs::create_dir_all("/var/backups/dockpanel").ok();
-    std::fs::create_dir_all("/var/backups/dockpanel/databases").ok();
-    std::fs::create_dir_all("/var/backups/dockpanel/volumes").ok();
+    std::fs::create_dir_all("/etc/axiapanel/ssl").ok();
+    std::fs::create_dir_all("/var/backups/axiapanel").ok();
+    std::fs::create_dir_all("/var/backups/axiapanel/databases").ok();
+    std::fs::create_dir_all("/var/backups/axiapanel/volumes").ok();
     std::fs::create_dir_all("/var/www/acme/.well-known/acme-challenge").ok();
 
     // Load auth token: prefer AGENT_TOKEN env var, then file, then generate new
@@ -223,7 +223,7 @@ async fn main() {
 
     // Multi-server: start TLS-wrapped TCP listener for remote panel connections.
     // Set AGENT_LISTEN_TCP=0.0.0.0:9443 to enable. The listener always terminates
-    // TLS using the self-signed cert at /etc/dockpanel/ssl/agent.{crt,key}; the
+    // TLS using the self-signed cert at /etc/axiapanel/ssl/agent.{crt,key}; the
     // central panel pins the cert's SHA-256 fingerprint on first checkin (TOFU).
     if let Ok(tcp_addr) = std::env::var("AGENT_LISTEN_TCP") {
         let parsed_addr: std::net::SocketAddr = match tcp_addr.parse() {
@@ -247,7 +247,7 @@ async fn main() {
     }
 
     tracing::info!(
-        "DockPanel Agent v{} listening on {SOCKET_PATH}",
+        "AxiaPanel Agent v{} listening on {SOCKET_PATH}",
         env!("CARGO_PKG_VERSION")
     );
 
@@ -258,7 +258,7 @@ async fn main() {
         tracing::error!("Agent server error: {e}");
     }
 
-    tracing::info!("DockPanel Agent shut down gracefully");
+    tracing::info!("AxiaPanel Agent shut down gracefully");
 }
 
 async fn shutdown_signal() {

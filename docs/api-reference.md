@@ -1,6 +1,6 @@
 # API Reference
 
-DockPanel exposes 733 REST endpoints (465 backend + 268 agent) across 50+ categories. All endpoints except `/api/health`, `/api/branding`, `/api/auth/setup-status`, and `/api/auth/login` require authentication.
+AxiaPanel exposes 733 REST endpoints (465 backend + 268 agent) across 50+ categories. All endpoints except `/api/health`, `/api/branding`, `/api/auth/setup-status`, and `/api/auth/login` require authentication.
 
 ## Authentication
 

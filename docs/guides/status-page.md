@@ -1,6 +1,6 @@
 # Public Status Page Guide
 
-DockPanel includes a public status page that shows the real-time health of your services. It requires no authentication -- anyone with the link can see it. Ideal for keeping users, clients, and team members informed during outages and maintenance.
+AxiaPanel includes a public status page that shows the real-time health of your services. It requires no authentication -- anyone with the link can see it. Ideal for keeping users, clients, and team members informed during outages and maintenance.
 
 ## Enabling the Status Page
 

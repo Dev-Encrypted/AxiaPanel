@@ -150,7 +150,7 @@ pub async fn send_notification(
                     "event_action": event_action,
                     "payload": {
                         "summary": subject,
-                        "source": "DockPanel",
+                        "source": "AxiaPanel",
                         "severity": severity,
                         "custom_details": { "message": message },
                     },
@@ -172,7 +172,7 @@ pub async fn send_notification(
                     "message": custom_message,
                     "severity": severity,
                     "timestamp": chrono::Utc::now().to_rfc3339(),
-                    "source": "dockpanel"
+                    "source": "axiapanel"
                 }))
                 .timeout(Duration::from_secs(10))
                 .send()
@@ -458,7 +458,7 @@ pub async fn try_fire_alert(
         };
 
         if !is_muted {
-            let subject = format!("DockPanel Alert: {title}");
+            let subject = format!("AxiaPanel Alert: {title}");
             let html = format!(
                 "<div style=\"font-family:sans-serif;max-width:600px;margin:0 auto\">\
                  <h2 style=\"color:{}\">{title}</h2>\
@@ -564,7 +564,7 @@ pub async fn resolve_alert(
 
     // Send recovery notification
     if let Some(channels) = get_user_channels(pool, user_id, server_id).await {
-        let subject = format!("DockPanel Resolved: {title}");
+        let subject = format!("AxiaPanel Resolved: {title}");
         let html = format!(
             "<div style=\"font-family:sans-serif;max-width:600px;margin:0 auto\">\
              <h2 style=\"color:#10b981\">{title}</h2>\

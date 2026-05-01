@@ -115,8 +115,8 @@ export default function NexusLayout() {
                 </div>
                 {!branding.hideBranding && (
                   <span className="text-lg font-bold tracking-tight">
-                    {branding.panelName === "DockPanel" ? (
-                      <><span className="text-rust-400">Dock</span><span className="text-dark-50">Panel</span></>
+                    {branding.panelName === "AxiaPanel" ? (
+                      <><span className="text-rust-400">Axia</span><span className="text-dark-50">Panel</span></>
                     ) : (
                       <span className="text-dark-50">{branding.panelName}</span>
                     )}

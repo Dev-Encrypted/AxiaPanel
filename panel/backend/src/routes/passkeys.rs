@@ -345,7 +345,7 @@ pub async fn register_begin(
 
     let options = PublicKeyCredentialCreationOptions {
         rp: RelyingParty {
-            name: "DockPanel".to_string(),
+            name: "AxiaPanel".to_string(),
             id: rp_id,
         },
         user: PublicKeyUser {

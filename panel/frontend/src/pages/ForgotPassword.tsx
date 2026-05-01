@@ -39,7 +39,7 @@ export default function ForgotPassword() {
               <rect x="18" y="18" width="10" height="10" rx="2" opacity="0.5" />
             </svg>
           </div>
-          <h1 className="text-base font-bold text-rust-500 uppercase font-mono tracking-widest">DockPanel</h1>
+          <h1 className="text-base font-bold text-rust-500 uppercase font-mono tracking-widest">AxiaPanel</h1>
           <p className="text-dark-200 text-sm mt-1">Enviaremos um link de redefinição</p>
         </div>
 

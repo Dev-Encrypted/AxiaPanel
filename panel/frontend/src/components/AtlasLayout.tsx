@@ -114,7 +114,7 @@ export default function AtlasLayout() {
               </svg>
             </div>
             <span className="text-sm font-bold">
-              <span className="text-rust-400">Dock</span>
+              <span className="text-rust-400">Axia</span>
               <span className="text-dark-50">Panel</span>
             </span>
           </Link>
@@ -379,7 +379,7 @@ export default function AtlasLayout() {
                   </svg>
                 </div>
                 <span className="text-sm font-bold">
-                  <span className="text-rust-400">Dock</span>
+                  <span className="text-rust-400">Axia</span>
                   <span className="text-dark-50">Panel</span>
                 </span>
               </Link>

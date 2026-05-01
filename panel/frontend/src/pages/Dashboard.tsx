@@ -581,7 +581,7 @@ export default function Dashboard() {
           <div className="flex items-center gap-3">
             <svg className="w-5 h-5 text-rust-400 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}><path strokeLinecap="round" strokeLinejoin="round" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" /></svg>
             <span className="text-sm text-rust-300">
-              <strong>DockPanel v{updateInfo.update_available_version}</strong> está disponível
+              <strong>AxiaPanel v{updateInfo.update_available_version}</strong> está disponível
               <span className="text-dark-400 ml-1">(atual: v{updateInfo.current_version})</span>
             </span>
           </div>
@@ -648,7 +648,7 @@ export default function Dashboard() {
               <p className="font-medium">{error}</p>
               {error.includes("Agent offline") && (
                 <p className="text-xs text-dark-300 mt-1 font-mono">
-                  Execute: <span className="text-dark-100">systemctl restart dockpanel-agent</span>
+                  Execute: <span className="text-dark-100">systemctl restart axiapanel-agent</span>
                 </p>
               )}
             </div>
@@ -695,7 +695,7 @@ export default function Dashboard() {
         return (
           <div className="mb-6 bg-dark-800 border border-dark-500 rounded-lg p-5 animate-fade-up">
             <div className="flex items-center justify-between mb-1">
-              <h3 className="text-sm font-bold text-dark-50 typewriter inline-block">Bem-vindo ao DockPanel</h3>
+              <h3 className="text-sm font-bold text-dark-50 typewriter inline-block">Bem-vindo ao AxiaPanel</h3>
               <div className="flex items-center gap-3">
                 <button onClick={toggleCollapse} className="text-dark-300 hover:text-dark-200 text-xs shrink-0">Recolher</button>
                 <button onClick={dismissOnboarding} className="text-dark-300 hover:text-dark-200 text-xs shrink-0">Dispensar</button>

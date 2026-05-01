@@ -1,6 +1,6 @@
 # Sessions Guide
 
-DockPanel tracks all active login sessions and provides session management, revocation, and GDPR data export.
+AxiaPanel tracks all active login sessions and provides session management, revocation, and GDPR data export.
 
 ## View Active Sessions
 

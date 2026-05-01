@@ -50,8 +50,8 @@ export default function Setup() {
               <rect x="18" y="18" width="10" height="10" rx="2" opacity="0.5" />
             </svg>
           </div>
-          <h1 className="text-base font-bold text-rust-500 uppercase font-mono tracking-widest">DockPanel</h1>
-          <p className="text-dark-200 text-sm mt-1">Configure o administrador do DockPanel</p>
+          <h1 className="text-base font-bold text-rust-500 uppercase font-mono tracking-widest">AxiaPanel</h1>
+          <p className="text-dark-200 text-sm mt-1">Configure o administrador do AxiaPanel</p>
         </div>
 
         <form onSubmit={handleSubmit} className="bg-dark-800 rounded-lg border border-dark-600 p-6 space-y-4">

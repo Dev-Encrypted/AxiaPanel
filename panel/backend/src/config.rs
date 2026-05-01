@@ -97,7 +97,7 @@ impl Config {
                 .expect("DATABASE_URL must be set"),
             jwt_secret,
             agent_socket: std::env::var("AGENT_SOCKET")
-                .unwrap_or_else(|_| "/var/run/dockpanel/agent.sock".into()),
+                .unwrap_or_else(|_| "/var/run/axiapanel/agent.sock".into()),
             agent_token: std::env::var("AGENT_TOKEN")
                 .expect("AGENT_TOKEN must be set"),
             listen_addr: std::env::var("LISTEN_ADDR")

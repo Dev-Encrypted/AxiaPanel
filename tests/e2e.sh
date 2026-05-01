@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 #
-# DockPanel E2E Test Suite
+# AxiaPanel E2E Test Suite
 # Tests every critical path against a fresh install.
 #
 # Usage: bash tests/e2e.sh <host> [port]
@@ -91,7 +91,7 @@ api_get_status() {
 }
 
 echo ""
-echo -e "${BOLD}DockPanel E2E Test Suite${NC}"
+echo -e "${BOLD}AxiaPanel E2E Test Suite${NC}"
 echo -e "Target: ${BASE}"
 echo -e "Date: $(date -u +%Y-%m-%dT%H:%M:%SZ)"
 echo ""
@@ -561,23 +561,23 @@ fi
 section "24. CLI VERIFICATION"
 # ─────────────────────────────────────────────────────────────────────────
 
-CLI_STATUS=$(ssh root@${HOST} "dockpanel status --output json 2>/dev/null" || echo "{}")
+CLI_STATUS=$(ssh root@${HOST} "axiapanel status --output json 2>/dev/null" || echo "{}")
 if echo "$CLI_STATUS" | python3 -c "import sys,json; json.load(sys.stdin)" 2>/dev/null; then
-    ok "CLI 'dockpanel status' works"
+    ok "CLI 'axiapanel status' works"
 else
     fail "CLI status failed"
 fi
 
-CLI_SITES=$(ssh root@${HOST} "dockpanel sites --output json 2>/dev/null" || echo "[]")
+CLI_SITES=$(ssh root@${HOST} "axiapanel sites --output json 2>/dev/null" || echo "[]")
 if echo "$CLI_SITES" | python3 -c "import sys,json; json.load(sys.stdin)" 2>/dev/null; then
-    ok "CLI 'dockpanel sites' works"
+    ok "CLI 'axiapanel sites' works"
 else
     fail "CLI sites failed"
 fi
 
-CLI_DIAG=$(ssh root@${HOST} "dockpanel diagnose --output json 2>/dev/null" || echo "{}")
+CLI_DIAG=$(ssh root@${HOST} "axiapanel diagnose --output json 2>/dev/null" || echo "{}")
 if echo "$CLI_DIAG" | python3 -c "import sys,json; json.load(sys.stdin)" 2>/dev/null; then
-    ok "CLI 'dockpanel diagnose' works"
+    ok "CLI 'axiapanel diagnose' works"
 else
     fail "CLI diagnose failed"
 fi
@@ -702,7 +702,7 @@ else
 fi
 
 # Check for leftover Docker containers
-LEFTOVER_CONTAINERS=$(ssh root@${HOST} "docker ps --filter 'label=dockpanel' --format '{{.Names}}' 2>/dev/null | wc -l" 2>/dev/null || echo "?")
+LEFTOVER_CONTAINERS=$(ssh root@${HOST} "docker ps --filter 'label=axiapanel' --format '{{.Names}}' 2>/dev/null | wc -l" 2>/dev/null || echo "?")
 if [ "$LEFTOVER_CONTAINERS" = "0" ]; then
     ok "Zero leftover Docker containers"
 else
@@ -710,7 +710,7 @@ else
 fi
 
 # Check for leftover nginx configs
-LEFTOVER_NGINX=$(ssh root@${HOST} "ls /etc/nginx/sites-enabled/ 2>/dev/null | grep -v dockpanel-panel | wc -l" 2>/dev/null || echo "?")
+LEFTOVER_NGINX=$(ssh root@${HOST} "ls /etc/nginx/sites-enabled/ 2>/dev/null | grep -v axiapanel-panel | wc -l" 2>/dev/null || echo "?")
 if [ "$LEFTOVER_NGINX" = "0" ]; then
     ok "Zero leftover nginx configs"
 else

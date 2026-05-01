@@ -114,9 +114,9 @@ async fn restic_backup(
         return Err(err(StatusCode::BAD_REQUEST, "Invalid domain"));
     }
 
-    let repo = format!("/var/backups/dockpanel/restic/{}", domain.replace('.', "_"));
+    let repo = format!("/var/backups/axiapanel/restic/{}", domain.replace('.', "_"));
     let site_dir = format!("/var/www/{domain}");
-    let password_file = "/etc/dockpanel/restic-password";
+    let password_file = "/etc/axiapanel/restic-password";
 
     if !std::path::Path::new(site_dir.as_str()).exists() {
         return Err(err(StatusCode::NOT_FOUND, "Site directory not found"));
@@ -208,8 +208,8 @@ async fn restic_snapshots(
         return Err(err(StatusCode::BAD_REQUEST, "Invalid domain"));
     }
 
-    let repo = format!("/var/backups/dockpanel/restic/{}", domain.replace('.', "_"));
-    let password_file = "/etc/dockpanel/restic-password";
+    let repo = format!("/var/backups/axiapanel/restic/{}", domain.replace('.', "_"));
+    let password_file = "/etc/axiapanel/restic-password";
 
     if !std::path::Path::new(&format!("{repo}/config")).exists() {
         return Ok(Json(serde_json::json!({ "snapshots": [], "total": 0 })));
@@ -245,8 +245,8 @@ async fn restic_restore(
         return Err(err(StatusCode::BAD_REQUEST, "Invalid snapshot ID"));
     }
 
-    let repo = format!("/var/backups/dockpanel/restic/{}", domain.replace('.', "_"));
-    let password_file = "/etc/dockpanel/restic-password";
+    let repo = format!("/var/backups/axiapanel/restic/{}", domain.replace('.', "_"));
+    let password_file = "/etc/axiapanel/restic-password";
 
     let output = tokio::time::timeout(
         std::time::Duration::from_secs(600),

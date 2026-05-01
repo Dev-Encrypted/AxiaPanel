@@ -81,7 +81,7 @@ const POSTFIX_VIRTUAL_DOMAINS: &str = "/etc/postfix/virtual_domains";
 const POSTFIX_VIRTUAL_MAILBOX: &str = "/etc/postfix/virtual_mailbox_maps";
 const POSTFIX_VIRTUAL_ALIAS: &str = "/etc/postfix/virtual_alias_maps";
 const DOVECOT_USERS: &str = "/etc/dovecot/users";
-const DKIM_KEYS_DIR: &str = "/etc/dockpanel/dkim";
+const DKIM_KEYS_DIR: &str = "/etc/axiapanel/dkim";
 
 pub fn router() -> Router<AppState> {
     Router::new()
@@ -179,12 +179,12 @@ async fn mail_install() -> Result<Json<serde_json::Value>, ApiErr> {
     // 3. Create config directories
     tokio::fs::create_dir_all(DKIM_KEYS_DIR).await
         .map_err(|e| err(StatusCode::INTERNAL_SERVER_ERROR, &format!("Failed to create DKIM dir: {e}")))?;
-    tokio::fs::create_dir_all("/etc/dockpanel/mail").await
+    tokio::fs::create_dir_all("/etc/axiapanel/mail").await
         .map_err(|e| err(StatusCode::INTERNAL_SERVER_ERROR, &format!("Failed to create mail config dir: {e}")))?;
 
     // 4. Write Postfix main.cf additions for virtual mailbox hosting
     let postfix_config = r#"
-# DockPanel mail configuration
+# AxiaPanel mail configuration
 virtual_mailbox_domains = /etc/postfix/virtual_domains
 virtual_mailbox_maps = hash:/etc/postfix/virtual_mailbox_maps
 virtual_alias_maps = hash:/etc/postfix/virtual_alias_maps
@@ -215,7 +215,7 @@ non_smtpd_milters = unix:opendkim/opendkim.sock
 
     // Append to main.cf if not already configured
     let main_cf = tokio::fs::read_to_string("/etc/postfix/main.cf").await.unwrap_or_default();
-    if !main_cf.contains("DockPanel mail configuration") {
+    if !main_cf.contains("AxiaPanel mail configuration") {
         let new_content = format!("{main_cf}\n{postfix_config}");
         write_file_atomic("/etc/postfix/main.cf", &new_content).await
             .map_err(|e| err(StatusCode::INTERNAL_SERVER_ERROR, &format!("Failed to write main.cf: {e}")))?;
@@ -231,7 +231,7 @@ non_smtpd_milters = unix:opendkim/opendkim.sock
     }
 
     // 6. Write Dovecot configuration for virtual users
-    let dovecot_config = r#"# DockPanel Dovecot configuration
+    let dovecot_config = r#"# AxiaPanel Dovecot configuration
 protocols = imap pop3 lmtp
 
 mail_location = maildir:/var/vmail/%d/%n
@@ -273,7 +273,7 @@ service auth {
 ssl = required
 "#;
 
-    write_file_atomic("/etc/dovecot/conf.d/99-dockpanel.conf", dovecot_config).await
+    write_file_atomic("/etc/dovecot/conf.d/99-axiapanel.conf", dovecot_config).await
         .map_err(|e| err(StatusCode::INTERNAL_SERVER_ERROR, &format!("Failed to write dovecot config: {e}")))?;
 
     // 7. Create empty map files
@@ -289,16 +289,16 @@ ssl = required
     let _ = safe_command("postmap").arg(POSTFIX_VIRTUAL_ALIAS).output().await;
 
     // 8. Configure OpenDKIM
-    let opendkim_conf = "Syslog yes\nUMask 007\nSocket local:/var/spool/postfix/opendkim/opendkim.sock\nPidFile /run/opendkim/opendkim.pid\nOversignHeaders From\nTrustAnchorFile /usr/share/dns/root.key\nKeyTable /etc/dockpanel/dkim/key.table\nSigningTable refile:/etc/dockpanel/dkim/signing.table\nExternalIgnoreList /etc/dockpanel/dkim/trusted.hosts\nInternalHosts /etc/dockpanel/dkim/trusted.hosts\n";
+    let opendkim_conf = "Syslog yes\nUMask 007\nSocket local:/var/spool/postfix/opendkim/opendkim.sock\nPidFile /run/opendkim/opendkim.pid\nOversignHeaders From\nTrustAnchorFile /usr/share/dns/root.key\nKeyTable /etc/axiapanel/dkim/key.table\nSigningTable refile:/etc/axiapanel/dkim/signing.table\nExternalIgnoreList /etc/axiapanel/dkim/trusted.hosts\nInternalHosts /etc/axiapanel/dkim/trusted.hosts\n";
     write_file_atomic("/etc/opendkim.conf", opendkim_conf).await
         .map_err(|e| err(StatusCode::INTERNAL_SERVER_ERROR, &format!("Failed to write opendkim.conf: {e}")))?;
 
     let trusted_hosts = "127.0.0.1\nlocalhost\n";
-    write_file_atomic("/etc/dockpanel/dkim/trusted.hosts", trusted_hosts).await
+    write_file_atomic("/etc/axiapanel/dkim/trusted.hosts", trusted_hosts).await
         .map_err(|e| err(StatusCode::INTERNAL_SERVER_ERROR, &format!("Failed to write trusted.hosts: {e}")))?;
-    write_file_atomic("/etc/dockpanel/dkim/key.table", "").await
+    write_file_atomic("/etc/axiapanel/dkim/key.table", "").await
         .map_err(|e| err(StatusCode::INTERNAL_SERVER_ERROR, &format!("Failed to write key.table: {e}")))?;
-    write_file_atomic("/etc/dockpanel/dkim/signing.table", "").await
+    write_file_atomic("/etc/axiapanel/dkim/signing.table", "").await
         .map_err(|e| err(StatusCode::INTERNAL_SERVER_ERROR, &format!("Failed to write signing.table: {e}")))?;
 
     // Create opendkim socket directory in Postfix chroot
@@ -375,9 +375,9 @@ async fn mail_uninstall() -> Result<Json<serde_json::Value>, ApiErr> {
             .output()
     ).await;
 
-    // 4. Remove DockPanel mail config dirs (NOT /var/vmail — user mail data)
-    let _ = tokio::fs::remove_dir_all("/etc/dockpanel/mail").await;
-    let _ = tokio::fs::remove_dir_all("/etc/dockpanel/dkim").await;
+    // 4. Remove AxiaPanel mail config dirs (NOT /var/vmail — user mail data)
+    let _ = tokio::fs::remove_dir_all("/etc/axiapanel/mail").await;
+    let _ = tokio::fs::remove_dir_all("/etc/axiapanel/dkim").await;
 
     tracing::info!("Mail server uninstalled (user mail data preserved in /var/vmail)");
 
@@ -894,7 +894,7 @@ async fn webmail_install(Json(body): Json<serde_json::Value>) -> Result<Json<ser
     let output = safe_command("docker")
         .args([
             "run", "-d",
-            "--name", "dockpanel-roundcube",
+            "--name", "axiapanel-roundcube",
             "--restart", "unless-stopped",
             "-p", &format!("127.0.0.1:{port}:80"),
             "-e", &format!("ROUNDCUBEMAIL_DEFAULT_HOST=ssl://{domain}"),
@@ -902,9 +902,9 @@ async fn webmail_install(Json(body): Json<serde_json::Value>) -> Result<Json<ser
             "-e", &format!("ROUNDCUBEMAIL_SMTP_SERVER=tls://{domain}"),
             "-e", "ROUNDCUBEMAIL_SMTP_PORT=587",
             "-e", "ROUNDCUBEMAIL_UPLOAD_MAX_FILESIZE=25M",
-            "-l", "dockpanel.managed=true",
-            "-l", "dockpanel.app.template=roundcube",
-            "-l", "dockpanel.app.name=roundcube",
+            "-l", "axiapanel.managed=true",
+            "-l", "axiapanel.app.template=roundcube",
+            "-l", "axiapanel.app.name=roundcube",
             "roundcube/roundcubemail:latest",
         ])
         .output().await
@@ -913,7 +913,7 @@ async fn webmail_install(Json(body): Json<serde_json::Value>) -> Result<Json<ser
     if !output.status.success() {
         let stderr = String::from_utf8_lossy(&output.stderr);
         if stderr.contains("already in use") {
-            let _ = safe_command("docker").args(["rm", "-f", "dockpanel-roundcube"]).output().await;
+            let _ = safe_command("docker").args(["rm", "-f", "axiapanel-roundcube"]).output().await;
             return Err(err(StatusCode::CONFLICT, "Roundcube container already exists. Remove it first or restart."));
         }
         return Err(err(StatusCode::INTERNAL_SERVER_ERROR, &format!("Roundcube deploy failed: {}", &stderr[..200.min(stderr.len())])));
@@ -926,13 +926,13 @@ async fn webmail_install(Json(body): Json<serde_json::Value>) -> Result<Json<ser
 /// GET /mail/webmail/status — Check if Roundcube is running.
 async fn webmail_status() -> Json<serde_json::Value> {
     let output = safe_command("docker")
-        .args(["inspect", "--format", "{{.State.Running}}", "dockpanel-roundcube"])
+        .args(["inspect", "--format", "{{.State.Running}}", "axiapanel-roundcube"])
         .output().await;
     let running = output.map(|o| String::from_utf8_lossy(&o.stdout).trim() == "true").unwrap_or(false);
 
     // Get port
     let port_output = safe_command("docker")
-        .args(["inspect", "--format", "{{range .NetworkSettings.Ports}}{{range .}}{{.HostPort}}{{end}}{{end}}", "dockpanel-roundcube"])
+        .args(["inspect", "--format", "{{range .NetworkSettings.Ports}}{{range .}}{{.HostPort}}{{end}}{{end}}", "axiapanel-roundcube"])
         .output().await;
     let port = port_output.ok().and_then(|o| String::from_utf8_lossy(&o.stdout).trim().parse::<u16>().ok()).unwrap_or(0);
 
@@ -941,7 +941,7 @@ async fn webmail_status() -> Json<serde_json::Value> {
 
 /// POST /mail/webmail/remove — Remove Roundcube container.
 async fn webmail_remove() -> Result<Json<serde_json::Value>, ApiErr> {
-    let _ = safe_command("docker").args(["rm", "-f", "dockpanel-roundcube"]).output().await;
+    let _ = safe_command("docker").args(["rm", "-f", "axiapanel-roundcube"]).output().await;
     Ok(ok("Roundcube removed"))
 }
 
@@ -979,11 +979,11 @@ async fn relay_configure(Json(body): Json<RelayConfig>) -> Result<Json<serde_jso
 
     // Remove existing relay config lines
     let cleaned: String = main_cf.lines()
-        .filter(|l| !l.starts_with("relayhost") && !l.starts_with("smtp_sasl_") && !l.starts_with("smtp_tls_") && !l.contains("# DockPanel relay"))
+        .filter(|l| !l.starts_with("relayhost") && !l.starts_with("smtp_sasl_") && !l.starts_with("smtp_tls_") && !l.contains("# AxiaPanel relay"))
         .collect::<Vec<_>>().join("\n");
 
     let relay_config = format!(
-        "\n# DockPanel relay configuration\nrelayhost = [{}]:{}\nsmtp_sasl_auth_enable = yes\nsmtp_sasl_password_maps = hash:/etc/postfix/sasl_passwd\nsmtp_sasl_security_options = noanonymous\nsmtp_tls_security_level = encrypt\nsmtp_tls_CAfile = /etc/ssl/certs/ca-certificates.crt\n",
+        "\n# AxiaPanel relay configuration\nrelayhost = [{}]:{}\nsmtp_sasl_auth_enable = yes\nsmtp_sasl_password_maps = hash:/etc/postfix/sasl_passwd\nsmtp_sasl_security_options = noanonymous\nsmtp_tls_security_level = encrypt\nsmtp_tls_CAfile = /etc/ssl/certs/ca-certificates.crt\n",
         body.host, body.port
     );
 
@@ -1013,7 +1013,7 @@ async fn relay_status() -> Json<serde_json::Value> {
 async fn relay_remove() -> Result<Json<serde_json::Value>, ApiErr> {
     let main_cf = tokio::fs::read_to_string("/etc/postfix/main.cf").await.unwrap_or_default();
     let cleaned: String = main_cf.lines()
-        .filter(|l| !l.starts_with("relayhost") && !l.starts_with("smtp_sasl_") && !l.starts_with("smtp_tls_") && !l.contains("# DockPanel relay"))
+        .filter(|l| !l.starts_with("relayhost") && !l.starts_with("smtp_sasl_") && !l.starts_with("smtp_tls_") && !l.contains("# AxiaPanel relay"))
         .collect::<Vec<_>>().join("\n");
 
     write_file_atomic("/etc/postfix/main.cf", &cleaned).await
@@ -1136,10 +1136,10 @@ async fn rate_limit_set(Json(body): Json<RateLimitRequest>) -> Result<Json<serde
     // Update Postfix config
     let main_cf = tokio::fs::read_to_string("/etc/postfix/main.cf").await.unwrap_or_default();
     let cleaned: String = main_cf.lines()
-        .filter(|l| !l.starts_with("smtp_destination_rate_delay") && !l.starts_with("smtp_extra_recipient_limit") && !l.contains("# DockPanel rate limit"))
+        .filter(|l| !l.starts_with("smtp_destination_rate_delay") && !l.starts_with("smtp_extra_recipient_limit") && !l.contains("# AxiaPanel rate limit"))
         .collect::<Vec<_>>().join("\n");
 
-    let rate_config = format!("\n# DockPanel rate limit: {}\nsmtp_destination_rate_delay = {}s\nsmtp_extra_recipient_limit = {}\n", body.rate, delay, count.min(50));
+    let rate_config = format!("\n# AxiaPanel rate limit: {}\nsmtp_destination_rate_delay = {}s\nsmtp_extra_recipient_limit = {}\n", body.rate, delay, count.min(50));
 
     write_file_atomic("/etc/postfix/main.cf", &format!("{cleaned}{rate_config}")).await
         .map_err(|e| err(StatusCode::INTERNAL_SERVER_ERROR, &format!("Config write failed: {e}")))?;
@@ -1153,7 +1153,7 @@ async fn rate_limit_set(Json(body): Json<RateLimitRequest>) -> Result<Json<serde
 /// GET /mail/rate-limit/status — Get current rate limit.
 async fn rate_limit_status() -> Json<serde_json::Value> {
     let main_cf = tokio::fs::read_to_string("/etc/postfix/main.cf").await.unwrap_or_default();
-    let rate_line = main_cf.lines().find(|l| l.contains("# DockPanel rate limit:"));
+    let rate_line = main_cf.lines().find(|l| l.contains("# AxiaPanel rate limit:"));
     let configured = rate_line.is_some();
     let rate = rate_line.and_then(|l| l.split(':').nth(1)).unwrap_or("").trim().to_string();
     Json(serde_json::json!({ "configured": configured, "rate": rate }))
@@ -1163,7 +1163,7 @@ async fn rate_limit_status() -> Json<serde_json::Value> {
 async fn rate_limit_remove() -> Result<Json<serde_json::Value>, ApiErr> {
     let main_cf = tokio::fs::read_to_string("/etc/postfix/main.cf").await.unwrap_or_default();
     let cleaned: String = main_cf.lines()
-        .filter(|l| !l.starts_with("smtp_destination_rate_delay") && !l.starts_with("smtp_extra_recipient_limit") && !l.contains("# DockPanel rate limit"))
+        .filter(|l| !l.starts_with("smtp_destination_rate_delay") && !l.starts_with("smtp_extra_recipient_limit") && !l.contains("# AxiaPanel rate limit"))
         .collect::<Vec<_>>().join("\n");
     write_file_atomic("/etc/postfix/main.cf", &cleaned).await
         .map_err(|e| err(StatusCode::INTERNAL_SERVER_ERROR, &format!("Config write failed: {e}")))?;
@@ -1192,7 +1192,7 @@ async fn mailbox_backup(Json(body): Json<MailboxBackupRequest>) -> Result<Json<s
         return Err(err(StatusCode::NOT_FOUND, "Mailbox directory not found"));
     }
 
-    let backup_dir = "/var/lib/dockpanel/mail-backups";
+    let backup_dir = "/var/lib/axiapanel/mail-backups";
     tokio::fs::create_dir_all(backup_dir).await.ok();
 
     let timestamp = std::time::SystemTime::now().duration_since(std::time::UNIX_EPOCH).unwrap_or_default().as_secs();
@@ -1223,7 +1223,7 @@ async fn mailbox_restore(Json(body): Json<serde_json::Value>) -> Result<Json<ser
     let backup_file = body.get("file").and_then(|v| v.as_str()).unwrap_or("");
 
     if email.is_empty() || !email.contains('@') { return Err(err(StatusCode::BAD_REQUEST, "Invalid email")); }
-    if backup_file.is_empty() || !backup_file.starts_with("/var/lib/dockpanel/mail-backups/") {
+    if backup_file.is_empty() || !backup_file.starts_with("/var/lib/axiapanel/mail-backups/") {
         return Err(err(StatusCode::BAD_REQUEST, "Invalid backup file path"));
     }
     if backup_file.contains("..") { return Err(err(StatusCode::BAD_REQUEST, "Path traversal not allowed")); }
@@ -1255,7 +1255,7 @@ async fn mailbox_restore(Json(body): Json<serde_json::Value>) -> Result<Json<ser
 
 /// GET /mail/backups — List available mailbox backups.
 async fn mailbox_backups() -> Result<Json<serde_json::Value>, ApiErr> {
-    let backup_dir = "/var/lib/dockpanel/mail-backups";
+    let backup_dir = "/var/lib/axiapanel/mail-backups";
     let mut backups = Vec::new();
 
     let mut entries = match tokio::fs::read_dir(backup_dir).await {
@@ -1285,7 +1285,7 @@ async fn mailbox_backups() -> Result<Json<serde_json::Value>, ApiErr> {
 /// POST /mail/backups/delete — Delete a backup file.
 async fn mailbox_backup_delete(Json(body): Json<serde_json::Value>) -> Result<Json<serde_json::Value>, ApiErr> {
     let file = body.get("file").and_then(|v| v.as_str()).unwrap_or("");
-    if file.is_empty() || !file.starts_with("/var/lib/dockpanel/mail-backups/") || file.contains("..") {
+    if file.is_empty() || !file.starts_with("/var/lib/axiapanel/mail-backups/") || file.contains("..") {
         return Err(err(StatusCode::BAD_REQUEST, "Invalid backup file"));
     }
     tokio::fs::remove_file(file).await.map_err(|e| err(StatusCode::INTERNAL_SERVER_ERROR, &format!("Delete failed: {e}")))?;
@@ -1304,7 +1304,7 @@ async fn tls_status() -> Json<serde_json::Value> {
         .and_then(|l| l.split('=').nth(1)).unwrap_or("").trim().to_string();
 
     // Check Dovecot SSL
-    let dovecot_conf = tokio::fs::read_to_string("/etc/dovecot/conf.d/99-dockpanel.conf").await.unwrap_or_default();
+    let dovecot_conf = tokio::fs::read_to_string("/etc/dovecot/conf.d/99-axiapanel.conf").await.unwrap_or_default();
     let dovecot_ssl = dovecot_conf.lines().find(|l| l.starts_with("ssl"))
         .and_then(|l| l.split('=').nth(1)).unwrap_or("").trim().to_string();
 

@@ -130,8 +130,8 @@ export default function CommandLayout() {
                 </div>
                 {!branding.hideBranding && (
                   <span className="text-lg font-bold logo-glow">
-                    {branding.panelName === "DockPanel" ? (
-                      <><span className="text-rust-400">Dock</span><span className="text-dark-50">Panel</span></>
+                    {branding.panelName === "AxiaPanel" ? (
+                      <><span className="text-rust-400">Axia</span><span className="text-dark-50">Panel</span></>
                     ) : (
                       <span className="text-dark-50">{branding.panelName}</span>
                     )}
@@ -389,7 +389,7 @@ export default function CommandLayout() {
               <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}><path strokeLinecap="round" strokeLinejoin="round" d="M3.75 6.75h16.5M3.75 12h16.5m-16.5 5.25h16.5" /></svg>
             </button>
             <span className="text-base font-bold logo-glow">
-              {branding.hideBranding ? "" : branding.panelName === "DockPanel" ? <><span className="text-rust-400">Dock</span><span className="text-dark-50">Panel</span></> : <span className="text-dark-50">{branding.panelName}</span>}
+              {branding.hideBranding ? "" : branding.panelName === "AxiaPanel" ? <><span className="text-rust-400">Axia</span><span className="text-dark-50">Panel</span></> : <span className="text-dark-50">{branding.panelName}</span>}
             </span>
           </div>
         )}

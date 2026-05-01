@@ -105,7 +105,7 @@ async fn export() -> Result<Json<ServerExport>, (StatusCode, Json<serde_json::Va
         .map(|app| {
             let clean_name = app
                 .name
-                .strip_prefix("dockpanel-app-")
+                .strip_prefix("axiapanel-app-")
                 .unwrap_or(&app.name)
                 .to_string();
             AppExport {
@@ -168,8 +168,8 @@ fn scan_nginx_sites() -> Vec<SiteExport> {
         let filename = path.file_name().and_then(|n| n.to_str()).unwrap_or("");
 
         // Skip panel config and default
-        if filename == "dockpanel-panel.conf"
-            || filename == "dockpanel.dev.conf"
+        if filename == "axiapanel-panel.conf"
+            || filename == "axiapanel.dev.conf"
             || filename == "default"
         {
             continue;
@@ -266,7 +266,7 @@ fn scan_nginx_sites() -> Vec<SiteExport> {
     sites
 }
 
-/// Read dockpanel cron entries from system crontab.
+/// Read axiapanel cron entries from system crontab.
 async fn read_crontab_entries() -> Vec<CronExport> {
     let output = safe_command("crontab")
         .arg("-l")
@@ -278,7 +278,7 @@ async fn read_crontab_entries() -> Vec<CronExport> {
         _ => return vec![],
     };
 
-    let marker = "# dockpanel:";
+    let marker = "# axiapanel:";
     crontab
         .lines()
         .filter(|line| line.contains(marker))

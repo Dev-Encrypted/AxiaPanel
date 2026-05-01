@@ -1,5 +1,5 @@
 #!/bin/bash
-# Post-push gate reminder hook for DockPanel
+# Post-push gate reminder hook for AxiaPanel
 # Fires on Stop event — checks if a git push happened and prints reminders
 
 INPUT=$(cat)
@@ -20,7 +20,7 @@ if [ "$REMOTE_HEAD" = "$LOCAL_HEAD" ] 2>/dev/null; then
   REMINDERS=""
 
   if echo "$CHANGED" | grep -qE '^website/|^docs/'; then
-    REMINDERS="${REMINDERS}\n- website/ or docs/ changed: deploy dockpanel.dev and/or docs.dockpanel.dev"
+    REMINDERS="${REMINDERS}\n- website/ or docs/ changed: deploy axiapanel.dev and/or docs.axiapanel.dev"
   fi
 
   if echo "$CHANGED" | grep -qE '^panel/(agent|backend|cli)/src/'; then

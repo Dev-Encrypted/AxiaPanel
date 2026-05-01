@@ -2,7 +2,7 @@
 
 ## Overview
 
-Git Deploy lets you push code to a Git repository and have DockPanel automatically build and deploy it. The pipeline supports:
+Git Deploy lets you push code to a Git repository and have AxiaPanel automatically build and deploy it. The pipeline supports:
 
 - **Webhook-triggered deploys** from GitHub, GitLab, or any Git provider
 - **Nixpacks auto-detection** for 30+ languages (no Dockerfile needed)
@@ -23,7 +23,7 @@ Git Deploy lets you push code to a Git repository and have DockPanel automatical
    - **Domain** (optional): `app.example.com` for auto reverse proxy + SSL
 4. Click **Create**
 
-DockPanel will clone the repository, detect the build method, build a Docker image, and start the container.
+AxiaPanel will clone the repository, detect the build method, build a Docker image, and start the container.
 
 ## Webhook Setup
 
@@ -31,18 +31,18 @@ Webhooks trigger automatic deploys when you push to your repository.
 
 ### GitHub
 
-1. In DockPanel, open your Git Deploy and copy the **Webhook URL** (shown after creation)
+1. In AxiaPanel, open your Git Deploy and copy the **Webhook URL** (shown after creation)
 2. In GitHub, go to your repository > **Settings** > **Webhooks** > **Add webhook**
 3. Configure:
-   - **Payload URL**: Paste the webhook URL from DockPanel
+   - **Payload URL**: Paste the webhook URL from AxiaPanel
    - **Content type**: `application/json`
-   - **Secret**: Leave empty (DockPanel validates by repository URL)
+   - **Secret**: Leave empty (AxiaPanel validates by repository URL)
    - **Events**: Select "Just the push event"
 4. Click **Add webhook**
 
 ### GitLab
 
-1. Copy the webhook URL from DockPanel
+1. Copy the webhook URL from AxiaPanel
 2. In GitLab, go to your project > **Settings** > **Webhooks**
 3. Configure:
    - **URL**: Paste the webhook URL
@@ -54,11 +54,11 @@ Now every push to the configured branch triggers a build and deploy.
 
 ## Deploy Keys (Private Repositories)
 
-For private repositories, DockPanel needs SSH access.
+For private repositories, AxiaPanel needs SSH access.
 
 1. Generate a deploy key on the server:
    ```bash
-   ssh-keygen -t ed25519 -C "dockpanel-deploy" -f /tmp/deploy-key -N ""
+   ssh-keygen -t ed25519 -C "axiapanel-deploy" -f /tmp/deploy-key -N ""
    ```
 
 2. Add the public key to your repository:
@@ -75,14 +75,14 @@ For private repositories, DockPanel needs SSH access.
 
 4. Move the private key where the agent can access it:
    ```bash
-   sudo mkdir -p /etc/dockpanel/deploy-keys
-   sudo mv /tmp/deploy-key /etc/dockpanel/deploy-keys/your-app
-   sudo chmod 600 /etc/dockpanel/deploy-keys/your-app
+   sudo mkdir -p /etc/axiapanel/deploy-keys
+   sudo mv /tmp/deploy-key /etc/axiapanel/deploy-keys/your-app
+   sudo chmod 600 /etc/axiapanel/deploy-keys/your-app
    ```
 
 ## Nixpacks Auto-Detection
 
-DockPanel uses [Nixpacks](https://nixpacks.com) to automatically detect your app's language and build it into an optimized Docker image -- no Dockerfile required.
+AxiaPanel uses [Nixpacks](https://nixpacks.com) to automatically detect your app's language and build it into an optimized Docker image -- no Dockerfile required.
 
 Supported languages include: Node.js, Python, Go, Rust, Ruby, PHP, Java, .NET, Elixir, Haskell, Crystal, Dart, Swift, Zig, and more (30+ total).
 
@@ -96,7 +96,7 @@ The build method used is tracked per deployment in the deploy history.
 
 ### Customizing the Build
 
-If Nixpacks does not detect your app correctly, add a `Dockerfile` to your repository root and DockPanel will use it instead.
+If Nixpacks does not detect your app correctly, add a `Dockerfile` to your repository root and AxiaPanel will use it instead.
 
 For Nixpacks-specific customization, add a `nixpacks.toml` to your repository:
 
@@ -120,7 +120,7 @@ Preview environments let you deploy branches for testing before merging.
 1. Create a Git Deploy for your main branch
 2. Configure **preview_ttl_hours** (e.g., `72` for 3-day TTL)
 3. Push to a feature branch and trigger the webhook
-4. DockPanel creates a preview deployment on an auto-assigned port
+4. AxiaPanel creates a preview deployment on an auto-assigned port
 5. Access it at `preview-branch-name.example.com` or via the assigned port
 6. After the TTL expires, the preview is automatically cleaned up
 
@@ -143,7 +143,7 @@ Every deployment is tracked in the deploy history with a build hash and timestam
 3. Find the version you want to roll back to
 4. Click **Rollback**
 
-DockPanel performs a blue-green rollback: it starts the old version in a new container, verifies the health check, and switches traffic -- the same zero-downtime process as a forward deploy.
+AxiaPanel performs a blue-green rollback: it starts the old version in a new container, verifies the health check, and switches traffic -- the same zero-downtime process as a forward deploy.
 
 ## Deploy History
 

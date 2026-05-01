@@ -180,7 +180,7 @@ async fn execute_policy(db: &PgPool, agent: &AgentClient, policy: &PolicyRow, jw
 
         for (db_id, db_name, engine, user, password_enc) in &databases {
             let password = crate::services::secrets_crypto::decrypt_credential_or_legacy(password_enc, jwt_secret);
-            let container_name = format!("dockpanel-db-{db_name}");
+            let container_name = format!("axiapanel-db-{db_name}");
             let body = serde_json::json!({
                 "container_name": container_name,
                 "db_name": db_name,

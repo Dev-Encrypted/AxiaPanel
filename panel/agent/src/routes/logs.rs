@@ -376,7 +376,7 @@ async fn log_stats(
     })))
 }
 
-/// GET /logs/docker — List Docker containers with dockpanel.managed label.
+/// GET /logs/docker — List Docker containers with axiapanel.managed label.
 async fn docker_containers() -> Json<serde_json::Value> {
     let output = tokio::time::timeout(
         std::time::Duration::from_secs(30),
@@ -384,7 +384,7 @@ async fn docker_containers() -> Json<serde_json::Value> {
             .args([
                 "ps",
                 "--filter",
-                "label=dockpanel.managed=true",
+                "label=axiapanel.managed=true",
                 "--format",
                 "{{.Names}}",
             ])
@@ -455,8 +455,8 @@ async fn service_logs(
 ) -> Result<Json<serde_json::Value>, ApiErr> {
     // Whitelist of allowed services
     let allowed = [
-        "dockpanel-agent",
-        "dockpanel-api",
+        "axiapanel-agent",
+        "axiapanel-api",
         "nginx",
         "postfix",
         "dovecot",

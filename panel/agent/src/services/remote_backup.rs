@@ -9,7 +9,7 @@ struct TempFileGuard {
 impl TempFileGuard {
     fn create(label: &str, content: &str) -> Result<Self, String> {
         let random_suffix: u64 = rand::random();
-        let path = format!("/tmp/.dockpanel-s3-{}-{:016x}", label, random_suffix);
+        let path = format!("/tmp/.axiapanel-s3-{}-{:016x}", label, random_suffix);
         std::fs::write(&path, content)
             .map_err(|e| format!("Failed to write S3 config: {e}"))?;
         #[cfg(unix)]

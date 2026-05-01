@@ -409,7 +409,7 @@ pub async fn rotate_token(
             state.agents.local().update_token(new_token.to_string()).await;
 
             // Update api.env on disk for persistence across API restarts
-            let env_path = "/etc/dockpanel/api.env";
+            let env_path = "/etc/axiapanel/api.env";
             if let Ok(contents) = std::fs::read_to_string(env_path) {
                 let updated = contents
                     .lines()
@@ -573,7 +573,7 @@ pub async fn bootstrap_ssh(
     if panel_url.is_empty() {
         return Err(err(
             StatusCode::BAD_REQUEST,
-            "BASE_URL não configurada — defina em /etc/dockpanel/api.env e reinicie o backend",
+            "BASE_URL não configurada — defina em /etc/axiapanel/api.env e reinicie o backend",
         ));
     }
     // Reject loopback addresses — the remote server can't reach 127.0.0.1 of the panel

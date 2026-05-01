@@ -126,7 +126,7 @@ pub async fn audit_log(
 // ── Tamper-Resistant File Logging (Feature 6) ───────────────────────────
 
 /// Write audit entry to append-only file on disk.
-/// The directory /var/lib/dockpanel/audit/ should have chattr +a set.
+/// The directory /var/lib/axiapanel/audit/ should have chattr +a set.
 fn write_to_audit_file(
     event_type: &str,
     actor_email: Option<&str>,
@@ -136,7 +136,7 @@ fn write_to_audit_file(
 ) {
     use std::io::Write;
 
-    let dir = "/var/lib/dockpanel/audit";
+    let dir = "/var/lib/axiapanel/audit";
     let _ = std::fs::create_dir_all(dir);
 
     let date = chrono::Utc::now().format("%Y-%m-%d");
@@ -346,7 +346,7 @@ pub async fn alert_suspicious_ip(
 pub async fn alert_lockdown(pool: &PgPool, reason: &str, triggered_by: &str) {
     let subject = "🔒 EMERGÊNCIA: Lockdown do Sistema Ativado";
     let message = format!(
-        "O DockPanel entrou em modo de lockdown.\n\
+        "O AxiaPanel entrou em modo de lockdown.\n\
          Acionado por: {triggered_by}\n\
          Motivo: {reason}\n\
          Todos os terminais desabilitados. Registro bloqueado.\n\

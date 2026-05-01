@@ -32,7 +32,7 @@ pub struct CronResult {
     pub exit_code: Option<i32>,
 }
 
-const CRONTAB_MARKER: &str = "# dockpanel:";
+const CRONTAB_MARKER: &str = "# axiapanel:";
 
 pub fn router() -> Router<AppState> {
     Router::new()
@@ -47,7 +47,7 @@ pub fn router() -> Router<AppState> {
 async fn sync_crons(
     AxumJson(crons): AxumJson<Vec<CronRequest>>,
 ) -> Result<Json<serde_json::Value>, ApiErr> {
-    // Read existing crontab, preserve non-dockpanel entries
+    // Read existing crontab, preserve non-axiapanel entries
     let existing = read_crontab().await;
     let mut lines: Vec<String> = existing
         .lines()
@@ -55,7 +55,7 @@ async fn sync_crons(
         .map(|s| s.to_string())
         .collect();
 
-    // Add dockpanel crons
+    // Add axiapanel crons
     for cron in &crons {
         if !is_valid_schedule(&cron.schedule) {
             return Err(err(StatusCode::BAD_REQUEST, &format!("Invalid cron schedule: {}", cron.schedule)));
@@ -130,14 +130,14 @@ async fn run_cron(
     }))
 }
 
-/// GET /crons/list — Read dockpanel crons from system crontab.
+/// GET /crons/list — Read axiapanel crons from system crontab.
 async fn list_crons() -> Result<Json<Vec<serde_json::Value>>, ApiErr> {
     let crontab = read_crontab().await;
     let crons: Vec<serde_json::Value> = crontab
         .lines()
         .filter(|line| line.contains(CRONTAB_MARKER))
         .filter_map(|line| {
-            // Format: schedule command # dockpanel:id label
+            // Format: schedule command # axiapanel:id label
             let marker_pos = line.find(CRONTAB_MARKER)?;
             let before_marker = &line[..marker_pos].trim();
             let after_marker = &line[marker_pos + CRONTAB_MARKER.len()..];

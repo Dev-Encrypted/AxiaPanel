@@ -79,7 +79,7 @@ This is useful for debugging or recovering from temporary downstream failures.
 
 When HMAC verification is configured:
 
-1. DockPanel computes the HMAC signature of the request body using the shared secret
+1. AxiaPanel computes the HMAC signature of the request body using the shared secret
 2. Compares it against the value in the configured header
 3. Marks the delivery as **verified** or **failed**
 

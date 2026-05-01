@@ -23,9 +23,9 @@ pub async fn render(pool: &PgPool) -> String {
 }
 
 fn render_info(out: &mut String) {
-    let _ = writeln!(out, "# HELP dockpanel_info DockPanel build information.");
-    let _ = writeln!(out, "# TYPE dockpanel_info gauge");
-    let _ = write!(out, "dockpanel_info{{version=\"");
+    let _ = writeln!(out, "# HELP axiapanel_info AxiaPanel build information.");
+    let _ = writeln!(out, "# TYPE axiapanel_info gauge");
+    let _ = write!(out, "axiapanel_info{{version=\"");
     push_escaped(out, env!("CARGO_PKG_VERSION"));
     let _ = writeln!(out, "\"}} 1");
 }
@@ -47,20 +47,20 @@ async fn render_system(out: &mut String, pool: &PgPool) {
         return;
     }
 
-    let _ = writeln!(out, "# HELP dockpanel_cpu_percent Current CPU usage (0-100).");
-    let _ = writeln!(out, "# TYPE dockpanel_cpu_percent gauge");
+    let _ = writeln!(out, "# HELP axiapanel_cpu_percent Current CPU usage (0-100).");
+    let _ = writeln!(out, "# TYPE axiapanel_cpu_percent gauge");
     for (sid, name, cpu, _, _) in &rows {
-        write_server_sample(out, "dockpanel_cpu_percent", sid, name, *cpu);
+        write_server_sample(out, "axiapanel_cpu_percent", sid, name, *cpu);
     }
-    let _ = writeln!(out, "# HELP dockpanel_memory_percent Current memory usage (0-100).");
-    let _ = writeln!(out, "# TYPE dockpanel_memory_percent gauge");
+    let _ = writeln!(out, "# HELP axiapanel_memory_percent Current memory usage (0-100).");
+    let _ = writeln!(out, "# TYPE axiapanel_memory_percent gauge");
     for (sid, name, _, mem, _) in &rows {
-        write_server_sample(out, "dockpanel_memory_percent", sid, name, *mem);
+        write_server_sample(out, "axiapanel_memory_percent", sid, name, *mem);
     }
-    let _ = writeln!(out, "# HELP dockpanel_disk_percent Current disk usage (0-100).");
-    let _ = writeln!(out, "# TYPE dockpanel_disk_percent gauge");
+    let _ = writeln!(out, "# HELP axiapanel_disk_percent Current disk usage (0-100).");
+    let _ = writeln!(out, "# TYPE axiapanel_disk_percent gauge");
     for (sid, name, _, _, disk) in &rows {
-        write_server_sample(out, "dockpanel_disk_percent", sid, name, *disk);
+        write_server_sample(out, "axiapanel_disk_percent", sid, name, *disk);
     }
 }
 
@@ -84,33 +84,33 @@ async fn render_gpu(out: &mut String, pool: &PgPool) {
         return;
     }
 
-    let _ = writeln!(out, "# HELP dockpanel_gpu_utilization_percent GPU compute utilization (0-100).");
-    let _ = writeln!(out, "# TYPE dockpanel_gpu_utilization_percent gauge");
+    let _ = writeln!(out, "# HELP axiapanel_gpu_utilization_percent GPU compute utilization (0-100).");
+    let _ = writeln!(out, "# TYPE axiapanel_gpu_utilization_percent gauge");
     for r in &rows {
-        write_gpu_sample(out, "dockpanel_gpu_utilization_percent", &r.0, &r.1, r.2, r.3);
+        write_gpu_sample(out, "axiapanel_gpu_utilization_percent", &r.0, &r.1, r.2, r.3);
     }
-    let _ = writeln!(out, "# HELP dockpanel_gpu_vram_used_mb GPU VRAM used in MB.");
-    let _ = writeln!(out, "# TYPE dockpanel_gpu_vram_used_mb gauge");
+    let _ = writeln!(out, "# HELP axiapanel_gpu_vram_used_mb GPU VRAM used in MB.");
+    let _ = writeln!(out, "# TYPE axiapanel_gpu_vram_used_mb gauge");
     for r in &rows {
-        write_gpu_sample(out, "dockpanel_gpu_vram_used_mb", &r.0, &r.1, r.2, r.4);
+        write_gpu_sample(out, "axiapanel_gpu_vram_used_mb", &r.0, &r.1, r.2, r.4);
     }
-    let _ = writeln!(out, "# HELP dockpanel_gpu_vram_total_mb GPU VRAM capacity in MB.");
-    let _ = writeln!(out, "# TYPE dockpanel_gpu_vram_total_mb gauge");
+    let _ = writeln!(out, "# HELP axiapanel_gpu_vram_total_mb GPU VRAM capacity in MB.");
+    let _ = writeln!(out, "# TYPE axiapanel_gpu_vram_total_mb gauge");
     for r in &rows {
-        write_gpu_sample(out, "dockpanel_gpu_vram_total_mb", &r.0, &r.1, r.2, r.5);
+        write_gpu_sample(out, "axiapanel_gpu_vram_total_mb", &r.0, &r.1, r.2, r.5);
     }
-    let _ = writeln!(out, "# HELP dockpanel_gpu_temperature_celsius GPU temperature in Celsius.");
-    let _ = writeln!(out, "# TYPE dockpanel_gpu_temperature_celsius gauge");
+    let _ = writeln!(out, "# HELP axiapanel_gpu_temperature_celsius GPU temperature in Celsius.");
+    let _ = writeln!(out, "# TYPE axiapanel_gpu_temperature_celsius gauge");
     for r in &rows {
         if let Some(v) = r.6 {
-            write_gpu_sample(out, "dockpanel_gpu_temperature_celsius", &r.0, &r.1, r.2, v);
+            write_gpu_sample(out, "axiapanel_gpu_temperature_celsius", &r.0, &r.1, r.2, v);
         }
     }
-    let _ = writeln!(out, "# HELP dockpanel_gpu_power_draw_watts GPU power draw in Watts.");
-    let _ = writeln!(out, "# TYPE dockpanel_gpu_power_draw_watts gauge");
+    let _ = writeln!(out, "# HELP axiapanel_gpu_power_draw_watts GPU power draw in Watts.");
+    let _ = writeln!(out, "# TYPE axiapanel_gpu_power_draw_watts gauge");
     for r in &rows {
         if let Some(v) = r.7 {
-            write_gpu_sample(out, "dockpanel_gpu_power_draw_watts", &r.0, &r.1, r.2, v);
+            write_gpu_sample(out, "axiapanel_gpu_power_draw_watts", &r.0, &r.1, r.2, v);
         }
     }
 }
@@ -128,10 +128,10 @@ async fn render_sites(out: &mut String, pool: &PgPool) {
         return;
     }
 
-    let _ = writeln!(out, "# HELP dockpanel_site_count Sites grouped by status.");
-    let _ = writeln!(out, "# TYPE dockpanel_site_count gauge");
+    let _ = writeln!(out, "# HELP axiapanel_site_count Sites grouped by status.");
+    let _ = writeln!(out, "# TYPE axiapanel_site_count gauge");
     for (status, cnt) in &rows {
-        let _ = write!(out, "dockpanel_site_count{{status=\"");
+        let _ = write!(out, "axiapanel_site_count{{status=\"");
         push_escaped(out, status);
         let _ = writeln!(out, "\"}} {cnt}");
     }
@@ -145,14 +145,14 @@ async fn render_alerts(out: &mut String, pool: &PgPool) {
     .await
     .unwrap_or_default();
 
-    let _ = writeln!(out, "# HELP dockpanel_alerts_firing Firing alerts grouped by severity.");
-    let _ = writeln!(out, "# TYPE dockpanel_alerts_firing gauge");
+    let _ = writeln!(out, "# HELP axiapanel_alerts_firing Firing alerts grouped by severity.");
+    let _ = writeln!(out, "# TYPE axiapanel_alerts_firing gauge");
     if rows.is_empty() {
         // Publish a zero so scrapers can reliably alert on presence.
-        let _ = writeln!(out, "dockpanel_alerts_firing{{severity=\"none\"}} 0");
+        let _ = writeln!(out, "axiapanel_alerts_firing{{severity=\"none\"}} 0");
     } else {
         for (severity, cnt) in &rows {
-            let _ = write!(out, "dockpanel_alerts_firing{{severity=\"");
+            let _ = write!(out, "axiapanel_alerts_firing{{severity=\"");
             push_escaped(out, severity);
             let _ = writeln!(out, "\"}} {cnt}");
         }

@@ -860,7 +860,7 @@ async fn remove(
         }
 
         // Remove SSL certificates (panel-provisioned)
-        let ssl_dir = format!("/etc/dockpanel/ssl/{domain}");
+        let ssl_dir = format!("/etc/axiapanel/ssl/{domain}");
         if std::path::Path::new(&ssl_dir).exists() {
             std::fs::remove_dir_all(&ssl_dir).ok();
             tracing::info!("SSL cleanup: removed certs for {domain}");
@@ -886,7 +886,7 @@ async fn remove(
 
     // Clean up persistent volume data
     if let Some(ref name) = app_name {
-        let volume_dir = format!("/var/lib/dockpanel/apps/{name}");
+        let volume_dir = format!("/var/lib/axiapanel/apps/{name}");
         if std::path::Path::new(&volume_dir).exists() {
             std::fs::remove_dir_all(&volume_dir).ok();
             tracing::info!("Volume cleanup: removed {volume_dir}");
@@ -1169,8 +1169,8 @@ async fn snapshot_container(
                 .as_secs();
             now.to_string()
         });
-        // Force-namespace with dockpanel-snapshot: prefix to prevent overwriting system images
-        let suffix = raw.strip_prefix("dockpanel-snapshot:").unwrap_or(&raw);
+        // Force-namespace with axiapanel-snapshot: prefix to prevent overwriting system images
+        let suffix = raw.strip_prefix("axiapanel-snapshot:").unwrap_or(&raw);
         // Sanitise the suffix: only allow alphanumeric, -, _, .
         let safe_suffix: String = suffix.chars()
             .filter(|c| c.is_ascii_alphanumeric() || *c == '-' || *c == '_' || *c == '.')
@@ -1181,9 +1181,9 @@ async fn snapshot_container(
                 .duration_since(std::time::UNIX_EPOCH)
                 .unwrap_or_default()
                 .as_secs();
-            format!("dockpanel-snapshot:{}", now)
+            format!("axiapanel-snapshot:{}", now)
         } else {
-            format!("dockpanel-snapshot:{}", safe_suffix)
+            format!("axiapanel-snapshot:{}", safe_suffix)
         }
     };
 

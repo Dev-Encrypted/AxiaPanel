@@ -3,13 +3,13 @@ services:
     image: postgres:16-alpine
     restart: unless-stopped
     environment:
-      POSTGRES_DB: dockpanel
-      POSTGRES_USER: dockpanel
+      POSTGRES_DB: axiapanel
+      POSTGRES_USER: axiapanel
       POSTGRES_PASSWORD: ${DB_PASSWORD:?Set DB_PASSWORD in .env}
     volumes:
       - pgdata:/var/lib/postgresql/data
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U dockpanel"]
+      test: ["CMD-SHELL", "pg_isready -U axiapanel"]
       interval: 10s
       timeout: 5s
       retries: 5
@@ -44,7 +44,7 @@ services:
     environment:
       NODE_ENV: production
       PORT: 3061
-      DATABASE_URL: postgresql://dockpanel:${DB_PASSWORD}@db:5432/dockpanel
+      DATABASE_URL: postgresql://axiapanel:${DB_PASSWORD}@db:5432/axiapanel
       JWT_SECRET: ${JWT_SECRET:?Set JWT_SECRET in .env}
       STRIPE_SECRET_KEY: ${STRIPE_SECRET_KEY:-}
       STRIPE_WEBHOOK_SECRET: ${STRIPE_WEBHOOK_SECRET:-}

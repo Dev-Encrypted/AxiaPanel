@@ -108,7 +108,7 @@ export default function GlassLayout() {
               </svg>
             </div>
             <span className="text-base font-semibold whitespace-nowrap overflow-hidden">
-              <span className="text-rust-400">Dock</span>
+              <span className="text-rust-400">Axia</span>
               <span className="text-dark-50">Panel</span>
             </span>
           </Link>
@@ -378,7 +378,7 @@ export default function GlassLayout() {
             <Icon name="hamburger" className="w-6 h-6" />
           </button>
           <span className="text-base font-semibold">
-            <span className="text-rust-400">Dock</span>
+            <span className="text-rust-400">Axia</span>
             <span className="text-dark-50">Panel</span>
           </span>
         </div>

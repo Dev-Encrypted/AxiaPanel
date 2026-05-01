@@ -1,5 +1,5 @@
 #!/bin/bash
-# DockPanel Full E2E Test Suite
+# AxiaPanel Full E2E Test Suite
 # Tests all major features end-to-end against the live API
 set -euo pipefail
 
@@ -33,15 +33,15 @@ test_contains() {
 }
 
 echo "═══════════════════════════════════════════════"
-echo "  DockPanel Full E2E Test Suite"
+echo "  AxiaPanel Full E2E Test Suite"
 echo "═══════════════════════════════════════════════"
 
 # Auth
 TOKEN=$(curl -s -X POST "$API/api/auth/login" -H "Content-Type: application/json" \
-    -d "{\"email\":\"admin@dockpanel.dev\",\"password\":\"${DOCKPANEL_TEST_PASSWORD:-testpassword}\"}" -D - 2>/dev/null | grep -oP 'token=\K[^;]+')
+    -d "{\"email\":\"admin@axiapanel.dev\",\"password\":\"${AXIAPANEL_TEST_PASSWORD:-testpassword}\"}" -D - 2>/dev/null | grep -oP 'token=\K[^;]+')
 [ -z "$TOKEN" ] && echo "FATAL: Login failed" && exit 1
 AUTH="Cookie: token=$TOKEN"
-echo "  Authenticated as admin@dockpanel.dev"
+echo "  Authenticated as admin@axiapanel.dev"
 echo ""
 
 echo "── Authentication ──"
@@ -167,7 +167,7 @@ test_api GET /api/notifications/unread-count "Unread notification count"
 echo ""
 echo "── Users ──"
 test_api GET /api/users "List users"
-test_contains GET /api/users "Has admin user" "admin@dockpanel.dev"
+test_contains GET /api/users "Has admin user" "admin@axiapanel.dev"
 
 echo ""
 echo "── Settings ──"
@@ -204,7 +204,7 @@ test_contains GET /api/servers "Has local server" "id"
 
 echo ""
 echo "── Database Migration ──"
-test_it() { if docker exec dockpanel-postgres psql -U dockpanel -d dockpanel -c "$1" > /dev/null 2>&1; then green "$2"; else red "$2"; fi; }
+test_it() { if docker exec axiapanel-postgres psql -U axiapanel -d axiapanel -c "$1" > /dev/null 2>&1; then green "$2"; else red "$2"; fi; }
 test_it "SELECT 1 FROM security_audit_log LIMIT 0" "security_audit_log table exists"
 test_it "SELECT active FROM lockdown_state WHERE id = 1" "lockdown_state table exists"
 test_it "SELECT 1 FROM suspicious_events LIMIT 0" "suspicious_events table exists"
@@ -215,10 +215,10 @@ test_it "SELECT sha256_hash FROM backups LIMIT 0" "backups.sha256_hash column ex
 
 echo ""
 echo "── Filesystem ──"
-[ -d /var/lib/dockpanel/audit ] && green "Audit log directory exists" || red "Audit log directory missing"
-[ -d /var/lib/dockpanel/recordings ] && green "Recordings directory exists" || red "Recordings directory missing"
-[ -d /var/backups/dockpanel ] && green "DB backup directory exists" || red "DB backup directory missing"
-lsattr -d /var/lib/dockpanel/audit/ 2>/dev/null | grep -q "a" && green "Audit dir has append-only flag" || red "Audit dir missing append-only flag"
+[ -d /var/lib/axiapanel/audit ] && green "Audit log directory exists" || red "Audit log directory missing"
+[ -d /var/lib/axiapanel/recordings ] && green "Recordings directory exists" || red "Recordings directory missing"
+[ -d /var/backups/axiapanel ] && green "DB backup directory exists" || red "DB backup directory missing"
+lsattr -d /var/lib/axiapanel/audit/ 2>/dev/null | grep -q "a" && green "Audit dir has append-only flag" || red "Audit dir missing append-only flag"
 
 echo ""
 echo "── Tier 2 Cert Pin (sub-suite) ──"

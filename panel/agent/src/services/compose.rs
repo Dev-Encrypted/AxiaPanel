@@ -159,7 +159,7 @@ pub fn parse_compose(yaml: &str) -> Result<Vec<ComposeService>, String> {
             name: def
                 .container_name
                 .clone()
-                .unwrap_or_else(|| format!("dockpanel-compose-{name}")),
+                .unwrap_or_else(|| format!("axiapanel-compose-{name}")),
             image,
             ports,
             environment,
@@ -230,7 +230,7 @@ fn parse_ports(ports_val: &Option<Vec<serde_yaml_ng::Value>>) -> Vec<PortMapping
 }
 
 /// Deploy all services from a parsed compose file.
-/// If `stack_id` is provided, all containers get a `dockpanel.stack_id` label.
+/// If `stack_id` is provided, all containers get a `axiapanel.stack_id` label.
 pub async fn deploy_compose(
     services: &[ComposeService],
     stack_id: Option<&str>,
@@ -328,7 +328,7 @@ async fn deploy_service(
     // Volume binds — validate that host paths are under the allowed prefix
     // and block mounting the Docker socket.
     let mut binds: Vec<String> = Vec::new();
-    const ALLOWED_BIND_PREFIX: &str = "/var/lib/dockpanel/compose/";
+    const ALLOWED_BIND_PREFIX: &str = "/var/lib/axiapanel/compose/";
     const BLOCKED_PATHS: &[&str] = &["/var/run/docker.sock", "/run/docker.sock"];
 
     for vol in &svc.volumes {
@@ -434,12 +434,12 @@ async fn deploy_service(
         host_config: Some(host_config),
         labels: Some({
             let mut labels = HashMap::from([
-                ("dockpanel.managed".to_string(), "true".to_string()),
-                ("dockpanel.app.template".to_string(), "compose".to_string()),
-                ("dockpanel.app.name".to_string(), svc.name.clone()),
+                ("axiapanel.managed".to_string(), "true".to_string()),
+                ("axiapanel.app.template".to_string(), "compose".to_string()),
+                ("axiapanel.app.name".to_string(), svc.name.clone()),
             ]);
             if let Some(sid) = stack_id {
-                labels.insert("dockpanel.stack_id".to_string(), sid.to_string());
+                labels.insert("axiapanel.stack_id".to_string(), sid.to_string());
             }
             labels
         }),

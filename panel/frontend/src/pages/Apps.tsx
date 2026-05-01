@@ -973,9 +973,9 @@ export default function Apps() {
       WORDPRESS_DB_NAME: wordpress
     depends_on: [db]
     labels:
-      dockpanel.managed: "true"
-      dockpanel.app.template: wordpress-package
-      dockpanel.app.name: wordpress
+      axiapanel.managed: "true"
+      axiapanel.app.template: wordpress-package
+      axiapanel.app.name: wordpress
   db:
     image: mysql:8
     environment:
@@ -985,9 +985,9 @@ export default function Apps() {
       MYSQL_PASSWORD: wp_password
     volumes: [mysql_data:/var/lib/mysql]
     labels:
-      dockpanel.managed: "true"
-      dockpanel.app.template: wordpress-package
-      dockpanel.app.name: wordpress-db
+      axiapanel.managed: "true"
+      axiapanel.app.template: wordpress-package
+      axiapanel.app.name: wordpress-db
 volumes:
   mysql_data:`,
     },
@@ -1009,7 +1009,7 @@ volumes:
       url: http://localhost:2368
     depends_on: [db]
     labels:
-      dockpanel.managed: "true"
+      axiapanel.managed: "true"
   db:
     image: mysql:8
     environment:
@@ -1019,7 +1019,7 @@ volumes:
       MYSQL_PASSWORD: ghost_password
     volumes: [ghost_mysql:/var/lib/mysql]
     labels:
-      dockpanel.managed: "true"
+      axiapanel.managed: "true"
 volumes:
   ghost_mysql:`,
     },
@@ -1041,7 +1041,7 @@ volumes:
     depends_on: [db, redis]
     volumes: [nextcloud_data:/var/www/html]
     labels:
-      dockpanel.managed: "true"
+      axiapanel.managed: "true"
   db:
     image: mariadb:11
     environment:
@@ -1051,11 +1051,11 @@ volumes:
       MYSQL_PASSWORD: nc_password
     volumes: [nc_mariadb:/var/lib/mysql]
     labels:
-      dockpanel.managed: "true"
+      axiapanel.managed: "true"
   redis:
     image: redis:7-alpine
     labels:
-      dockpanel.managed: "true"
+      axiapanel.managed: "true"
 volumes:
   nextcloud_data:
   nc_mariadb:`,

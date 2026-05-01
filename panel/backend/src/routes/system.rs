@@ -24,14 +24,14 @@ pub async fn health(State(state): State<AppState>) -> Json<serde_json::Value> {
     if db_ok {
         Json(serde_json::json!({
             "status": "ok",
-            "service": "dockpanel-api",
+            "service": "axiapanel-api",
             "version": env!("CARGO_PKG_VERSION"),
         }))
     } else {
         Json(serde_json::json!({
             "status": "degraded",
             "db": "unreachable",
-            "service": "dockpanel-api",
+            "service": "axiapanel-api",
             "version": env!("CARGO_PKG_VERSION"),
         }))
     }

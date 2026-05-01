@@ -76,9 +76,9 @@ jobs:
       - name: Package binaries
         run: |
           mkdir -p release
-          cp panel/agent/target/${{ matrix.target }}/release/dockpanel-agent release/dockpanel-agent-linux-${{ matrix.arch }}
-          cp panel/backend/target/${{ matrix.target }}/release/dockpanel-api release/dockpanel-api-linux-${{ matrix.arch }}
-          cp panel/cli/target/${{ matrix.target }}/release/dockpanel release/dockpanel-cli-linux-${{ matrix.arch }}
+          cp panel/agent/target/${{ matrix.target }}/release/axiapanel-agent release/axiapanel-agent-linux-${{ matrix.arch }}
+          cp panel/backend/target/${{ matrix.target }}/release/axiapanel-api release/axiapanel-api-linux-${{ matrix.arch }}
+          cp panel/cli/target/${{ matrix.target }}/release/axiapanel release/axiapanel-cli-linux-${{ matrix.arch }}
           chmod +x release/*
 
           # Report binary sizes
@@ -92,9 +92,9 @@ jobs:
       - name: Generate SBOMs (SPDX JSON)
         if: matrix.arch == 'amd64'
         run: |
-          cargo sbom --project-directory panel/agent   --output-format spdx_json_2_3 > release/dockpanel-agent.spdx.json
-          cargo sbom --project-directory panel/backend --output-format spdx_json_2_3 > release/dockpanel-api.spdx.json
-          cargo sbom --project-directory panel/cli     --output-format spdx_json_2_3 > release/dockpanel-cli.spdx.json
+          cargo sbom --project-directory panel/agent   --output-format spdx_json_2_3 > release/axiapanel-agent.spdx.json
+          cargo sbom --project-directory panel/backend --output-format spdx_json_2_3 > release/axiapanel-api.spdx.json
+          cargo sbom --project-directory panel/cli     --output-format spdx_json_2_3 > release/axiapanel-cli.spdx.json
 
       - name: Upload artifacts
         uses: actions/upload-artifact@v7
@@ -121,13 +121,13 @@ jobs:
       - name: Package frontend
         run: |
           cd panel/frontend
-          tar czf ../../dockpanel-frontend.tar.gz dist/
+          tar czf ../../axiapanel-frontend.tar.gz dist/
 
       - name: Upload artifact
         uses: actions/upload-artifact@v7
         with:
           name: frontend
-          path: dockpanel-frontend.tar.gz
+          path: axiapanel-frontend.tar.gz
 
   release:
     needs: [build, frontend]
@@ -146,11 +146,11 @@ jobs:
           mkdir -p release
           cp artifacts/binaries-amd64/* release/
           cp artifacts/binaries-arm64/* release/
-          cp artifacts/frontend/dockpanel-frontend.tar.gz release/
+          cp artifacts/frontend/axiapanel-frontend.tar.gz release/
 
           # Create checksums (over binaries + SBOMs, before signatures)
           cd release
-          sha256sum dockpanel-* > checksums.txt
+          sha256sum axiapanel-* > checksums.txt
 
           echo "Release contents:"
           ls -lh

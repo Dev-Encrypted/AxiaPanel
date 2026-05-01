@@ -178,7 +178,7 @@ pub async fn webhook(
         "provision" | "CreateAccount" if auto_provision => {
             // Create user + site for new WHMCS service
             let email = body.client_email.as_deref().unwrap_or("user@example.com");
-            let _domain = body.domain.as_deref().unwrap_or("pending.dockpanel.dev");
+            let _domain = body.domain.as_deref().unwrap_or("pending.axiapanel.dev");
             let plan = body.plan.as_deref().unwrap_or("basic");
 
             // Check if user already exists

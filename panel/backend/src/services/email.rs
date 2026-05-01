@@ -40,7 +40,7 @@ pub async fn send_email(
     // Decrypt the password (handles legacy plaintext values gracefully)
     let password = crate::services::secrets_crypto::decrypt_credential_from_env(&password_raw);
     let from_email = get("smtp_from").ok_or("SMTP from address not configured")?;
-    let from_name = get("smtp_from_name").unwrap_or_else(|| "DockPanel".to_string());
+    let from_name = get("smtp_from_name").unwrap_or_else(|| "AxiaPanel".to_string());
     let encryption = get("smtp_encryption").unwrap_or_else(|| "starttls".to_string());
 
     let from: Mailbox = format!("{from_name} <{from_email}>")
@@ -101,7 +101,7 @@ pub async fn send_verification_email(
     let body = format!(
         r#"<div style="font-family: sans-serif; max-width: 600px; margin: 0 auto;">
             <h2 style="color: #4f46e5;">Verifique seu e-mail</h2>
-            <p>Clique no botão abaixo para verificar sua conta no DockPanel:</p>
+            <p>Clique no botão abaixo para verificar sua conta no AxiaPanel:</p>
             <p style="margin: 24px 0;">
                 <a href="{link}" style="background-color: #4f46e5; color: white; padding: 12px 24px; text-decoration: none; border-radius: 8px; font-weight: 600;">
                     Verificar E-mail
@@ -112,7 +112,7 @@ pub async fn send_verification_email(
         </div>"#
     );
 
-    send_email(pool, to, "Verifique sua conta no DockPanel", &body).await
+    send_email(pool, to, "Verifique sua conta no AxiaPanel", &body).await
 }
 
 /// Send password reset link.
@@ -126,7 +126,7 @@ pub async fn send_reset_email(
     let body = format!(
         r#"<div style="font-family: sans-serif; max-width: 600px; margin: 0 auto;">
             <h2 style="color: #4f46e5;">Redefina sua senha</h2>
-            <p>Clique no botão abaixo para redefinir sua senha no DockPanel:</p>
+            <p>Clique no botão abaixo para redefinir sua senha no AxiaPanel:</p>
             <p style="margin: 24px 0;">
                 <a href="{link}" style="background-color: #4f46e5; color: white; padding: 12px 24px; text-decoration: none; border-radius: 8px; font-weight: 600;">
                     Redefinir Senha
@@ -137,5 +137,5 @@ pub async fn send_reset_email(
         </div>"#
     );
 
-    send_email(pool, to, "Redefina sua senha do DockPanel", &body).await
+    send_email(pool, to, "Redefina sua senha do AxiaPanel", &body).await
 }

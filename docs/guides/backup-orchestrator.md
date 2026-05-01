@@ -19,7 +19,7 @@ The fastest way to get started is the one-click preset.
 
 1. Go to **Backup Orchestrator** in the sidebar
 2. Click **Protect Everything**
-3. DockPanel creates a policy that backs up all sites, databases, and volumes daily at 2 AM, keeps 7 days of history, and verifies each backup after creation.
+3. AxiaPanel creates a policy that backs up all sites, databases, and volumes daily at 2 AM, keeps 7 days of history, and verifies each backup after creation.
 
 ## Creating Backup Policies
 
@@ -52,13 +52,13 @@ The backup runs `pg_dump` or `mysqldump` inside the container and stores the com
 **From the CLI:**
 
 ```bash
-dockpanel backup db-create dockpanel-db-myapp myapp --db-type postgres --user root --password secret
+axiapanel backup db-create axiapanel-db-myapp myapp --db-type postgres --user root --password secret
 ```
 
 ### List Database Backups
 
 ```bash
-dockpanel backup db-list myapp
+axiapanel backup db-list myapp
 ```
 
 ### Restore a Database
@@ -80,13 +80,13 @@ The restore replaces the database contents. Encrypted backups are decrypted auto
 **From the CLI:**
 
 ```bash
-dockpanel backup vol-create my_app_data my-app-container
+axiapanel backup vol-create my_app_data my-app-container
 ```
 
 ### List Volume Backups
 
 ```bash
-dockpanel backup vol-list my-app-container
+axiapanel backup vol-list my-app-container
 ```
 
 ### Restore a Volume
@@ -113,7 +113,7 @@ Enable **Verify after backup** on a policy to verify every backup automatically.
 **From the CLI:**
 
 ```bash
-dockpanel backup verify --type database myapp myapp_2026-03-22_020000.sql.gz
+axiapanel backup verify --type database myapp myapp_2026-03-22_020000.sql.gz
 ```
 
 Sample output:
@@ -160,7 +160,7 @@ When encryption is enabled:
 **From the CLI:**
 
 ```bash
-dockpanel backup health
+axiapanel backup health
 ```
 
 The dashboard shows:

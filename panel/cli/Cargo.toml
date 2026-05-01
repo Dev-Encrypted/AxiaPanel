@@ -1,11 +1,11 @@
 [package]
-name = "dockpanel"
+name = "axiapanel"
 version = "2.7.20"
 edition = "2024"
-description = "CLI for DockPanel — self-hosted server management"
+description = "CLI for AxiaPanel — self-hosted server management"
 
 [[bin]]
-name = "dockpanel"
+name = "axiapanel"
 path = "src/main.rs"
 
 [profile.release]

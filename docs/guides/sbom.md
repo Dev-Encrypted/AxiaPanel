@@ -1,6 +1,6 @@
 ## SBOMs (Software Bill of Materials)
 
-DockPanel can generate an SPDX 2.3 JSON SBOM for any deployed Docker app's image, listing every package present in the container. This is the **composition** companion to image vulnerability scanning, which reports **risk**.
+AxiaPanel can generate an SPDX 2.3 JSON SBOM for any deployed Docker app's image, listing every package present in the container. This is the **composition** companion to image vulnerability scanning, which reports **risk**.
 
 SBOMs are useful for:
 
@@ -13,14 +13,14 @@ SBOM generation is **disabled by default** — admins opt in from the Settings U
 ## Enable
 
 1. Go to **Settings → Services → SBOM Generation**.
-2. Click **Install Generator**. DockPanel downloads [syft](https://github.com/anchore/syft) (~80 MB) into `/var/lib/dockpanel/scanners/`. Self-contained — nothing is written to `/usr/local/bin`, and it lives entirely inside the agent's hardened sandbox.
+2. Click **Install Generator**. AxiaPanel downloads [syft](https://github.com/anchore/syft) (~80 MB) into `/var/lib/axiapanel/scanners/`. Self-contained — nothing is written to `/usr/local/bin`, and it lives entirely inside the agent's hardened sandbox.
 
 That's the whole setup. SBOMs are generated on demand — there is no scheduled sweep.
 
 ## Download an SBOM for a deployed app
 
 1. On the **Apps** page, click the row of any running app to open its scan drawer.
-2. Click **Download SBOM**. DockPanel runs syft against the app's image (10 – 60 s on first generation), persists the result, and triggers a browser download of `<app>.spdx.json`.
+2. Click **Download SBOM**. AxiaPanel runs syft against the app's image (10 – 60 s on first generation), persists the result, and triggers a browser download of `<app>.spdx.json`.
 
 Subsequent downloads of the same image return the persisted SBOM immediately — re-click **Download SBOM** to regenerate from a fresh image pull if the image has been updated.
 
@@ -45,17 +45,17 @@ The SBOM also pairs cleanly with `grype` to repeat the vulnerability assessment 
 grype sbom:./my-app.spdx.json
 ```
 
-## Verifying DockPanel's own release SBOMs
+## Verifying AxiaPanel's own release SBOMs
 
-Since v2.7.10, DockPanel itself ships SPDX SBOMs for `dockpanel-agent`, `dockpanel-api`, and `dockpanel` (CLI), all signed with cosign keyless via Sigstore. See [SECURITY.md](https://github.com/ovexro/dockpanel/blob/main/SECURITY.md#verifying-release-signatures) for the full verification snippet — short version:
+Since v2.7.10, AxiaPanel itself ships SPDX SBOMs for `axiapanel-agent`, `axiapanel-api`, and `axiapanel` (CLI), all signed with cosign keyless via Sigstore. See [SECURITY.md](https://github.com/ovexro/axiapanel/blob/main/SECURITY.md#verifying-release-signatures) for the full verification snippet — short version:
 
 ```bash
 cosign verify-blob \
-  --certificate dockpanel-agent.spdx.json.pem \
-  --signature  dockpanel-agent.spdx.json.sig \
-  --certificate-identity-regexp '^https://github\.com/ovexro/dockpanel/\.github/workflows/release\.yml@refs/tags/v.+$' \
+  --certificate axiapanel-agent.spdx.json.pem \
+  --signature  axiapanel-agent.spdx.json.sig \
+  --certificate-identity-regexp '^https://github\.com/ovexro/axiapanel/\.github/workflows/release\.yml@refs/tags/v.+$' \
   --certificate-oidc-issuer 'https://token.actions.githubusercontent.com' \
-  dockpanel-agent.spdx.json
+  axiapanel-agent.spdx.json
 ```
 
 A successful verify proves the SBOM was produced by this repository's release workflow and recorded in the public Rekor transparency log.
@@ -78,7 +78,7 @@ All endpoints require admin auth.
 
 SBOMs live in the `image_sbom` table — one row per image, overwritten on regeneration. Stored as `JSONB` so the API serves the SPDX document directly without re-parsing on the agent.
 
-The syft binary lives at `/var/lib/dockpanel/scanners/syft`. Uninstalling from the UI removes it.
+The syft binary lives at `/var/lib/axiapanel/scanners/syft`. Uninstalling from the UI removes it.
 
 ## Relationship to image vulnerability scanning
 

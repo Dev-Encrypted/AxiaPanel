@@ -1,7 +1,7 @@
 use std::path::PathBuf;
 use crate::safe_cmd::safe_command;
 
-const BACKUP_DIR: &str = "/var/backups/dockpanel";
+const BACKUP_DIR: &str = "/var/backups/axiapanel";
 const WEBROOT: &str = "/var/www";
 
 #[derive(serde::Serialize, Default)]

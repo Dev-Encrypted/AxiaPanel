@@ -9,25 +9,25 @@
 3. Select the site to back up
 4. Click **Create**
 
-The backup includes the site files, database (if attached), and Nginx configuration. It is saved as a compressed tarball in `/var/backups/dockpanel/`.
+The backup includes the site files, database (if attached), and Nginx configuration. It is saved as a compressed tarball in `/var/backups/axiapanel/`.
 
 ### From the CLI
 
 ```bash
-dockpanel backup create example.com
+axiapanel backup create example.com
 ```
 
 Sample output:
 
 ```
 Backup created: example.com_2026-03-20_143022.tar.gz (45.2 MB)
-Location: /var/backups/dockpanel/example.com/example.com_2026-03-20_143022.tar.gz
+Location: /var/backups/axiapanel/example.com/example.com_2026-03-20_143022.tar.gz
 ```
 
 ### List Backups
 
 ```bash
-dockpanel backup list example.com
+axiapanel backup list example.com
 ```
 
 Sample output:
@@ -55,7 +55,7 @@ Scheduled backups run in the background. The backup scheduler checks for pending
 
 ## Configure S3 / Remote Destination
 
-Store backups off-server for disaster recovery. DockPanel supports any S3-compatible storage (AWS S3, Backblaze B2, MinIO, Wasabi, DigitalOcean Spaces, etc.).
+Store backups off-server for disaster recovery. AxiaPanel supports any S3-compatible storage (AWS S3, Backblaze B2, MinIO, Wasabi, DigitalOcean Spaces, etc.).
 
 1. Go to **Backups** > **Destinations**
 2. Click **Add Destination**
@@ -96,7 +96,7 @@ The restore replaces the site files and database with the backup contents. The c
 ### From the CLI
 
 ```bash
-dockpanel backup restore example.com example.com_2026-03-20_143022.tar.gz
+axiapanel backup restore example.com example.com_2026-03-20_143022.tar.gz
 ```
 
 Sample output:
@@ -114,7 +114,7 @@ Restore complete.
 ### From the CLI
 
 ```bash
-dockpanel backup delete example.com example.com_2026-03-18_020000.tar.gz
+axiapanel backup delete example.com example.com_2026-03-18_020000.tar.gz
 ```
 
 ### From the Panel
@@ -123,11 +123,11 @@ Click the delete icon next to any backup in the list.
 
 ## Database Backups
 
-DockPanel runs an automatic daily database backup cron job for the panel's own PostgreSQL database:
+AxiaPanel runs an automatic daily database backup cron job for the panel's own PostgreSQL database:
 
 - **Schedule**: Daily at 2:00 AM
 - **Retention**: 7 days (older backups are automatically deleted)
-- **Location**: `/var/backups/dockpanel/`
+- **Location**: `/var/backups/axiapanel/`
 
 This is separate from site backups. Site backups include the site's own database (MySQL or PostgreSQL container) as part of the site backup tarball.
 

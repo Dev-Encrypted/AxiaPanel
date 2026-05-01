@@ -168,7 +168,7 @@ async fn login_audit() -> Result<Json<serde_json::Value>, ApiErr> {
     Ok(Json(serde_json::json!({ "entries": entries })))
 }
 
-/// POST /security/panel-jail/setup — Create DockPanel Fail2Ban jail.
+/// POST /security/panel-jail/setup — Create AxiaPanel Fail2Ban jail.
 async fn setup_panel_jail() -> Result<Json<serde_json::Value>, ApiErr> {
     security::setup_panel_jail().await
         .map_err(|e| err(StatusCode::INTERNAL_SERVER_ERROR, &e))?;
@@ -200,7 +200,7 @@ async fn forensic_snapshot() -> Result<Json<serde_json::Value>, ApiErr> {
     use crate::safe_cmd::safe_command;
 
     let ts = chrono::Utc::now().format("%Y%m%d_%H%M%S");
-    let dir = format!("/var/lib/dockpanel/forensics/snapshot-{ts}");
+    let dir = format!("/var/lib/axiapanel/forensics/snapshot-{ts}");
     let _ = std::fs::create_dir_all(&dir);
 
     // Capture running processes
@@ -261,7 +261,7 @@ async fn forensic_snapshot() -> Result<Json<serde_json::Value>, ApiErr> {
     let _ = std::fs::write(format!("{dir}/etc_passwd.txt"), &passwd);
 
     // Capture active terminal recordings
-    let recordings = std::fs::read_dir("/var/lib/dockpanel/recordings")
+    let recordings = std::fs::read_dir("/var/lib/axiapanel/recordings")
         .map(|d| d.filter_map(|e| e.ok()).map(|e| e.file_name().to_string_lossy().to_string()).collect::<Vec<_>>())
         .unwrap_or_default();
     let _ = std::fs::write(format!("{dir}/active_recordings.txt"), recordings.join("\n"));
@@ -275,20 +275,20 @@ async fn forensic_snapshot() -> Result<Json<serde_json::Value>, ApiErr> {
     })))
 }
 
-/// POST /security/db-backup — Backup DockPanel's own PostgreSQL database (Feature 2).
+/// POST /security/db-backup — Backup AxiaPanel's own PostgreSQL database (Feature 2).
 async fn db_backup() -> Result<Json<serde_json::Value>, ApiErr> {
     use crate::safe_cmd::safe_command;
 
-    let backup_dir = "/var/backups/dockpanel";
+    let backup_dir = "/var/backups/axiapanel";
     let _ = std::fs::create_dir_all(backup_dir);
 
     let ts = chrono::Utc::now().format("%Y%m%d_%H%M%S");
-    let filename = format!("{backup_dir}/dockpanel-db-{ts}.sql.gz");
+    let filename = format!("{backup_dir}/axiapanel-db-{ts}.sql.gz");
 
     // pg_dump via Docker exec, capture output, then compress with gzip subprocess
     // No shell interpolation — all args passed directly
     let dump_output = safe_command("docker")
-        .args(["exec", "dockpanel-postgres", "pg_dump", "-U", "dockpanel", "dockpanel"])
+        .args(["exec", "axiapanel-postgres", "pg_dump", "-U", "axiapanel", "axiapanel"])
         .output()
         .await
         .map_err(|e| err(StatusCode::INTERNAL_SERVER_ERROR, &format!("pg_dump failed: {e}")))?;
@@ -327,7 +327,7 @@ async fn db_backup() -> Result<Json<serde_json::Value>, ApiErr> {
     if let Ok(entries) = std::fs::read_dir(backup_dir) {
         let mut files: Vec<_> = entries
             .filter_map(|e| e.ok())
-            .filter(|e| e.file_name().to_string_lossy().starts_with("dockpanel-db-"))
+            .filter(|e| e.file_name().to_string_lossy().starts_with("axiapanel-db-"))
             .collect();
         files.sort_by_key(|e| std::cmp::Reverse(e.file_name()));
         for old in files.iter().skip(7) {
@@ -336,7 +336,7 @@ async fn db_backup() -> Result<Json<serde_json::Value>, ApiErr> {
     }
 
     let size = std::fs::metadata(&filename).map(|m| m.len()).unwrap_or(0);
-    tracing::info!("DockPanel DB backup created: {filename} ({size} bytes)");
+    tracing::info!("AxiaPanel DB backup created: {filename} ({size} bytes)");
 
     Ok(Json(serde_json::json!({
         "filename": filename,
@@ -352,23 +352,23 @@ async fn security_init() -> Result<Json<serde_json::Value>, ApiErr> {
     let mut results = Vec::new();
 
     // Set chattr +a on audit directory
-    let _ = std::fs::create_dir_all("/var/lib/dockpanel/audit");
-    let chattr = safe_command("chattr").args(["+a", "/var/lib/dockpanel/audit/"]).output().await;
+    let _ = std::fs::create_dir_all("/var/lib/axiapanel/audit");
+    let chattr = safe_command("chattr").args(["+a", "/var/lib/axiapanel/audit/"]).output().await;
     results.push(serde_json::json!({
-        "action": "chattr +a /var/lib/dockpanel/audit/",
+        "action": "chattr +a /var/lib/axiapanel/audit/",
         "success": chattr.map(|o| o.status.success()).unwrap_or(false),
     }));
 
     // Ensure recording directory exists
-    let _ = std::fs::create_dir_all("/var/lib/dockpanel/recordings");
+    let _ = std::fs::create_dir_all("/var/lib/axiapanel/recordings");
     results.push(serde_json::json!({ "action": "create recordings dir", "success": true }));
 
     // Ensure forensics directory exists
-    let _ = std::fs::create_dir_all("/var/lib/dockpanel/forensics");
+    let _ = std::fs::create_dir_all("/var/lib/axiapanel/forensics");
     results.push(serde_json::json!({ "action": "create forensics dir", "success": true }));
 
     // Ensure DB backup directory exists
-    let _ = std::fs::create_dir_all("/var/backups/dockpanel");
+    let _ = std::fs::create_dir_all("/var/backups/axiapanel");
     results.push(serde_json::json!({ "action": "create db backup dir", "success": true }));
 
     Ok(Json(serde_json::json!({ "initialized": results })))
@@ -377,16 +377,16 @@ async fn security_init() -> Result<Json<serde_json::Value>, ApiErr> {
 /// POST /security/canary/setup — Create canary files in sensitive directories (Feature 12).
 async fn canary_setup() -> Result<Json<serde_json::Value>, ApiErr> {
     let canary_locations = [
-        ("/etc/.dockpanel-canary", "System config directory canary"),
-        ("/root/.dockpanel-canary", "Root home directory canary"),
-        ("/home/.dockpanel-canary", "Home directories canary"),
-        ("/var/www/.dockpanel-canary", "Web root canary"),
+        ("/etc/.axiapanel-canary", "System config directory canary"),
+        ("/root/.axiapanel-canary", "Root home directory canary"),
+        ("/home/.axiapanel-canary", "Home directories canary"),
+        ("/var/www/.axiapanel-canary", "Web root canary"),
     ];
 
     let mut created = Vec::new();
     for (path, desc) in &canary_locations {
         let content = format!(
-            "DOCKPANEL CANARY FILE — DO NOT TOUCH\n\
+            "AXIAPANEL CANARY FILE — DO NOT TOUCH\n\
              Created: {}\n\
              Purpose: Intrusion detection tripwire\n\
              If you are reading this, security has been alerted.\n",

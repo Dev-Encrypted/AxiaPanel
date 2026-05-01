@@ -257,7 +257,7 @@ async fn update_count() -> Json<UpdateCount> {
 /// POST /system/reboot — schedule a system reboot in 1 minute.
 async fn system_reboot() -> Json<RebootResult> {
     let result = safe_command("shutdown")
-        .args(["-r", "+1", "DockPanel initiated reboot"])
+        .args(["-r", "+1", "AxiaPanel initiated reboot"])
         .output()
         .await;
 

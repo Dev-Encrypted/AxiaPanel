@@ -1,10 +1,10 @@
-# DockPanel vs Alternatives
+# AxiaPanel vs Alternatives
 
-An honest comparison. We're not shy about where DockPanel leads — and we're upfront about where others still win.
+An honest comparison. We're not shy about where AxiaPanel leads — and we're upfront about where others still win.
 
 ## Quick Comparison
 
-| Feature | DockPanel | HestiaCP | CloudPanel | RunCloud | CyberPanel | Ploi |
+| Feature | AxiaPanel | HestiaCP | CloudPanel | RunCloud | CyberPanel | Ploi |
 |---------|-----------|----------|------------|----------|------------|------|
 | **Price** | Free | Free | Free | $8/mo+ | Free | $8/mo+ |
 | **Self-hosted** | Yes | Yes | Yes | No (SaaS) | Yes | No (SaaS) |
@@ -25,17 +25,17 @@ An honest comparison. We're not shy about where DockPanel leads — and we're up
 | **Per-image SBOM generation** | **Yes (syft, on-demand SPDX 2.3 download)** | No | No | No | No | No |
 | **Prometheus metrics endpoint** | **Yes (`/api/metrics`, token-gated, OpenMetrics text)** | No | No | No | No | No |
 
-## Where DockPanel Wins — Massively
+## Where AxiaPanel Wins — Massively
 
 **10x lighter** — The panel binaries are ~41MB on disk. At runtime the panel services themselves idle around ~19MB of RAM (measured on a fresh Vultr VPS: agent 12MB + API 7MB), or about ~85MB total with the bundled PostgreSQL. cPanel uses 800MB+. CloudPanel uses 250MB+. On a $5 VPS with 1GB of RAM, that difference is the gap between running your apps and running out of memory.
 
 **Docker integration that no other free panel has** — 152 one-click app templates across 14 categories. Docker Compose stack management. Container logs, shell, stats, resource limits, health checks. Blue-green zero-downtime updates. This is a full container management platform built into a hosting panel. HestiaCP, CloudPanel, and CyberPanel have nothing close to this.
 
-**A complete developer toolkit** — Git push-to-deploy with Nixpacks auto-build (30+ languages, no Dockerfile needed), preview environments with TTL, a full CLI for automation, and Infrastructure as Code (YAML export/import). These are features that RunCloud and Ploi charge $8-15/month for. DockPanel includes all of them for free.
+**A complete developer toolkit** — Git push-to-deploy with Nixpacks auto-build (30+ languages, no Dockerfile needed), preview environments with TTL, a full CLI for automation, and Infrastructure as Code (YAML export/import). These are features that RunCloud and Ploi charge $8-15/month for. AxiaPanel includes all of them for free.
 
 **Business-ready out of the box** — Multi-server management (unlimited), reseller accounts with quotas and white-label branding, OAuth/SSO (Google, GitHub, GitLab), extension API with HMAC-signed webhooks, migration wizard (import from cPanel/Plesk/HestiaCP), and teams with role-based access. Most panels don't have even half of these at any price.
 
-**Per-image CVE scanning with deploy gating** — No other free Docker-native panel ships this. Every running app is scanned against the Anchore grype vulnerability database, a severity badge surfaces on the Apps list, and a configurable gate refuses new deploys on images with critical/high/medium CVEs. Coolify, Dokploy, Portainer CE, and CyberPanel all leave this to third-party tooling. DockPanel ships it in the Settings UI, defaults it off, and makes it one click to enable.
+**Per-image CVE scanning with deploy gating** — No other free Docker-native panel ships this. Every running app is scanned against the Anchore grype vulnerability database, a severity badge surfaces on the Apps list, and a configurable gate refuses new deploys on images with critical/high/medium CVEs. Coolify, Dokploy, Portainer CE, and CyberPanel all leave this to third-party tooling. AxiaPanel ships it in the Settings UI, defaults it off, and makes it one click to enable.
 
 **Prometheus-native observability** — A bearer-token-gated `/api/metrics` endpoint emits CPU, memory, disk, GPU utilization/VRAM/temperature/power, site counts, and firing alerts in standard Prometheus exposition format. Drop the generated scrape config block into your `prometheus.yml` and you're done. No other free Docker-native hosting panel ships a Prometheus endpoint — Coolify, Dokploy, Portainer CE, HestiaCP, and CyberPanel all leave this to third-party exporters. The endpoint reads from the existing 30-second metrics collector, so enabling it adds zero per-scrape agent load.
 
@@ -55,7 +55,7 @@ An honest comparison. We're not shy about where DockPanel leads — and we're up
 
 **Ploi** — Excellent Laravel-specific features. Deep integration with Laravel Forge patterns. Better for Laravel-heavy shops.
 
-## Who Should Use DockPanel
+## Who Should Use AxiaPanel
 
 - **Self-hosters** who want full control without SaaS subscriptions
 - **Docker users** who want a GUI for container management alongside traditional hosting
@@ -64,7 +64,7 @@ An honest comparison. We're not shy about where DockPanel leads — and we're up
 - **Agencies** who need reseller accounts and white-label branding
 - **Migration projects** moving from cPanel/Plesk to a modern stack
 
-## Who Should NOT Use DockPanel
+## Who Should NOT Use AxiaPanel
 
 - Teams that need **commercial support SLAs** (we're open source, community-supported)
 - Shops committed to **OpenLiteSpeed/LiteSpeed** (use CyberPanel)

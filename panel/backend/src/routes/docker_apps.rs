@@ -92,7 +92,7 @@ pub async fn deploy(
     .map_err(|e| internal_error("container policy check", e))?;
 
     if let Some((max_containers, max_memory, max_cpu, allowed_images)) = &policy {
-        // Check container count via agent (count dockpanel-managed containers)
+        // Check container count via agent (count axiapanel-managed containers)
         if let Ok(apps_json) = agent.get("/apps").await {
             if let Some(apps) = apps_json.as_array() {
                 if apps.len() >= *max_containers as usize {
@@ -213,7 +213,7 @@ pub async fn deploy(
         if let Some(ref domain) = deploy_domain {
             emit("dns", "Creating DNS record", "in_progress", None);
 
-            // Extract parent domain (e.g., "mail.dockpanel.dev" → "dockpanel.dev")
+            // Extract parent domain (e.g., "mail.axiapanel.dev" → "axiapanel.dev")
             let parts: Vec<&str> = domain.splitn(3, '.').collect();
             let parent_domain = if parts.len() >= 3 {
                 format!("{}.{}", parts[parts.len() - 2], parts[parts.len() - 1])

@@ -18,11 +18,11 @@ If the connection times out, port 25 is blocked on your network.
 
 ## One-Click Install
 
-DockPanel installs a complete mail server stack with one click.
+AxiaPanel installs a complete mail server stack with one click.
 
 1. Go to **Mail** in the sidebar
 2. If the mail server is not installed, click **Install Mail Server**
-3. DockPanel installs and configures:
+3. AxiaPanel installs and configures:
    - **Postfix** -- SMTP server for sending and receiving email
    - **Dovecot** -- IMAP/POP3 server for reading email
    - **OpenDKIM** -- DKIM signing for email authentication
@@ -34,11 +34,11 @@ The installation takes about 30 seconds.
 1. Go to **Mail** > **Domains**
 2. Click **Add Domain**
 3. Enter your domain name: `example.com`
-4. DockPanel generates the DKIM keys and shows the DNS records you need to add
+4. AxiaPanel generates the DKIM keys and shows the DNS records you need to add
 
 ## DNS Records
 
-After adding a mail domain, you must add these DNS records at your domain registrar or DNS provider. DockPanel shows the exact values on the domain detail page.
+After adding a mail domain, you must add these DNS records at your domain registrar or DNS provider. AxiaPanel shows the exact values on the domain detail page.
 
 ### MX Record
 
@@ -76,7 +76,7 @@ Replace `203.0.113.10` with your server's public IP.
 
 ### DKIM Record
 
-Cryptographic signature that proves emails were sent from your server. DockPanel generates a 2048-bit RSA key pair when you add the domain. Copy the value shown in the panel:
+Cryptographic signature that proves emails were sent from your server. AxiaPanel generates a 2048-bit RSA key pair when you add the domain. Copy the value shown in the panel:
 
 ```
 Type: TXT
@@ -85,7 +85,7 @@ Value: v=DKIM1; k=rsa; p=MIIBIjANBgkqh... (long key)
 TTL: 3600
 ```
 
-The full DKIM value is displayed in DockPanel's domain detail page. Copy it exactly.
+The full DKIM value is displayed in AxiaPanel's domain detail page. Copy it exactly.
 
 ### DMARC Record
 
@@ -123,7 +123,7 @@ You can also create:
 Send a test email from the server:
 
 ```bash
-echo "Test from DockPanel mail server" | mail -s "Test Email" recipient@gmail.com
+echo "Test from AxiaPanel mail server" | mail -s "Test Email" recipient@gmail.com
 ```
 
 Or use the mail queue viewer in the panel (Mail > Queue) to monitor outgoing messages.
@@ -165,7 +165,7 @@ Supported relay providers: SendGrid, Mailgun, Amazon SES, Brevo, or any SMTP ser
    - **Password**: Your SendGrid API key
 4. Save
 
-DockPanel configures Postfix to route all outbound email through the relay. Incoming email still arrives directly to your server (port 25 inbound is not blocked by providers, only outbound).
+AxiaPanel configures Postfix to route all outbound email through the relay. Incoming email still arrives directly to your server (port 25 inbound is not blocked by providers, only outbound).
 
 ## Webmail (Roundcube)
 

@@ -540,8 +540,8 @@ pub async fn create_db_backup(
     // Decrypt the database password (handles both encrypted and legacy plaintext)
     let password = crate::services::secrets_crypto::decrypt_credential_or_legacy(&password_enc, &state.config.jwt_secret);
 
-    // Container name follows convention: dockpanel-db-{name}
-    let container_name = format!("dockpanel-db-{db_name}");
+    // Container name follows convention: axiapanel-db-{name}
+    let container_name = format!("axiapanel-db-{db_name}");
 
     // Get encryption key from destination if configured
     let encryption_key: Option<String> = sqlx::query_scalar(
@@ -681,7 +681,7 @@ pub async fn restore_db_backup(
     // Decrypt the database password (handles both encrypted and legacy plaintext)
     let password = crate::services::secrets_crypto::decrypt_credential_or_legacy(&password_enc, &state.config.jwt_secret);
 
-    let container_name = format!("dockpanel-db-{}", backup.db_name);
+    let container_name = format!("axiapanel-db-{}", backup.db_name);
 
     // Get encryption key if backup is encrypted
     let encryption_key: Option<String> = if backup.encrypted {

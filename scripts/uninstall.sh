@@ -23,8 +23,8 @@ echo "This will remove:"
 echo "  - Agent and API binaries and systemd services"
 echo "  - PostgreSQL container and data volume"
 echo "  - Nginx panel config"
-echo "  - Config directory (/etc/dockpanel)"
-echo "  - Source directory (/opt/dockpanel, if present)"
+echo "  - Config directory (/etc/axiapanel)"
+echo "  - Source directory (/opt/axiapanel, if present)"
 echo ""
 echo -e "${YELLOW}Database and backup data will be DELETED.${NC}"
 echo ""
@@ -42,34 +42,34 @@ echo ""
 
 # Stop and remove agent service
 echo -e "${GREEN}[+]${NC} Removing agent service..."
-systemctl stop dockpanel-agent 2>/dev/null || true
-systemctl disable dockpanel-agent 2>/dev/null || true
-rm -f /etc/systemd/system/dockpanel-agent.service
-rm -f /usr/local/bin/dockpanel-agent
+systemctl stop axiapanel-agent 2>/dev/null || true
+systemctl disable axiapanel-agent 2>/dev/null || true
+rm -f /etc/systemd/system/axiapanel-agent.service
+rm -f /usr/local/bin/axiapanel-agent
 
 # Stop and remove API service
 echo -e "${GREEN}[+]${NC} Removing API service..."
-systemctl stop dockpanel-api 2>/dev/null || true
-systemctl disable dockpanel-api 2>/dev/null || true
-rm -f /etc/systemd/system/dockpanel-api.service
-rm -f /usr/local/bin/dockpanel-api
+systemctl stop axiapanel-api 2>/dev/null || true
+systemctl disable axiapanel-api 2>/dev/null || true
+rm -f /etc/systemd/system/axiapanel-api.service
+rm -f /usr/local/bin/axiapanel-api
 
 systemctl daemon-reload 2>/dev/null || true
 
 # Remove PostgreSQL container and volume
-if docker ps -a --format '{{.Names}}' 2>/dev/null | grep -q "^dockpanel-postgres$"; then
+if docker ps -a --format '{{.Names}}' 2>/dev/null | grep -q "^axiapanel-postgres$"; then
     echo -e "${GREEN}[+]${NC} Removing PostgreSQL container..."
-    docker stop dockpanel-postgres 2>/dev/null || true
-    docker rm dockpanel-postgres 2>/dev/null || true
+    docker stop axiapanel-postgres 2>/dev/null || true
+    docker rm axiapanel-postgres 2>/dev/null || true
 fi
 
-if docker volume ls --format '{{.Name}}' 2>/dev/null | grep -q "^dockpanel-pgdata$"; then
+if docker volume ls --format '{{.Name}}' 2>/dev/null | grep -q "^axiapanel-pgdata$"; then
     echo -e "${GREEN}[+]${NC} Removing PostgreSQL data volume..."
-    docker volume rm dockpanel-pgdata 2>/dev/null || true
+    docker volume rm axiapanel-pgdata 2>/dev/null || true
 fi
 
 # Also handle old Docker Compose deployments
-for DIR in /opt/dockpanel/panel /home/*/dockpanel/panel; do
+for DIR in /opt/axiapanel/panel /home/*/axiapanel/panel; do
     if [ -f "$DIR/docker-compose.yml" ]; then
         echo -e "${GREEN}[+]${NC} Stopping old Docker Compose deployment at $DIR..."
         (cd "$DIR" && docker compose down -v 2>/dev/null) || true
@@ -79,32 +79,32 @@ done
 
 # Remove nginx config
 echo -e "${GREEN}[+]${NC} Removing nginx config..."
-rm -f /etc/nginx/sites-enabled/dockpanel-panel.conf
-rm -f /etc/nginx/conf.d/dockpanel-panel.conf
+rm -f /etc/nginx/sites-enabled/axiapanel-panel.conf
+rm -f /etc/nginx/conf.d/axiapanel-panel.conf
 nginx -t > /dev/null 2>&1 && (nginx -s reload 2>/dev/null || systemctl reload nginx 2>/dev/null) || true
 
 # Remove CLI binary
 echo -e "${GREEN}[+]${NC} Removing CLI binary..."
-rm -f /usr/local/bin/dockpanel
+rm -f /usr/local/bin/axiapanel
 
 # Remove directories
 echo -e "${GREEN}[+]${NC} Removing data directories..."
-rm -rf /etc/dockpanel
-rm -rf /var/run/dockpanel
-rm -rf /var/backups/dockpanel
-rm -rf /var/lib/dockpanel
+rm -rf /etc/axiapanel
+rm -rf /var/run/axiapanel
+rm -rf /var/backups/axiapanel
+rm -rf /var/lib/axiapanel
 rm -rf /var/www/acme
 
 # Remove tmpfiles.d config
-rm -f /etc/tmpfiles.d/dockpanel.conf
+rm -f /etc/tmpfiles.d/axiapanel.conf
 
 # Remove AxiaPanel crontab entries
-(crontab -l 2>/dev/null | grep -v "dockpanel" | crontab -) 2>/dev/null || true
+(crontab -l 2>/dev/null | grep -v "axiapanel" | crontab -) 2>/dev/null || true
 
-# Remove source (if installed to /opt/dockpanel by install.sh)
-if [ -d /opt/dockpanel ]; then
+# Remove source (if installed to /opt/axiapanel by install.sh)
+if [ -d /opt/axiapanel ]; then
     echo -e "${GREEN}[+]${NC} Removing source directory..."
-    rm -rf /opt/dockpanel
+    rm -rf /opt/axiapanel
 fi
 
 echo ""

@@ -102,9 +102,9 @@ jobs:
         run: |
           echo "| Binary | Size |" >> $GITHUB_STEP_SUMMARY
           echo "|--------|------|" >> $GITHUB_STEP_SUMMARY
-          echo "| Agent | $(du -h panel/agent/target/release/dockpanel-agent | cut -f1) |" >> $GITHUB_STEP_SUMMARY
-          echo "| API | $(du -h panel/backend/target/release/dockpanel-api | cut -f1) |" >> $GITHUB_STEP_SUMMARY
-          echo "| CLI | $(du -h panel/cli/target/release/dockpanel | cut -f1) |" >> $GITHUB_STEP_SUMMARY
+          echo "| Agent | $(du -h panel/agent/target/release/axiapanel-agent | cut -f1) |" >> $GITHUB_STEP_SUMMARY
+          echo "| API | $(du -h panel/backend/target/release/axiapanel-api | cut -f1) |" >> $GITHUB_STEP_SUMMARY
+          echo "| CLI | $(du -h panel/cli/target/release/axiapanel | cut -f1) |" >> $GITHUB_STEP_SUMMARY
 
   build-frontend:
     name: Build (Frontend)

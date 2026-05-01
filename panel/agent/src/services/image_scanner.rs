@@ -9,12 +9,12 @@ use crate::safe_cmd::safe_command;
 use serde::{Deserialize, Serialize};
 use std::time::Duration;
 
-// Scanner lives inside the DockPanel data dir so it works under the hardened
+// Scanner lives inside the AxiaPanel data dir so it works under the hardened
 // agent sandbox (ProtectSystem=strict, ProtectHome=yes) without needing write
 // access to /usr/local/bin or $HOME.
-const GRYPE_DIR: &str = "/var/lib/dockpanel/scanners";
-const GRYPE_BIN: &str = "/var/lib/dockpanel/scanners/grype";
-const GRYPE_DB_CACHE: &str = "/var/lib/dockpanel/scanners/grype-db";
+const GRYPE_DIR: &str = "/var/lib/axiapanel/scanners";
+const GRYPE_BIN: &str = "/var/lib/axiapanel/scanners/grype";
+const GRYPE_DB_CACHE: &str = "/var/lib/axiapanel/scanners/grype-db";
 
 #[derive(Serialize, Clone)]
 pub struct ImageScanResult {
@@ -44,7 +44,7 @@ pub async fn is_installed() -> bool {
     tokio::fs::metadata(GRYPE_BIN).await.is_ok()
 }
 
-/// Install grype via Anchore's official installer script into the DockPanel
+/// Install grype via Anchore's official installer script into the AxiaPanel
 /// data directory so the hardened agent sandbox can read/write it.
 pub async fn install_grype() -> Result<(), String> {
     if is_installed().await {
@@ -56,7 +56,7 @@ pub async fn install_grype() -> Result<(), String> {
         .map_err(|e| format!("create {GRYPE_DIR}: {e}"))?;
 
     // Anchore's installer writes the binary to the path passed via `-b`. We
-    // pin it inside /var/lib/dockpanel (writable under systemd ProtectSystem=strict)
+    // pin it inside /var/lib/axiapanel (writable under systemd ProtectSystem=strict)
     // rather than /usr/local/bin.
     let cmd = format!(
         "curl -sSfL https://raw.githubusercontent.com/anchore/grype/main/install.sh \

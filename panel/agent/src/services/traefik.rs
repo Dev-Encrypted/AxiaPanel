@@ -5,10 +5,10 @@ use bollard::network::CreateNetworkOptions;
 use serde::Serialize;
 use std::collections::HashMap;
 
-const TRAEFIK_CONTAINER: &str = "dockpanel-traefik";
+const TRAEFIK_CONTAINER: &str = "axiapanel-traefik";
 const TRAEFIK_IMAGE: &str = "traefik:v3.3";
-const PROXY_NETWORK: &str = "dockpanel-proxy";
-const TRAEFIK_CONFIG_DIR: &str = "/etc/dockpanel/traefik";
+const PROXY_NETWORK: &str = "axiapanel-proxy";
+const TRAEFIK_CONFIG_DIR: &str = "/etc/axiapanel/traefik";
 
 #[derive(Serialize)]
 pub struct TraefikStatus {
@@ -18,7 +18,7 @@ pub struct TraefikStatus {
     pub dashboard_url: String,
 }
 
-/// Ensure the dockpanel-proxy Docker network exists.
+/// Ensure the axiapanel-proxy Docker network exists.
 pub async fn ensure_network(docker: &Docker) -> Result<(), String> {
     // Check if network already exists
     match docker.inspect_network::<String>(PROXY_NETWORK, None).await {
@@ -128,8 +128,8 @@ pub async fn install(docker: &Docker, acme_email: &str) -> Result<TraefikStatus,
     }]));
 
     let mut labels = HashMap::new();
-    labels.insert("dockpanel.managed".to_string(), "true".to_string());
-    labels.insert("dockpanel.type".to_string(), "traefik".to_string());
+    labels.insert("axiapanel.managed".to_string(), "true".to_string());
+    labels.insert("axiapanel.type".to_string(), "traefik".to_string());
 
     let mut endpoints = HashMap::new();
     endpoints.insert(PROXY_NETWORK.to_string(), EndpointSettings::default());

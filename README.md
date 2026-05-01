@@ -1,8 +1,8 @@
 <p align="center">
-  <img src=".github/screenshots/dp-dashboard.png" alt="DockPanel Dashboard" width="800">
+  <img src=".github/screenshots/dp-dashboard.png" alt="AxiaPanel Dashboard" width="800">
 </p>
 
-<h1 align="center">DockPanel</h1>
+<h1 align="center">AxiaPanel</h1>
 
 <p align="center">
   <strong>The most feature-packed free server panel ever built.</strong><br>
@@ -10,16 +10,16 @@
 </p>
 
 <p align="center">
-  <a href="https://github.com/ovexro/dockpanel/releases"><img src="https://img.shields.io/github/v/release/ovexro/dockpanel" alt="Release"></a>
-  <a href="https://github.com/ovexro/dockpanel/actions"><img src="https://img.shields.io/github/actions/workflow/status/ovexro/dockpanel/ci.yml?label=CI" alt="CI"></a>
+  <a href="https://github.com/ovexro/axiapanel/releases"><img src="https://img.shields.io/github/v/release/ovexro/axiapanel" alt="Release"></a>
+  <a href="https://github.com/ovexro/axiapanel/actions"><img src="https://img.shields.io/github/actions/workflow/status/ovexro/axiapanel/ci.yml?label=CI" alt="CI"></a>
   <a href="LICENSE"><img src="https://img.shields.io/badge/License-BSL_1.1-blue.svg" alt="License: BSL 1.1"></a>
 </p>
 
 <p align="center">
-  <a href="https://dockpanel.dev">Website</a> &bull;
-  <a href="https://docs.dockpanel.dev">Docs</a> &bull;
+  <a href="https://axiapanel.dev">Website</a> &bull;
+  <a href="https://docs.axiapanel.dev">Docs</a> &bull;
   <a href="CHANGELOG.md">Changelog</a> &bull;
-  <a href="https://github.com/ovexro/dockpanel/discussions">Discussions</a>
+  <a href="https://github.com/ovexro/axiapanel/discussions">Discussions</a>
 </p>
 
 ---
@@ -27,18 +27,18 @@
 ## Install
 
 ```bash
-curl -sL https://dockpanel.dev/install.sh | sudo bash
+curl -sL https://axiapanel.dev/install.sh | sudo bash
 ```
 
 Open `http://YOUR_SERVER_IP:8443`, create your admin account, done.
 
 Supports Ubuntu 20+, Debian 11+, CentOS 9+, Rocky 9+, Fedora 39+, Amazon Linux 2023. x86_64 and ARM64.
 
-## Why DockPanel?
+## Why AxiaPanel?
 
-No other free panel gives you Git push-to-deploy with blue-green zero-downtime updates, 152 one-click Docker app templates, per-image CVE scanning with deploy gating, a WAF, passkey login, GPU passthrough, multi-server management, reseller accounts, a developer CLI, and Infrastructure as Code — all while the panel services themselves use under 20MB of RAM. DockPanel does.
+No other free panel gives you Git push-to-deploy with blue-green zero-downtime updates, 152 one-click Docker app templates, per-image CVE scanning with deploy gating, a WAF, passkey login, GPU passthrough, multi-server management, reseller accounts, a developer CLI, and Infrastructure as Code — all while the panel services themselves use under 20MB of RAM. AxiaPanel does.
 
-| | DockPanel | HestiaCP | CloudPanel | RunCloud |
+| | AxiaPanel | HestiaCP | CloudPanel | RunCloud |
 |---|---|---|---|---|
 | **Price** | **Free** | Free | Free | $8/mo+ |
 | **Stack** | **Rust + React** | PHP | PHP | PHP (SaaS) |
@@ -177,7 +177,7 @@ No other free panel gives you Git push-to-deploy with blue-green zero-downtime u
 - **Container Management** — Auto-sleep (scale to zero), auto-update detection, per-user isolation policies, app migration between servers.
 - **Mail** — Postfix + Dovecot + OpenDKIM. Webmail (Roundcube), spam filter (Rspamd), SMTP relay.
 - **Monitoring** — HTTP/TCP/ping uptime checks, SLA tracking, PagerDuty integration.
-- **Prometheus + Grafana** — Token-gated `/api/metrics` scrape endpoint (off by default) plus a drop-in [fleet dashboard](dashboards/dockpanel-grafana.json) covering CPU/memory/disk, GPU utilization/VRAM/temp/power, sites, and alerts. See [docs/guides/prometheus.md](docs/guides/prometheus.md).
+- **Prometheus + Grafana** — Token-gated `/api/metrics` scrape endpoint (off by default) plus a drop-in [fleet dashboard](dashboards/axiapanel-grafana.json) covering CPU/memory/disk, GPU utilization/VRAM/temp/power, sites, and alerts. See [docs/guides/prometheus.md](docs/guides/prometheus.md).
 - **Incident Management** — Full lifecycle (investigating, identified, monitoring, resolved, postmortem), severity levels, timeline, affected components.
 - **Public Status Page** — Standalone dark-themed page at `/status`, component groups, email subscribers, overall status auto-computed from checks.
 - **Terminal** — Full SSH with tabs, themes, sharing, session recording.
@@ -190,13 +190,13 @@ No other free panel gives you Git push-to-deploy with blue-green zero-downtime u
 - **Fail2Ban** — View/ban/unban IPs, panel-specific jail.
 - **SSH Hardening** — Disable password/root login, change port — one click.
 - **Vulnerability Scanning** — File integrity, security headers, full-server audits.
-- **Per-Image CVE Scanning** — Scan every running Docker app's image with Anchore grype. Severity badge per app row on the Apps page. Scheduled background rescans (configurable interval). Soft deploy gate refuses deploys on images exceeding a critical/high/medium threshold. Grype installs self-contained into `/var/lib/dockpanel/scanners/` from the Settings UI. **Defaults to off** — opt in from Settings → Services → Image Vulnerability Scanning.
+- **Per-Image CVE Scanning** — Scan every running Docker app's image with Anchore grype. Severity badge per app row on the Apps page. Scheduled background rescans (configurable interval). Soft deploy gate refuses deploys on images exceeding a critical/high/medium threshold. Grype installs self-contained into `/var/lib/axiapanel/scanners/` from the Settings UI. **Defaults to off** — opt in from Settings → Services → Image Vulnerability Scanning.
 - **Signed Releases + SBOM** — Every release binary and its SPDX SBOM is signed in CI with cosign keyless via Sigstore (no long-lived signing key, recorded in the public Rekor transparency log). Verification snippet in [SECURITY.md](SECURITY.md#verifying-release-signatures).
-- **Per-Image SBOM Generation** — Generate an SPDX 2.3 JSON SBOM for any deployed Docker app's image on demand (syft). Click "Download SBOM" in any app's scan drawer. Self-contained install at `/var/lib/dockpanel/scanners/syft`. **Defaults to off** — opt in from Settings → Services → SBOM Generation. Companion to image CVE scanning: composition vs. risk.
+- **Per-Image SBOM Generation** — Generate an SPDX 2.3 JSON SBOM for any deployed Docker app's image on demand (syft). Click "Download SBOM" in any app's scan drawer. Self-contained install at `/var/lib/axiapanel/scanners/syft`. **Defaults to off** — opt in from Settings → Services → SBOM Generation. Companion to image CVE scanning: composition vs. risk.
 - **Auto-Healing** — Restart crashed services, clean disk, renew expiring SSL, auto-sleep idle containers.
 
 ### Developer Experience
-- **CLI** — `dockpanel status`, `sites`, `apps`, `diagnose`, `export`, `apply`
+- **CLI** — `axiapanel status`, `sites`, `apps`, `diagnose`, `export`, `apply`
 - **Infrastructure as Code** — Export/import server config as YAML. Terraform/Pulumi provider API with scoped IaC tokens.
 - **Smart Diagnostics** — 6 check categories with one-click fixes. Auto-optimization recommendations.
 - **File Manager** — Browse, edit, upload files from the browser.
@@ -240,16 +240,16 @@ Browser → React 19 SPA → Nginx
 
 ## Security
 
-DockPanel has undergone seven rounds of security auditing (280+ vulnerabilities found and fixed). Credentials are encrypted at rest with AES-256-GCM. All child processes run with sanitized environments. Per-image CVE scanning (grype) with optional deploy gating catches vulnerable images before they ship. See [SECURITY.md](SECURITY.md) for details.
+AxiaPanel has undergone seven rounds of security auditing (280+ vulnerabilities found and fixed). Credentials are encrypted at rest with AES-256-GCM. All child processes run with sanitized environments. Per-image CVE scanning (grype) with optional deploy gating catches vulnerable images before they ship. See [SECURITY.md](SECURITY.md) for details.
 
 ## Development
 
 ```bash
-git clone https://github.com/ovexro/dockpanel.git && cd dockpanel
+git clone https://github.com/ovexro/axiapanel.git && cd axiapanel
 
 # Start database
-docker run -d --name dockpanel-postgres \
-  -e POSTGRES_USER=dockpanel -e POSTGRES_PASSWORD=dockpanel -e POSTGRES_DB=dockpanel \
+docker run -d --name axiapanel-postgres \
+  -e POSTGRES_USER=axiapanel -e POSTGRES_PASSWORD=axiapanel -e POSTGRES_DB=axiapanel \
   -p 5450:5432 postgres:16
 
 # Build
@@ -264,24 +264,24 @@ See [CONTRIBUTING.md](CONTRIBUTING.md) for full development setup.
 ## CLI
 
 ```bash
-dockpanel status              # Server status (CPU, RAM, disk)
-dockpanel sites               # List all sites
-dockpanel apps                # List Docker apps
-dockpanel diagnose            # Run smart diagnostics
-dockpanel export -o config.yml  # Export server config as YAML
-dockpanel apply config.yml    # Apply config (Infrastructure as Code)
+axiapanel status              # Server status (CPU, RAM, disk)
+axiapanel sites               # List all sites
+axiapanel apps                # List Docker apps
+axiapanel diagnose            # Run smart diagnostics
+axiapanel export -o config.yml  # Export server config as YAML
+axiapanel apply config.yml    # Apply config (Infrastructure as Code)
 ```
 
 ## Update / Uninstall
 
 ```bash
-sudo bash /opt/dockpanel/scripts/update.sh     # Update
-sudo bash /opt/dockpanel/scripts/uninstall.sh   # Remove
+sudo bash /opt/axiapanel/scripts/update.sh     # Update
+sudo bash /opt/axiapanel/scripts/uninstall.sh   # Remove
 ```
 
 ## Documentation
 
-- [Live Docs](https://docs.dockpanel.dev) — Getting started, guides, configuration
+- [Live Docs](https://docs.axiapanel.dev) — Getting started, guides, configuration
 - [FEATURES.md](FEATURES.md) — Complete feature manifest (60+ features, ~280 capabilities)
 - [CHANGELOG.md](CHANGELOG.md) — Version history
 - [SECURITY.md](SECURITY.md) — Security model and vulnerability reporting

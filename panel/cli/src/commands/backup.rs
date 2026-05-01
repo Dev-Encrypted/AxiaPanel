@@ -235,13 +235,13 @@ pub async fn cmd_backup_verify(token: &str, backup_type: &str, name: &str, filen
 
 pub async fn cmd_backup_health(token: &str) -> Result<(), String> {
     // This calls the API, not the agent. For CLI simplicity, show local backup counts.
-    let site_dirs = std::fs::read_dir("/var/backups/dockpanel")
+    let site_dirs = std::fs::read_dir("/var/backups/axiapanel")
         .map(|d| d.filter_map(|e| e.ok()).filter(|e| e.path().is_dir()).count())
         .unwrap_or(0);
-    let db_dirs = std::fs::read_dir("/var/backups/dockpanel/databases")
+    let db_dirs = std::fs::read_dir("/var/backups/axiapanel/databases")
         .map(|d| d.filter_map(|e| e.ok()).filter(|e| e.path().is_dir()).count())
         .unwrap_or(0);
-    let vol_dirs = std::fs::read_dir("/var/backups/dockpanel/volumes")
+    let vol_dirs = std::fs::read_dir("/var/backups/axiapanel/volumes")
         .map(|d| d.filter_map(|e| e.ok()).filter(|e| e.path().is_dir()).count())
         .unwrap_or(0);
 
@@ -268,9 +268,9 @@ pub async fn cmd_backup_health(token: &str) -> Result<(), String> {
         (count, size)
     };
 
-    let (site_count, site_size) = count_files("/var/backups/dockpanel");
-    let (db_count, db_size) = count_files("/var/backups/dockpanel/databases");
-    let (vol_count, vol_size) = count_files("/var/backups/dockpanel/volumes");
+    let (site_count, site_size) = count_files("/var/backups/axiapanel");
+    let (db_count, db_size) = count_files("/var/backups/axiapanel/databases");
+    let (vol_count, vol_size) = count_files("/var/backups/axiapanel/volumes");
 
     let total_size = site_size + db_size + vol_size;
     let total_count = site_count + db_count + vol_count;

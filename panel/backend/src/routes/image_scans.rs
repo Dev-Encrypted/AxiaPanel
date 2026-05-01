@@ -399,7 +399,7 @@ async fn resolve_template_image(
 
 // ── Internal helpers ────────────────────────────────────────────────────
 
-/// Look up the Docker image for a running DockPanel-managed app by name.
+/// Look up the Docker image for a running AxiaPanel-managed app by name.
 async fn resolve_app_image(
     agent: &crate::services::agent::AgentHandle,
     app_name: &str,

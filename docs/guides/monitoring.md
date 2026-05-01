@@ -2,7 +2,7 @@
 
 ## Monitors
 
-Monitors check whether your services are reachable. DockPanel supports four active monitor types and a passive heartbeat type.
+Monitors check whether your services are reachable. AxiaPanel supports four active monitor types and a passive heartbeat type.
 
 | Type | How it works |
 |------|-------------|
@@ -31,7 +31,7 @@ Monitors check whether your services are reachable. DockPanel supports four acti
 ### From the CLI
 
 ```bash
-dockpanel monitors create --name "My Site" --url https://example.com --interval 300
+axiapanel monitors create --name "My Site" --url https://example.com --interval 300
 ```
 
 ### Monitor Status
@@ -123,7 +123,7 @@ If an HTTP monitor returns a successful status but the response time exceeds 500
 
 ### Auto-Incidents
 
-When a monitor goes down, DockPanel automatically creates a managed incident for the public status page. When the monitor recovers, the incident is auto-resolved. Status page subscribers are notified of both transitions.
+When a monitor goes down, AxiaPanel automatically creates a managed incident for the public status page. When the monitor recovers, the incident is auto-resolved. Status page subscribers are notified of both transitions.
 
 ### Disk-Full Forecast
 
@@ -142,7 +142,7 @@ Every 2 minutes, the alert engine checks all Docker containers on the server:
 
 ## SSL Certificate Dashboard
 
-The certificate dashboard shows all SSL certificates across your sites with expiry dates. Certificates expiring within the configured warning window (default: 30, 14, 7, 3, 1 days) trigger alerts. DockPanel auto-renews Let's Encrypt certificates. The dashboard helps you spot custom certificates that need manual renewal.
+The certificate dashboard shows all SSL certificates across your sites with expiry dates. Certificates expiring within the configured warning window (default: 30, 14, 7, 3, 1 days) trigger alerts. AxiaPanel auto-renews Let's Encrypt certificates. The dashboard helps you spot custom certificates that need manual renewal.
 
 ## API Reference
 

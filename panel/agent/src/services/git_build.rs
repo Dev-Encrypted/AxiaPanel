@@ -9,7 +9,7 @@ use std::sync::OnceLock;
 use tera::Tera;
 use crate::safe_cmd::safe_command;
 
-const GIT_BASE_DIR: &str = "/var/lib/dockpanel/git";
+const GIT_BASE_DIR: &str = "/var/lib/axiapanel/git";
 
 #[derive(Debug, Serialize)]
 pub struct CloneResult {
@@ -29,7 +29,7 @@ pub struct GitDeployResult {
     pub blue_green: bool,
 }
 
-/// Clone or pull a git repository to `/var/lib/dockpanel/git/{name}/`.
+/// Clone or pull a git repository to `/var/lib/axiapanel/git/{name}/`.
 /// Uses `--depth 50` for clone and `fetch + reset --hard` for pull.
 pub async fn clone_or_pull(
     name: &str,
@@ -146,7 +146,7 @@ pub async fn clone_or_pull(
 }
 
 /// Build a Docker image from the git repo directory.
-/// Tags with both `dockpanel-git-{name}:{commit_hash}` and `dockpanel-git-{name}:latest`.
+/// Tags with both `axiapanel-git-{name}:{commit_hash}` and `axiapanel-git-{name}:latest`.
 /// Uses BuildKit for layer caching, supports build args and custom build context.
 pub async fn build_image(
     name: &str,
@@ -156,7 +156,7 @@ pub async fn build_image(
     build_context: &str,
 ) -> Result<BuildResult, String> {
     let deploy_dir = format!("{GIT_BASE_DIR}/{name}");
-    let image_name = format!("dockpanel-git-{name}");
+    let image_name = format!("axiapanel-git-{name}");
     let image_tag = format!("{image_name}:{commit_hash}");
     let latest_tag = format!("{image_name}:latest");
 
@@ -250,7 +250,7 @@ pub async fn deploy_or_update(
     let docker =
         Docker::connect_with_local_defaults().map_err(|e| format!("Docker connect failed: {e}"))?;
 
-    let container_name = format!("dockpanel-git-{name}");
+    let container_name = format!("axiapanel-git-{name}");
 
     // Build environment list
     let env_list: Vec<String> = env_vars
@@ -260,12 +260,12 @@ pub async fn deploy_or_update(
 
     // Build labels
     let mut labels = HashMap::from([
-        ("dockpanel.managed".to_string(), "true".to_string()),
-        ("dockpanel.type".to_string(), "git".to_string()),
-        ("dockpanel.git.name".to_string(), name.to_string()),
+        ("axiapanel.managed".to_string(), "true".to_string()),
+        ("axiapanel.type".to_string(), "git".to_string()),
+        ("axiapanel.git.name".to_string(), name.to_string()),
     ]);
     if let Some(d) = domain {
-        labels.insert("dockpanel.app.domain".to_string(), d.to_string());
+        labels.insert("axiapanel.app.domain".to_string(), d.to_string());
     }
 
     // Port bindings: 127.0.0.1:{host_port} -> {container_port}/tcp
@@ -451,13 +451,13 @@ pub async fn cleanup_container(name: &str) -> Result<(), String> {
     let docker =
         Docker::connect_with_local_defaults().map_err(|e| format!("Docker connect failed: {e}"))?;
 
-    let container_name = format!("dockpanel-git-{name}");
+    let container_name = format!("axiapanel-git-{name}");
 
     // Inspect to find domain label before removing
     let domain = if let Ok(info) = docker.inspect_container(&container_name, None).await {
         info.config
             .and_then(|c| c.labels)
-            .and_then(|l| l.get("dockpanel.app.domain").cloned())
+            .and_then(|l| l.get("axiapanel.app.domain").cloned())
     } else {
         None
     };
@@ -502,7 +502,7 @@ pub async fn cleanup_container(name: &str) -> Result<(), String> {
         }
 
         // Remove SSL certificates
-        let ssl_dir = format!("/etc/dockpanel/ssl/{d}");
+        let ssl_dir = format!("/etc/axiapanel/ssl/{d}");
         if std::path::Path::new(&ssl_dir).exists() {
             std::fs::remove_dir_all(&ssl_dir).ok();
             tracing::info!("Removed SSL certs: {ssl_dir}");
@@ -522,7 +522,7 @@ pub async fn cleanup_container(name: &str) -> Result<(), String> {
 /// Prune old images for a git app, keeping the last `keep` images (by creation time).
 /// The `:latest` tag is always excluded from pruning.
 pub async fn prune_images(name: &str, keep: usize) -> Result<Vec<String>, String> {
-    let image_prefix = format!("dockpanel-git-{name}");
+    let image_prefix = format!("axiapanel-git-{name}");
 
     // List all images via CLI to get tags and creation times
     let output = safe_command("docker")
@@ -708,7 +708,7 @@ async fn find_container(
     let domain = container
         .labels
         .as_ref()
-        .and_then(|l| l.get("dockpanel.app.domain").cloned());
+        .and_then(|l| l.get("axiapanel.app.domain").cloned());
 
     let host_port = container
         .ports
@@ -1138,11 +1138,11 @@ pub async fn nixpacks_build(
         return Err("Build context must not contain path traversal (..)".into());
     }
 
-    let image_tag = format!("dockpanel-git-{name}:{commit_hash}");
-    let context_dir = format!("/var/lib/dockpanel/git/{name}/{build_context}");
+    let image_tag = format!("axiapanel-git-{name}:{commit_hash}");
+    let context_dir = format!("/var/lib/axiapanel/git/{name}/{build_context}");
 
     // Set up persistent cache directory for faster rebuilds
-    let cache_dir = format!("/var/cache/dockpanel/nixpacks/{name}");
+    let cache_dir = format!("/var/cache/axiapanel/nixpacks/{name}");
     std::fs::create_dir_all(&cache_dir).ok();
 
     // Build nixpacks command
@@ -1182,7 +1182,7 @@ pub async fn nixpacks_build(
 
     // Also tag as :latest
     let _ = safe_command("docker")
-        .args(["tag", &image_tag, &format!("dockpanel-git-{name}:latest")])
+        .args(["tag", &image_tag, &format!("axiapanel-git-{name}:latest")])
         .output()
         .await;
 

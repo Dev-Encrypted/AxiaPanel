@@ -376,7 +376,7 @@ pub fn is_auto_update_enabled(domain: &str) -> bool {
 /// Create a pre-update snapshot (files + DB) for rollback.
 pub async fn create_update_snapshot(domain: &str) -> Result<String, String> {
     let _path = site_path(domain)?;
-    let snapshot_dir = format!("/var/backups/dockpanel/wp-snapshots/{domain}");
+    let snapshot_dir = format!("/var/backups/axiapanel/wp-snapshots/{domain}");
     std::fs::create_dir_all(&snapshot_dir)
         .map_err(|e| format!("Create snapshot dir: {e}"))?;
 

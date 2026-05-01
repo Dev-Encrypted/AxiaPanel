@@ -2,7 +2,7 @@ use serde::Serialize;
 use std::path::Path;
 use crate::safe_cmd::safe_command;
 
-const MIGRATION_DIR: &str = "/tmp/dockpanel-migration";
+const MIGRATION_DIR: &str = "/tmp/axiapanel-migration";
 
 /// Validate migration ID format (UUID: alphanumeric + hyphens, max 36 chars).
 fn is_valid_migration_id(id: &str) -> bool {
@@ -440,12 +440,12 @@ pub async fn import_database(migration_id: &str, sql_file: &str, container_name:
         return Err("Invalid migration ID format".into());
     }
 
-    // Validate container name — only allow DockPanel-managed DB containers
-    if !container_name.starts_with("dockpanel-") || container_name.contains('/') || container_name.contains('\0')
+    // Validate container name — only allow AxiaPanel-managed DB containers
+    if !container_name.starts_with("axiapanel-") || container_name.contains('/') || container_name.contains('\0')
         || container_name.len() > 128
         || !container_name.chars().all(|c| c.is_ascii_alphanumeric() || c == '-' || c == '_')
     {
-        return Err("Invalid container name — only DockPanel-managed containers are allowed".into());
+        return Err("Invalid container name — only AxiaPanel-managed containers are allowed".into());
     }
 
     // Validate no path traversal in sql_file

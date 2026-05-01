@@ -3,7 +3,7 @@ use std::time::Instant;
 use crate::safe_cmd::{safe_command, safe_command_sync};
 
 const WEBROOT: &str = "/var/www";
-const DEPLOY_KEYS_DIR: &str = "/etc/dockpanel/deploy-keys";
+const DEPLOY_KEYS_DIR: &str = "/etc/axiapanel/deploy-keys";
 
 pub struct DeployResult {
     pub success: bool,
@@ -42,7 +42,7 @@ pub(crate) fn ssh_command(key_path: &str) -> Result<String, String> {
 
     let canon_str = canon.to_string_lossy();
     Ok(format!(
-        "ssh -i {canon_str} -o StrictHostKeyChecking=accept-new -o UserKnownHostsFile=/etc/dockpanel/known_hosts"
+        "ssh -i {canon_str} -o StrictHostKeyChecking=accept-new -o UserKnownHostsFile=/etc/axiapanel/known_hosts"
     ))
 }
 
@@ -158,7 +158,7 @@ pub async fn clone_or_pull(
 
 /// Run a deploy script file from the site directory.
 /// The `script` parameter is treated as a relative path within the site dir
-/// (e.g., ".dockpanel/deploy.sh"), NOT as arbitrary bash code.
+/// (e.g., ".axiapanel/deploy.sh"), NOT as arbitrary bash code.
 pub async fn run_script(domain: &str, script: &str) -> Result<(bool, String), String> {
     if script.trim().is_empty() {
         return Ok((true, String::new()));
@@ -612,7 +612,7 @@ pub fn generate_deploy_key(domain: &str) -> Result<(String, String), String> {
             "-t", "ed25519",
             "-f", &key_path,
             "-N", "",
-            "-C", &format!("dockpanel-deploy@{domain}"),
+            "-C", &format!("axiapanel-deploy@{domain}"),
         ])
         .output()
         .map_err(|e| format!("ssh-keygen failed: {e}"))?;

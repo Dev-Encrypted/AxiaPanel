@@ -369,7 +369,7 @@ async fn handle_terminal(mut socket: WebSocket, domain: String, user_email: Stri
     let domain_str = if domain.is_empty() { "server" } else { &domain };
 
     // Feature 5: Open session recording file
-    let recording_dir = "/var/lib/dockpanel/recordings";
+    let recording_dir = "/var/lib/axiapanel/recordings";
     let _ = std::fs::create_dir_all(recording_dir);
     let session_id = uuid::Uuid::new_v4();
     let recording_path = format!("{recording_dir}/{session_id}.cast");
@@ -399,7 +399,7 @@ async fn handle_terminal(mut socket: WebSocket, domain: String, user_email: Stri
 
     // Feature 6: Write session start to tamper-resistant audit file
     {
-        let dir = "/var/lib/dockpanel/audit";
+        let dir = "/var/lib/axiapanel/audit";
         let _ = std::fs::create_dir_all(dir);
         let date = chrono::Utc::now().format("%Y-%m-%d");
         let path = format!("{dir}/audit-{date}.log");
@@ -602,7 +602,7 @@ async fn handle_terminal(mut socket: WebSocket, domain: String, user_email: Stri
 /// Write a suspicious event to the shared JSONL file for backend ingestion.
 fn write_suspicious_event(user_email: &str, domain: &str, command: &str) {
     use std::io::Write;
-    let path = "/var/lib/dockpanel/suspicious-events.jsonl";
+    let path = "/var/lib/axiapanel/suspicious-events.jsonl";
     if let Ok(mut f) = std::fs::OpenOptions::new().create(true).append(true).open(path) {
         let event = serde_json::json!({
             "timestamp": chrono::Utc::now().to_rfc3339(),

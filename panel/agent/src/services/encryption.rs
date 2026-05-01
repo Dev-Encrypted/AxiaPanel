@@ -4,8 +4,8 @@ use crate::safe_cmd::safe_command;
 
 /// Validate that a filepath is within the allowed backup directory and contains no traversal.
 fn validate_backup_path(filepath: &str) -> Result<(), String> {
-    if !filepath.starts_with("/var/backups/dockpanel/") {
-        return Err("Path must be within /var/backups/dockpanel/".to_string());
+    if !filepath.starts_with("/var/backups/axiapanel/") {
+        return Err("Path must be within /var/backups/axiapanel/".to_string());
     }
     if filepath.contains("..") {
         return Err("Path must not contain '..'".to_string());

@@ -378,7 +378,7 @@ async fn delete_site(
     }
 
     // SSL certificates
-    let ssl_dir = format!("/etc/dockpanel/ssl/{domain}");
+    let ssl_dir = format!("/etc/axiapanel/ssl/{domain}");
     if std::path::Path::new(&ssl_dir).exists() {
         if let Err(e) = std::fs::remove_dir_all(&ssl_dir) {
             tracing::warn!("Failed to remove SSL certs for {domain}: {e}");
@@ -490,7 +490,7 @@ async fn get_site(
     }
 
     let config_path = format!("/etc/nginx/sites-enabled/{domain}.conf");
-    let ssl_cert_path = format!("/etc/dockpanel/ssl/{domain}/fullchain.pem");
+    let ssl_cert_path = format!("/etc/axiapanel/ssl/{domain}/fullchain.pem");
     let config_exists = std::path::Path::new(&config_path).exists();
     let ssl_enabled = std::path::Path::new(&ssl_cert_path).exists();
 
@@ -574,8 +574,8 @@ async fn rename_site(
     std::fs::remove_file(&old_conf).ok();
 
     // 5. Rename SSL certificates directory
-    let old_ssl = format!("/etc/dockpanel/ssl/{old_domain}");
-    let new_ssl = format!("/etc/dockpanel/ssl/{new_domain}");
+    let old_ssl = format!("/etc/axiapanel/ssl/{old_domain}");
+    let new_ssl = format!("/etc/axiapanel/ssl/{new_domain}");
     if std::path::Path::new(&old_ssl).exists() {
         std::fs::rename(&old_ssl, &new_ssl).ok();
     }
@@ -1481,7 +1481,7 @@ async fn set_env(Path(domain): Path<String>, Json(body): Json<serde_json::Value>
     let _ = safe_command("chown").args(["www-data:www-data", &env_path]).output().await;
 
     // Restart the app service if it's a Node/Python site
-    let service_name = format!("dockpanel-app-{}", domain.replace('.', "-"));
+    let service_name = format!("axiapanel-app-{}", domain.replace('.', "-"));
     let _ = safe_command("systemctl").args(["restart", &service_name]).output().await;
 
     tracing::info!("Environment variables updated for {domain}");
@@ -1525,7 +1525,7 @@ async fn disable_site(Path(domain): Path<String>) -> Result<Json<serde_json::Val
         .map_err(|e| (StatusCode::INTERNAL_SERVER_ERROR, format!("Write disabled config: {e}")))?;
 
     // Stop app process if it exists (node/python)
-    let service_name = format!("dockpanel-app-{}", domain.replace('.', "-"));
+    let service_name = format!("axiapanel-app-{}", domain.replace('.', "-"));
     let _ = safe_command("systemctl").args(["stop", &service_name]).output().await;
 
     // Reload nginx
@@ -1554,7 +1554,7 @@ async fn enable_site(Path(domain): Path<String>) -> Result<Json<serde_json::Valu
     std::fs::remove_file(&backup_path).ok();
 
     // Restart app process if it exists (node/python)
-    let service_name = format!("dockpanel-app-{}", domain.replace('.', "-"));
+    let service_name = format!("axiapanel-app-{}", domain.replace('.', "-"));
     let _ = safe_command("systemctl").args(["restart", &service_name]).output().await;
 
     // Reload nginx
@@ -1667,7 +1667,7 @@ async fn redis_enable(
 
             // Insert Redis config before "That's all, stop editing!" or before first require
             let redis_config = format!(
-                "// Redis Object Cache (managed by DockPanel)\n\
+                "// Redis Object Cache (managed by AxiaPanel)\n\
                  define('WP_REDIS_HOST', '127.0.0.1');\n\
                  define('WP_REDIS_PORT', 6379);\n\
                  define('WP_REDIS_DATABASE', {redis_db});\n\
@@ -1739,7 +1739,7 @@ async fn redis_disable(
                 .filter(|l| {
                     !l.contains("WP_REDIS_") &&
                     !l.contains("WP_CACHE_KEY_SALT") &&
-                    !l.contains("// Redis Object Cache (managed by DockPanel)")
+                    !l.contains("// Redis Object Cache (managed by AxiaPanel)")
                 })
                 .collect();
             let _ = std::fs::write(&wp_config, cleaned.join("\n"));
@@ -1832,7 +1832,7 @@ async fn waf_configure(
     let has_crs = std::path::Path::new(&format!("{crs_dir}/crs-setup.conf")).exists();
 
     let config = format!(
-        "# WAF config for {domain} (managed by DockPanel)\n\
+        "# WAF config for {domain} (managed by AxiaPanel)\n\
          Include /etc/modsecurity/modsecurity.conf\n\
          SecRuleEngine {engine}\n\
          SecAuditLog {log_dir}/{safe_domain}_audit.log\n\

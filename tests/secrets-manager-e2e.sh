@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 #
-# DockPanel Secrets Manager E2E Test Suite
+# AxiaPanel Secrets Manager E2E Test Suite
 #
 # Usage: bash tests/secrets-manager-e2e.sh <host> [port]
 #
@@ -23,7 +23,7 @@ api_post() { curl -sf -H "Authorization: Bearer $AUTH_TOKEN" -X POST "${API}$1" 
 api_put() { curl -sf -H "Authorization: Bearer $AUTH_TOKEN" -X PUT "${API}$1" -H "Content-Type: application/json" -d "$2" 2>/dev/null; }
 api_delete() { curl -sf -H "Authorization: Bearer $AUTH_TOKEN" -X DELETE "${API}$1" 2>/dev/null; }
 
-echo -e "${BOLD}DockPanel Secrets Manager E2E Tests${NC}"
+echo -e "${BOLD}AxiaPanel Secrets Manager E2E Tests${NC}"
 echo "Target: ${HOST}:${PORT}"
 
 # Auth

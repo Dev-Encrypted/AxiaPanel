@@ -275,7 +275,7 @@ pub async fn invite(
     let _ = email::send_email(
         &state.db,
         &email_addr,
-        &format!("Convite para entrar em {} no DockPanel", team_name.0),
+        &format!("Convite para entrar em {} no AxiaPanel", team_name.0),
         &format!(
             "<h2>Você foi convidado!</h2>\
              <p>{} convidou você para entrar em <strong>{}</strong> como <strong>{role}</strong>.</p>\

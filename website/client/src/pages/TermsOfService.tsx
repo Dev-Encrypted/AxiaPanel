@@ -29,27 +29,27 @@ export default function TermsOfService() {
           <section>
             <h2 className="text-lg font-semibold text-white">Overview</h2>
             <p className="mt-2">
-              DockPanel is free, open-source software licensed under the{' '}
+              AxiaPanel is free, open-source software licensed under the{' '}
               <a
-                href="https://github.com/ovexro/dockpanel/blob/main/LICENSE"
+                href="https://github.com/ovexro/axiapanel/blob/main/LICENSE"
                 className="text-emerald-400 underline underline-offset-2 transition hover:text-emerald-300"
                 target="_blank"
                 rel="noopener noreferrer"
               >
                 Business Source License 1.1
               </a>
-              {' '}(which converts to MIT on 2030-03-25). By using DockPanel, you agree to the following terms.
+              {' '}(which converts to MIT on 2030-03-25). By using AxiaPanel, you agree to the following terms.
             </p>
           </section>
 
           <section>
             <h2 className="text-lg font-semibold text-white">License</h2>
             <p className="mt-2">
-              DockPanel is released under the Business Source License 1.1 (BSL 1.1). You are free to use,
+              AxiaPanel is released under the Business Source License 1.1 (BSL 1.1). You are free to use,
               copy, modify, and self-host the software for non-production or evaluation purposes. The license
               converts to MIT on 2030-03-25. The full license text is available in the{' '}
               <a
-                href="https://github.com/ovexro/dockpanel/blob/main/LICENSE"
+                href="https://github.com/ovexro/axiapanel/blob/main/LICENSE"
                 className="text-emerald-400 underline underline-offset-2 transition hover:text-emerald-300"
                 target="_blank"
                 rel="noopener noreferrer"
@@ -74,15 +74,15 @@ export default function TermsOfService() {
           <section>
             <h2 className="text-lg font-semibold text-white">Your Responsibility</h2>
             <p className="mt-2">
-              DockPanel is self-hosted software that you install and run on your own server. You are solely
+              AxiaPanel is self-hosted software that you install and run on your own server. You are solely
               responsible for:
             </p>
             <ul className="mt-3 list-disc space-y-1.5 pl-5">
               <li>The security and maintenance of your server</li>
-              <li>Keeping DockPanel and its dependencies up to date</li>
+              <li>Keeping AxiaPanel and its dependencies up to date</li>
               <li>Backing up your data and configurations</li>
               <li>Compliance with applicable laws and regulations in your jurisdiction</li>
-              <li>Any content hosted on servers managed by DockPanel</li>
+              <li>Any content hosted on servers managed by AxiaPanel</li>
             </ul>
           </section>
 
@@ -91,7 +91,7 @@ export default function TermsOfService() {
             <p className="mt-2">
               Community support is available through{' '}
               <a
-                href="https://github.com/ovexro/dockpanel/issues"
+                href="https://github.com/ovexro/axiapanel/issues"
                 className="text-emerald-400 underline underline-offset-2 transition hover:text-emerald-300"
                 target="_blank"
                 rel="noopener noreferrer"
@@ -107,7 +107,7 @@ export default function TermsOfService() {
             <h2 className="text-lg font-semibold text-white">Changes to Terms</h2>
             <p className="mt-2">
               We may update these terms from time to time. Changes will be reflected on this page with an
-              updated date. Continued use of DockPanel after changes constitutes acceptance of the new terms.
+              updated date. Continued use of AxiaPanel after changes constitutes acceptance of the new terms.
             </p>
           </section>
 
@@ -116,7 +116,7 @@ export default function TermsOfService() {
             <p className="mt-2">
               For questions about these terms, please open an issue on our{' '}
               <a
-                href="https://github.com/ovexro/dockpanel"
+                href="https://github.com/ovexro/axiapanel"
                 className="text-emerald-400 underline underline-offset-2 transition hover:text-emerald-300"
                 target="_blank"
                 rel="noopener noreferrer"

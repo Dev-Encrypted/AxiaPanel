@@ -95,8 +95,8 @@ async fn file_upload(
         const ALLOWED_SERVER_PATHS: &[&str] = &[
             "/var/www/",
             "/etc/nginx/",
-            "/etc/dockpanel/",
-            "/var/backups/dockpanel/",
+            "/etc/axiapanel/",
+            "/var/backups/axiapanel/",
             "/home/",
             "/opt/",
         ];
@@ -308,7 +308,7 @@ async fn disable_auto_updates() -> Result<Json<serde_json::Value>, ApiErr> {
 // ── Panel IP Whitelist ──────────────────────────────────────────────────
 
 async fn get_whitelist() -> Result<Json<serde_json::Value>, ApiErr> {
-    let path = "/etc/dockpanel/panel-whitelist.conf";
+    let path = "/etc/axiapanel/panel-whitelist.conf";
     let content = tokio::fs::read_to_string(path).await.unwrap_or_default();
     let ips: Vec<String> = content
         .lines()
@@ -327,7 +327,7 @@ pub struct WhitelistRequest {
 async fn set_whitelist(
     Json(body): Json<WhitelistRequest>,
 ) -> Result<Json<serde_json::Value>, ApiErr> {
-    let path = "/etc/dockpanel/panel-whitelist.conf";
+    let path = "/etc/axiapanel/panel-whitelist.conf";
 
     // Validate IPs
     for ip in &body.ips {

@@ -4,7 +4,7 @@ use crate::safe_cmd::safe_command;
 
 use super::backups::BackupInfo;
 
-const BACKUP_DIR: &str = "/var/backups/dockpanel/databases";
+const BACKUP_DIR: &str = "/var/backups/axiapanel/databases";
 
 /// Validate backup filename (prevent path traversal).
 fn is_safe_filename(name: &str) -> bool {

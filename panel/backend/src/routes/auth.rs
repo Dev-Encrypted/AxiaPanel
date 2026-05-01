@@ -928,7 +928,7 @@ pub async fn twofa_setup(
         1,
         30,
         secret.to_bytes().map_err(|e| internal_error("2FA setup", e))?,
-        Some("DockPanel".to_string()),
+        Some("AxiaPanel".to_string()),
         user.email.clone(),
     )
     .map_err(|e| internal_error("2FA setup", e))?;
@@ -993,7 +993,7 @@ pub async fn twofa_enable(
         .to_bytes()
         .map_err(|e| internal_error("2FA enable", e))?;
 
-    let totp = TOTP::new(Algorithm::SHA1, 6, 1, 30, secret, Some("DockPanel".to_string()), user.email.clone())
+    let totp = TOTP::new(Algorithm::SHA1, 6, 1, 30, secret, Some("AxiaPanel".to_string()), user.email.clone())
         .map_err(|e| internal_error("2FA enable", e))?;
 
     if !totp.check_current(&body.code).map_err(|e| internal_error("2FA enable", e))? {
@@ -1093,7 +1093,7 @@ pub async fn twofa_verify(
         .to_bytes()
         .map_err(|e| internal_error("2FA verify", e))?;
 
-    let totp = TOTP::new(Algorithm::SHA1, 6, 1, 30, secret, Some("DockPanel".to_string()), user.email.clone())
+    let totp = TOTP::new(Algorithm::SHA1, 6, 1, 30, secret, Some("AxiaPanel".to_string()), user.email.clone())
         .map_err(|e| internal_error("2FA verify", e))?;
 
     let code_valid = totp.check_current(&body.code)
@@ -1233,7 +1233,7 @@ pub async fn twofa_disable(
         .to_bytes()
         .map_err(|e| internal_error("2FA disable", e))?;
 
-    let totp = TOTP::new(Algorithm::SHA1, 6, 1, 30, secret, Some("DockPanel".to_string()), user.email.clone())
+    let totp = TOTP::new(Algorithm::SHA1, 6, 1, 30, secret, Some("AxiaPanel".to_string()), user.email.clone())
         .map_err(|e| internal_error("2FA disable", e))?;
 
     if !totp.check_current(&body.code).map_err(|e| internal_error("2FA disable", e))? {

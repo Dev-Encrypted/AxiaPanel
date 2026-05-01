@@ -120,8 +120,8 @@ pub async fn create(
         let panel_url = &state.config.base_url;
         let welcome_html = format!(
             r#"<div style="font-family: sans-serif; max-width: 600px; margin: 0 auto;">
-                <h2 style="color: #4f46e5;">Welcome to DockPanel</h2>
-                <p>Your DockPanel account has been created by an administrator.</p>
+                <h2 style="color: #4f46e5;">Welcome to AxiaPanel</h2>
+                <p>Your AxiaPanel account has been created by an administrator.</p>
                 <p><strong>Email:</strong> {}</p>
                 <p><strong>Panel URL:</strong> <a href="{}">{}</a></p>
                 <p>Please log in and change your password at your earliest convenience.</p>
@@ -130,7 +130,7 @@ pub async fn create(
             user.email, panel_url, panel_url
         );
         if let Err(e) = crate::services::email::send_email(
-            &state.db, &user.email, "Welcome to DockPanel", &welcome_html
+            &state.db, &user.email, "Welcome to AxiaPanel", &welcome_html
         ).await {
             tracing::debug!("Welcome email not sent to {}: {e}", user.email);
         }

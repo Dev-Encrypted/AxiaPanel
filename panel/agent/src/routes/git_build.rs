@@ -59,9 +59,9 @@ fn is_valid_build_context(ctx: &str) -> bool {
     !ctx.contains("..") && !ctx.starts_with('/')
 }
 
-/// Validate that an image_tag is a dockpanel-managed tag and has no path traversal.
+/// Validate that an image_tag is a axiapanel-managed tag and has no path traversal.
 fn is_valid_image_tag(tag: &str) -> bool {
-    tag.starts_with("dockpanel-git-") && !tag.contains('/')
+    tag.starts_with("axiapanel-git-") && !tag.contains('/')
 }
 
 #[derive(Deserialize)]
@@ -202,7 +202,7 @@ async fn deploy_container(
         return Err(err(StatusCode::BAD_REQUEST, "Invalid name"));
     }
     if !is_valid_image_tag(&body.image_tag) {
-        return Err(err(StatusCode::BAD_REQUEST, "Invalid image_tag: must start with dockpanel-git- and not contain /"));
+        return Err(err(StatusCode::BAD_REQUEST, "Invalid image_tag: must start with axiapanel-git- and not contain /"));
     }
     if body.container_port == 0 || body.host_port == 0 {
         return Err(err(StatusCode::BAD_REQUEST, "Invalid port"));
@@ -289,7 +289,7 @@ struct LifecycleRequest {
 /// POST /git/stop
 async fn stop_container(Json(body): Json<LifecycleRequest>) -> Result<Json<serde_json::Value>, ApiErr> {
     if !super::is_valid_name(&body.name) { return Err(err(StatusCode::BAD_REQUEST, "Invalid name")); }
-    let container_name = format!("dockpanel-git-{}", body.name);
+    let container_name = format!("axiapanel-git-{}", body.name);
     let docker = bollard::Docker::connect_with_local_defaults()
         .map_err(|e| err(StatusCode::INTERNAL_SERVER_ERROR, &format!("{e}")))?;
     tokio::time::timeout(
@@ -304,7 +304,7 @@ async fn stop_container(Json(body): Json<LifecycleRequest>) -> Result<Json<serde
 /// POST /git/start
 async fn start_container(Json(body): Json<LifecycleRequest>) -> Result<Json<serde_json::Value>, ApiErr> {
     if !super::is_valid_name(&body.name) { return Err(err(StatusCode::BAD_REQUEST, "Invalid name")); }
-    let container_name = format!("dockpanel-git-{}", body.name);
+    let container_name = format!("axiapanel-git-{}", body.name);
     let docker = bollard::Docker::connect_with_local_defaults()
         .map_err(|e| err(StatusCode::INTERNAL_SERVER_ERROR, &format!("{e}")))?;
     tokio::time::timeout(
@@ -319,7 +319,7 @@ async fn start_container(Json(body): Json<LifecycleRequest>) -> Result<Json<serd
 /// POST /git/restart
 async fn restart_container(Json(body): Json<LifecycleRequest>) -> Result<Json<serde_json::Value>, ApiErr> {
     if !super::is_valid_name(&body.name) { return Err(err(StatusCode::BAD_REQUEST, "Invalid name")); }
-    let container_name = format!("dockpanel-git-{}", body.name);
+    let container_name = format!("axiapanel-git-{}", body.name);
     let docker = bollard::Docker::connect_with_local_defaults()
         .map_err(|e| err(StatusCode::INTERNAL_SERVER_ERROR, &format!("{e}")))?;
     tokio::time::timeout(
@@ -342,7 +342,7 @@ fn default_log_lines() -> usize { 200 }
 /// POST /git/logs
 async fn container_logs(Json(body): Json<LogsRequest>) -> Result<Json<serde_json::Value>, ApiErr> {
     if !super::is_valid_name(&body.name) { return Err(err(StatusCode::BAD_REQUEST, "Invalid name")); }
-    let container_name = format!("dockpanel-git-{}", body.name);
+    let container_name = format!("axiapanel-git-{}", body.name);
     let docker = bollard::Docker::connect_with_local_defaults()
         .map_err(|e| err(StatusCode::INTERNAL_SERVER_ERROR, &format!("{e}")))?;
 
@@ -374,7 +374,7 @@ async fn run_hook(Json(body): Json<HookRequest>) -> Result<Json<serde_json::Valu
         return Err(err(StatusCode::BAD_REQUEST, "Command contains disallowed characters or patterns"));
     }
 
-    let container_name = format!("dockpanel-git-{}", body.name);
+    let container_name = format!("axiapanel-git-{}", body.name);
 
     let output = tokio::time::timeout(
         std::time::Duration::from_secs(300),
@@ -413,7 +413,7 @@ async fn pre_build_hook(Json(body): Json<PreBuildHookRequest>) -> Result<Json<se
         return Err(err(StatusCode::BAD_REQUEST, "Command not allowed. Permitted commands: npm install, npm ci, yarn install, pnpm install, composer install, bundle install, pip install -r requirements.txt, pip3 install -r requirements.txt, cargo build --release"));
     }
 
-    let git_dir = format!("/var/lib/dockpanel/git/{}", body.name);
+    let git_dir = format!("/var/lib/axiapanel/git/{}", body.name);
     if !std::path::Path::new(&git_dir).exists() {
         return Err(err(StatusCode::NOT_FOUND, "Git repo not found"));
     }
@@ -458,7 +458,7 @@ async fn auto_detect(Json(body): Json<AutoDetectRequest>) -> Result<Json<serde_j
     }
 
     // Check if the original Dockerfile exists before calling auto-detect
-    let deploy_dir = format!("/var/lib/dockpanel/git/{}", body.name);
+    let deploy_dir = format!("/var/lib/axiapanel/git/{}", body.name);
     let context_dir = if body.build_context == "." { deploy_dir.clone() } else { format!("{deploy_dir}/{}", body.build_context) };
     let original_exists = std::path::Path::new(&context_dir).join(&body.dockerfile).exists();
 
@@ -487,7 +487,7 @@ async fn compose_check(Json(body): Json<ComposeCheckRequest>) -> Result<Json<ser
     if !is_valid_build_context(&body.build_context) {
         return Err(err(StatusCode::BAD_REQUEST, "Invalid build_context path"));
     }
-    let deploy_dir = format!("/var/lib/dockpanel/git/{}", body.name);
+    let deploy_dir = format!("/var/lib/axiapanel/git/{}", body.name);
     let context_dir = if body.build_context == "." { deploy_dir.clone() } else { format!("{deploy_dir}/{}", body.build_context) };
 
     // Check for docker-compose.yml or compose.yml

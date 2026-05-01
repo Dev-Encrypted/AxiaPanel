@@ -160,7 +160,7 @@ async fn upload_cert(
         ));
     }
 
-    let ssl_dir = format!("/etc/dockpanel/ssl/{}", body.domain);
+    let ssl_dir = format!("/etc/axiapanel/ssl/{}", body.domain);
     tokio::fs::create_dir_all(&ssl_dir).await
         .map_err(|e| (
             StatusCode::INTERNAL_SERVER_ERROR,
@@ -264,7 +264,7 @@ async fn renew(
     // Read the existing cert (if any) so we can send it as the ARI replaces
     // hint. Missing or unreadable is fine — the renewal just becomes a
     // fresh issuance from the CA's perspective.
-    let cert_path = format!("/etc/dockpanel/ssl/{domain}/fullchain.pem");
+    let cert_path = format!("/etc/axiapanel/ssl/{domain}/fullchain.pem");
     let replaces_pem = tokio::fs::read_to_string(&cert_path).await.ok();
 
     let opts = ssl::ProvisionOpts {
@@ -374,7 +374,7 @@ async fn renewal_info(
         )
     })?;
 
-    let cert_path = format!("/etc/dockpanel/ssl/{domain}/fullchain.pem");
+    let cert_path = format!("/etc/axiapanel/ssl/{domain}/fullchain.pem");
     let suggestion = ssl::fetch_ari(&account, &cert_path).await;
     Ok(Json(serde_json::json!({ "suggestion": suggestion })))
 }
@@ -397,7 +397,7 @@ async fn revoke(
 
     tracing::info!("Deleting SSL certificate for {domain}");
 
-    let ssl_dir = format!("/etc/dockpanel/ssl/{domain}");
+    let ssl_dir = format!("/etc/axiapanel/ssl/{domain}");
     if std::path::Path::new(&ssl_dir).exists() {
         tokio::fs::remove_dir_all(&ssl_dir).await.map_err(|e| {
             (

@@ -2,9 +2,9 @@
 
 ## Prerequisites
 
-- DockPanel installed and running
+- AxiaPanel installed and running
 - A domain with an A record pointing to your server's IP (see [Getting Started](../getting-started.md#dns-setup))
-- Port 80 and 443 open in your firewall (DockPanel opens these during install)
+- Port 80 and 443 open in your firewall (AxiaPanel opens these during install)
 
 ## Create a WordPress Site
 
@@ -21,14 +21,14 @@
 ### From the CLI
 
 ```bash
-dockpanel sites create example.com --runtime php --ssl --ssl-email you@example.com
+axiapanel sites create example.com --runtime php --ssl --ssl-email you@example.com
 ```
 
 The CLI creates the site with PHP and SSL. WordPress CMS installation is available through the panel interface.
 
 ## What Happens Automatically
 
-When you create a WordPress site, DockPanel performs these steps in sequence:
+When you create a WordPress site, AxiaPanel performs these steps in sequence:
 
 1. **Creates the document root** at `/var/www/example.com/public/`
 2. **Creates a MySQL database** in a Docker container with auto-generated credentials
@@ -50,7 +50,7 @@ Once the site is created:
 
 ### WordPress Toolkit
 
-DockPanel includes a WordPress Toolkit (sidebar > WordPress) that provides:
+AxiaPanel includes a WordPress Toolkit (sidebar > WordPress) that provides:
 
 - **Multi-site dashboard** -- See all WordPress installations on the server
 - **Vulnerability scanning** -- Checks plugins against 14 known exploited vulnerabilities
@@ -67,12 +67,12 @@ DockPanel includes a WordPress Toolkit (sidebar > WordPress) that provides:
 
 ```bash
 # From the CLI
-dockpanel php install 8.3
+axiapanel php install 8.3
 
 # Or from the panel: Settings > Service Installers > PHP-FPM
 ```
 
-DockPanel validates that PHP-FPM is available before writing the Nginx config and will tell you exactly which version to install.
+AxiaPanel validates that PHP-FPM is available before writing the Nginx config and will tell you exactly which version to install.
 
 ### SSL provisioning fails
 
@@ -87,7 +87,7 @@ DockPanel validates that PHP-FPM is available before writing the Nginx config an
 Retry SSL provisioning:
 
 ```bash
-dockpanel ssl provision example.com --email you@example.com --runtime php
+axiapanel ssl provision example.com --email you@example.com --runtime php
 ```
 
 ### 502 Bad Gateway

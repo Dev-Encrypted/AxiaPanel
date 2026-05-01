@@ -163,7 +163,7 @@ export default function Login() {
           )}
           {!branding.hideBranding && (
             <h1 className="text-lg font-bold uppercase font-mono tracking-widest logo-glow">
-              {branding.panelName === "DockPanel" ? <><span className="text-rust-500">Dock</span><span className="text-dark-50">Panel</span></> : <span className="text-dark-50">{branding.panelName}</span>}
+              {branding.panelName === "AxiaPanel" ? <><span className="text-rust-500">Axia</span><span className="text-dark-50">Panel</span></> : <span className="text-dark-50">{branding.panelName}</span>}
             </h1>
           )}
           <p className="text-dark-200 text-sm mt-1">

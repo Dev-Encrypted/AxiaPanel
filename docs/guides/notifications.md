@@ -1,6 +1,6 @@
 # Notifications Guide
 
-DockPanel provides an in-app notification system with real-time delivery via Server-Sent Events (SSE), unread badges, and bulk management.
+AxiaPanel provides an in-app notification system with real-time delivery via Server-Sent Events (SSE), unread badges, and bulk management.
 
 ## Notification Sources
 

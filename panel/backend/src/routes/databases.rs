@@ -237,7 +237,7 @@ pub async fn credentials(
 
     let host = container_id
         .as_deref()
-        .map(|_| format!("dockpanel-db-{name}"))
+        .map(|_| format!("axiapanel-db-{name}"))
         .unwrap_or_else(|| "127.0.0.1".to_string());
     let port = port.unwrap_or(5432);
 
@@ -355,7 +355,7 @@ pub async fn tables(
         }
     };
 
-    let container = format!("dockpanel-db-{name}");
+    let container = format!("axiapanel-db-{name}");
     let agent_body = serde_json::json!({
         "container": container,
         "engine": engine,
@@ -410,7 +410,7 @@ pub async fn table_schema(
         ),
     };
 
-    let container = format!("dockpanel-db-{name}");
+    let container = format!("axiapanel-db-{name}");
     let agent_body = serde_json::json!({
         "container": container,
         "engine": engine,
@@ -453,7 +453,7 @@ pub async fn query(
 
     let (name, engine, password, _port) = get_db_info(&state, id, claims.sub).await?;
 
-    let container = format!("dockpanel-db-{name}");
+    let container = format!("axiapanel-db-{name}");
     let agent_body = serde_json::json!({
         "container": container,
         "engine": engine,
@@ -500,7 +500,7 @@ pub async fn table_indexes(
         ),
     };
 
-    let container = format!("dockpanel-db-{name}");
+    let container = format!("axiapanel-db-{name}");
     let agent_body = serde_json::json!({
         "container": container,
         "engine": engine,
@@ -548,7 +548,7 @@ pub async fn foreign_keys(
              ORDER BY tc.table_name, kcu.column_name".to_string(),
     };
 
-    let container = format!("dockpanel-db-{name}");
+    let container = format!("axiapanel-db-{name}");
     let agent_body = serde_json::json!({
         "container": container,
         "engine": engine,
@@ -570,7 +570,7 @@ pub async fn schema_overview(
     ServerScope(_server_id, agent): ServerScope,
 ) -> Result<Json<serde_json::Value>, ApiError> {
     let (name, engine, password, _port) = get_db_info(&state, id, claims.sub).await?;
-    let container = format!("dockpanel-db-{name}");
+    let container = format!("axiapanel-db-{name}");
 
     // Execute all queries concurrently
     let tables_sql = match engine.as_str() {
@@ -713,7 +713,7 @@ pub async fn update_pitr_config(
     let (name, engine, password, _port) = get_db_info(&state, id, claims.sub).await?;
     let enabled = body.pitr_enabled.unwrap_or(false);
     let hours = body.retention_hours.unwrap_or(24).max(1).min(720);
-    let container = format!("dockpanel-db-{name}");
+    let container = format!("axiapanel-db-{name}");
 
     // Configure WAL/binlog on the database container
     if enabled {
@@ -794,7 +794,7 @@ pub async fn pitr_restore(
     Json(body): Json<serde_json::Value>,
 ) -> Result<Json<serde_json::Value>, ApiError> {
     let (name, engine, password, _port) = get_db_info(&state, id, claims.sub).await?;
-    let container = format!("dockpanel-db-{name}");
+    let container = format!("axiapanel-db-{name}");
 
     let target_time = body.get("target_time").and_then(|v| v.as_str())
         .ok_or_else(|| err(StatusCode::BAD_REQUEST, "target_time é obrigatório (ISO 8601)"))?;
@@ -876,7 +876,7 @@ pub async fn reset_password(
     let new_password = uuid::Uuid::new_v4().to_string().replace('-', "");
 
     // Reset password in the actual database container via the agent
-    let container = format!("dockpanel-db-{name}");
+    let container = format!("axiapanel-db-{name}");
     let agent_body = serde_json::json!({
         "container": container,
         "engine": engine,

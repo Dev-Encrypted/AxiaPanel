@@ -112,7 +112,7 @@ async fn scan_malware() -> Vec<Finding> {
     let mut findings = Vec::new();
 
     // Scan site directories for suspicious filenames
-    let web_roots = ["/var/www", "/etc/dockpanel/sites"];
+    let web_roots = ["/var/www", "/etc/axiapanel/sites"];
     for root in &web_roots {
         if let Ok(output) = tokio::time::timeout(
             std::time::Duration::from_secs(60),
@@ -245,7 +245,7 @@ async fn scan_open_ports() -> Vec<Finding> {
 async fn scan_ssl_expiry() -> Vec<Finding> {
     let mut findings = Vec::new();
 
-    let ssl_dir = "/etc/dockpanel/ssl";
+    let ssl_dir = "/etc/axiapanel/ssl";
     let mut entries = match tokio::fs::read_dir(ssl_dir).await {
         Ok(e) => e,
         Err(_) => return findings,
@@ -344,7 +344,7 @@ async fn scan_container_vulnerabilities() -> Vec<Finding> {
         Err(_) => return Vec::new(),
     };
 
-    // List DockPanel-managed containers
+    // List AxiaPanel-managed containers
     let containers = docker
         .list_containers(Some(bollard::container::ListContainersOptions::<String> {
             all: false,
@@ -352,7 +352,7 @@ async fn scan_container_vulnerabilities() -> Vec<Finding> {
                 let mut f = HashMap::new();
                 f.insert(
                     "label".to_string(),
-                    vec!["dockpanel.managed=true".to_string()],
+                    vec!["axiapanel.managed=true".to_string()],
                 );
                 f
             },
@@ -515,7 +515,7 @@ async fn scan_security_headers() -> Vec<Finding> {
         let filename = path.file_name().and_then(|f| f.to_str()).unwrap_or("");
 
         // Skip non-site configs
-        if !filename.ends_with(".conf") || filename == "dockpanel.dev.conf" {
+        if !filename.ends_with(".conf") || filename == "axiapanel.dev.conf" {
             continue;
         }
         let domain = filename.trim_end_matches(".conf");

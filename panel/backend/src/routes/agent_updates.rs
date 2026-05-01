@@ -55,7 +55,7 @@ pub struct ArchQuery {
 /// depending on a public GitHub release. Path resolution order:
 ///   1. AGENT_BINARY_PATH_<ARCH> env var (e.g. AGENT_BINARY_PATH_AMD64)
 ///   2. AGENT_BINARY_PATH env var (only when arch matches local)
-///   3. /usr/local/bin/dockpanel-agent (only when arch matches local)
+///   3. /usr/local/bin/axiapanel-agent (only when arch matches local)
 /// Public endpoint (no auth) because the bootstrap script runs as root on a
 /// fresh server and has no credentials yet — the agent_token is provided
 /// out-of-band via the SSH session.
@@ -87,7 +87,7 @@ pub async fn download_binary(
         })
         .unwrap_or_else(|| {
             if arch == local_arch {
-                "/usr/local/bin/dockpanel-agent".to_string()
+                "/usr/local/bin/axiapanel-agent".to_string()
             } else {
                 String::new()
             }
@@ -110,7 +110,7 @@ pub async fn download_binary(
         StatusCode::OK,
         [
             (header::CONTENT_TYPE, "application/octet-stream"),
-            (header::CONTENT_DISPOSITION, "attachment; filename=\"dockpanel-agent\""),
+            (header::CONTENT_DISPOSITION, "attachment; filename=\"axiapanel-agent\""),
         ],
         bytes,
     ))

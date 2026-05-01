@@ -9,8 +9,8 @@
 #
 set -euo pipefail
 
-VERSION="${DOCKPANEL_VERSION:-main}"
-INSTALL_DIR="/opt/dockpanel"
+VERSION="${AXIAPANEL_VERSION:-main}"
+INSTALL_DIR="/opt/axiapanel"
 
 RED='\033[0;31m'
 GREEN='\033[0;32m'

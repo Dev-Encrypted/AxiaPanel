@@ -93,7 +93,7 @@ const snippets = [
   { label: "Limpar Cache", cmd: "sync && echo 3 > /proc/sys/vm/drop_caches" },
   { label: "Info do Sistema", cmd: "uname -a && uptime" },
   { label: "Tail Erros Nginx", cmd: "tail -50 /var/log/nginx/error.log" },
-  { label: "Sessão Persistente (tmux)", cmd: "tmux new-session -A -s dockpanel" },
+  { label: "Sessão Persistente (tmux)", cmd: "tmux new-session -A -s axiapanel" },
 ];
 
 const IDLE_TIMEOUT = 30 * 60 * 1000; // 30 minutes

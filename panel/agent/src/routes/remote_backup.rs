@@ -57,7 +57,7 @@ async fn upload(
     Json(body): Json<UploadRequest>,
 ) -> Result<Json<serde_json::Value>, ApiErr> {
     // Validate filepath
-    if !body.filepath.starts_with("/var/backups/dockpanel/") {
+    if !body.filepath.starts_with("/var/backups/axiapanel/") {
         return Err(err(StatusCode::BAD_REQUEST, "Invalid backup filepath"));
     }
 

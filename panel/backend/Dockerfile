@@ -11,6 +11,6 @@ RUN touch src/main.rs && cargo build --release
 
 FROM debian:bookworm-slim
 RUN apt-get update && apt-get install -y ca-certificates && rm -rf /var/lib/apt/lists/*
-COPY --from=builder /app/target/release/dockpanel-api /usr/local/bin/
+COPY --from=builder /app/target/release/axiapanel-api /usr/local/bin/
 EXPOSE 3000
-ENTRYPOINT ["dockpanel-api"]
+ENTRYPOINT ["axiapanel-api"]

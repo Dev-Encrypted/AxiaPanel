@@ -46,7 +46,7 @@ function AnimatedTerminal() {
   const [typing, setTyping] = useState('');
   const [phase, setPhase] = useState<'idle' | 'typing' | 'running' | 'done'>('idle');
 
-  const command = 'curl -sL dockpanel.dev/install.sh | sudo bash';
+  const command = 'curl -sL axiapanel.dev/install.sh | sudo bash';
 
   useEffect(() => {
     if (!inView || started.current) return;
@@ -68,12 +68,12 @@ function AnimatedTerminal() {
 
         const output: { text: string; cls: string; delay: number }[] = [
           { text: '  Detecting OS... Ubuntu 24.04 LTS', cls: 'text-zinc-600', delay: 400 },
-          { text: '  Downloading dockpanel-api (41 MB)...', cls: 'text-zinc-600', delay: 600 },
-          { text: '  Downloading dockpanel-agent...', cls: 'text-zinc-600', delay: 350 },
+          { text: '  Downloading axiapanel-api (41 MB)...', cls: 'text-zinc-600', delay: 600 },
+          { text: '  Downloading axiapanel-agent...', cls: 'text-zinc-600', delay: 350 },
           { text: '  Configuring nginx & PostgreSQL...', cls: 'text-zinc-600', delay: 500 },
           { text: '  Starting services...', cls: 'text-zinc-600', delay: 400 },
           { text: '\u00A0', cls: '', delay: 250 },
-          { text: '\u2713 DockPanel v2.7.4 installed in 47s', cls: 'text-emerald-400 font-medium', delay: 350 },
+          { text: '\u2713 AxiaPanel v2.7.4 installed in 47s', cls: 'text-emerald-400 font-medium', delay: 350 },
           { text: '  Panel \u2192 https://your-server:3080', cls: 'text-zinc-300', delay: 200 },
         ];
 
@@ -228,8 +228,8 @@ const steps = [
 const faqs = [
   { q: 'Is it really free?', a: 'Every feature, every server, no limits. Licensed under BSL 1.1, which converts to MIT in 2030. There is no premium tier.' },
   { q: 'System requirements?', a: '512 MB RAM, 1 CPU, 10 GB disk. Runs on Ubuntu, Debian, CentOS, Rocky, and Amazon Linux. ARM64 works too.' },
-  { q: 'How is this different from cPanel?', a: "cPanel uses ~800 MB of RAM, costs $15/month, and doesn't support Docker. DockPanel's panel services idle around ~19 MB (about ~85 MB with the bundled PostgreSQL), cost nothing, and ship with 152 Docker templates, a WAF, passkey authentication, Git deploys, a CLI, and multi-server management." },
-  { q: 'What happens if DockPanel goes down?', a: 'Your sites keep running. Nginx and Docker are independent processes \u2014 the panel is just the management layer. It auto-restarts via systemd if it ever stops.' },
+  { q: 'How is this different from cPanel?', a: "cPanel uses ~800 MB of RAM, costs $15/month, and doesn't support Docker. AxiaPanel's panel services idle around ~19 MB (about ~85 MB with the bundled PostgreSQL), cost nothing, and ship with 152 Docker templates, a WAF, passkey authentication, Git deploys, a CLI, and multi-server management." },
+  { q: 'What happens if AxiaPanel goes down?', a: 'Your sites keep running. Nginx and Docker are independent processes \u2014 the panel is just the management layer. It auto-restarts via systemd if it ever stops.' },
   { q: 'Can I manage multiple servers?', a: 'As many as you want. Install a lightweight agent on each server and manage them all from one dashboard.' },
   { q: 'Why Rust?', a: "~41 MB of binaries on disk, ~19 MB of RAM for the panel services at idle (measured on a fresh Vultr VPS), no JVM, no Node, no Python dependency to maintain. On a $5 VPS, that's the difference between running 20 sites and running 2." },
 ];
@@ -269,14 +269,14 @@ export default function Landing() {
   }, []);
 
   useEffect(() => {
-    fetch('https://api.github.com/repos/ovexro/dockpanel')
+    fetch('https://api.github.com/repos/ovexro/axiapanel')
       .then(r => r.json())
       .then(d => { if (d.stargazers_count) setStars(d.stargazers_count); })
       .catch(() => {});
   }, []);
 
   const handleCopy = () => {
-    navigator.clipboard.writeText('curl -sL https://dockpanel.dev/install.sh | sudo bash');
+    navigator.clipboard.writeText('curl -sL https://axiapanel.dev/install.sh | sudo bash');
     setCopied(true);
     setTimeout(() => setCopied(false), 2000);
   };
@@ -312,7 +312,7 @@ export default function Landing() {
             <div className="w-7 h-7 rounded-md bg-white flex items-center justify-center">
               <Server className="w-4 h-4 text-zinc-900" />
             </div>
-            <span className={`text-lg font-bold text-white ${hd}`}>DockPanel</span>
+            <span className={`text-lg font-bold text-white ${hd}`}>AxiaPanel</span>
           </Link>
           <div className="hidden md:flex items-center gap-8 text-[13px] font-medium text-zinc-500">
             <NavLink href="#features" label="Features" active={activeSection === 'features'} />
@@ -322,7 +322,7 @@ export default function Landing() {
             <NavLink href="#faq" label="FAQ" active={activeSection === 'faq'} />
           </div>
           <div className="flex items-center gap-3">
-            <a href="https://github.com/ovexro/dockpanel" className="hidden sm:flex items-center gap-1.5 text-[13px] text-zinc-500 hover:text-white transition-colors">
+            <a href="https://github.com/ovexro/axiapanel" className="hidden sm:flex items-center gap-1.5 text-[13px] text-zinc-500 hover:text-white transition-colors">
               <Github className="w-4 h-4" />
               {stars !== null && (
                 <span className="flex items-center gap-1 text-xs">
@@ -331,7 +331,7 @@ export default function Landing() {
                 </span>
               )}
             </a>
-            <a href="https://docs.dockpanel.dev" className="hidden sm:block text-[13px] font-semibold px-4 py-1.5 rounded-md bg-white text-zinc-900 hover:bg-zinc-200 transition-colors">
+            <a href="https://docs.axiapanel.dev" className="hidden sm:block text-[13px] font-semibold px-4 py-1.5 rounded-md bg-white text-zinc-900 hover:bg-zinc-200 transition-colors">
               Docs
             </a>
             <button onClick={() => setMobileMenu(true)} className="md:hidden p-1 text-zinc-400 hover:text-white transition-colors">
@@ -364,10 +364,10 @@ export default function Landing() {
                 <a href="#pricing" onClick={() => setMobileMenu(false)} className="text-zinc-300 hover:text-white transition-colors">Pricing</a>
                 <a href="#faq" onClick={() => setMobileMenu(false)} className="text-zinc-300 hover:text-white transition-colors">FAQ</a>
                 <hr className="border-zinc-800" />
-                <a href="https://github.com/ovexro/dockpanel" className="flex items-center gap-2 text-zinc-300 hover:text-white transition-colors">
+                <a href="https://github.com/ovexro/axiapanel" className="flex items-center gap-2 text-zinc-300 hover:text-white transition-colors">
                   <Github className="w-4 h-4" /> GitHub
                 </a>
-                <a href="https://docs.dockpanel.dev" className="flex items-center gap-2 text-zinc-300 hover:text-white transition-colors">
+                <a href="https://docs.axiapanel.dev" className="flex items-center gap-2 text-zinc-300 hover:text-white transition-colors">
                   Docs
                 </a>
               </div>
@@ -407,7 +407,7 @@ export default function Landing() {
               <div className="install-glow inline-flex items-center bg-zinc-900 border border-zinc-800 rounded-lg p-1 hover:border-zinc-700 transition-colors">
                 <span className="px-3 text-zinc-600 font-mono text-sm select-none">$</span>
                 <code className="text-zinc-300 font-mono text-sm pr-3">
-                  curl -sL dockpanel.dev/install.sh | sudo bash
+                  curl -sL axiapanel.dev/install.sh | sudo bash
                 </code>
                 <button onClick={handleCopy} className="px-3 py-2 bg-zinc-800 hover:bg-zinc-700 rounded-md text-xs text-zinc-300 font-medium transition-colors flex items-center gap-1.5">
                   {copied ? <Check className="w-3.5 h-3.5 text-emerald-400" /> : <Copy className="w-3.5 h-3.5" />}
@@ -418,10 +418,10 @@ export default function Landing() {
             </div>
 
             <div className="flex items-center justify-center gap-3">
-              <a href="https://docs.dockpanel.dev" className="flex items-center gap-2 bg-white hover:bg-zinc-200 text-zinc-900 px-6 py-3 rounded-lg text-[15px] font-bold transition-colors">
+              <a href="https://docs.axiapanel.dev" className="flex items-center gap-2 bg-white hover:bg-zinc-200 text-zinc-900 px-6 py-3 rounded-lg text-[15px] font-bold transition-colors">
                 Get Started <ArrowRight className="w-4 h-4" />
               </a>
-              <a href="https://github.com/ovexro/dockpanel" className="flex items-center gap-2 text-[15px] font-medium text-zinc-300 hover:text-white px-5 py-3 rounded-lg border border-zinc-800 hover:border-zinc-700 bg-zinc-900/50 transition-all">
+              <a href="https://github.com/ovexro/axiapanel" className="flex items-center gap-2 text-[15px] font-medium text-zinc-300 hover:text-white px-5 py-3 rounded-lg border border-zinc-800 hover:border-zinc-700 bg-zinc-900/50 transition-all">
                 <Github className="w-4 h-4" /> Source
               </a>
             </div>
@@ -447,7 +447,7 @@ export default function Landing() {
                 <div className="w-2.5 h-2.5 rounded-full bg-[#febc2e]" />
                 <div className="w-2.5 h-2.5 rounded-full bg-[#28c840]" />
               </div>
-              <img src="/screenshots/dp-dashboard.png" alt="DockPanel Dashboard" className="w-full block" />
+              <img src="/screenshots/dp-dashboard.png" alt="AxiaPanel Dashboard" className="w-full block" />
             </div>
             <div className="absolute bottom-0 left-0 right-0 h-40 bg-gradient-to-t from-[#09090b] to-transparent pointer-events-none" />
           </motion.div>
@@ -590,7 +590,7 @@ export default function Landing() {
           </motion.div>
 
           <div className="space-y-3 mb-16">
-            <RamBar name="DockPanel" mb={19} max={800} highlight delay={0} />
+            <RamBar name="AxiaPanel" mb={19} max={800} highlight delay={0} />
             <RamBar name="CloudPanel" mb={250} max={800} delay={0.1} />
             <RamBar name="Plesk" mb={512} max={800} delay={0.2} />
             <RamBar name="HestiaCP" mb={512} max={800} delay={0.3} />
@@ -610,7 +610,7 @@ export default function Landing() {
               </thead>
               <tbody>
                 {[
-                  { n: 'DockPanel', t: '<60 sec', p: 'Free', d: true, s: true, hl: true },
+                  { n: 'AxiaPanel', t: '<60 sec', p: 'Free', d: true, s: true, hl: true },
                   { n: 'cPanel', t: '~45 min', p: '$15/mo', d: false, s: true },
                   { n: 'Plesk', t: '~20 min', p: '$10/mo', d: false, s: true },
                   { n: 'RunCloud', t: '~5 min', p: '$8/mo', d: false, s: false },
@@ -645,18 +645,18 @@ export default function Landing() {
             </p>
 
             <div className="flex flex-col sm:flex-row items-center justify-center gap-3 mb-8">
-              <a href="https://github.com/ovexro/dockpanel" className="flex items-center gap-2 bg-white hover:bg-zinc-200 text-zinc-900 px-6 py-3 rounded-lg text-sm font-bold transition-colors">
+              <a href="https://github.com/ovexro/axiapanel" className="flex items-center gap-2 bg-white hover:bg-zinc-200 text-zinc-900 px-6 py-3 rounded-lg text-sm font-bold transition-colors">
                 <Github className="w-4 h-4" /> View on GitHub
               </a>
-              <a href="https://docs.dockpanel.dev" className="flex items-center gap-2 border border-zinc-800 hover:border-zinc-700 bg-zinc-900/50 text-white px-6 py-3 rounded-lg text-sm font-bold transition-all">
+              <a href="https://docs.axiapanel.dev" className="flex items-center gap-2 border border-zinc-800 hover:border-zinc-700 bg-zinc-900/50 text-white px-6 py-3 rounded-lg text-sm font-bold transition-all">
                 Read the docs <ArrowRight className="w-4 h-4" />
               </a>
             </div>
 
             <p className="text-[13px] text-zinc-600">
               Need help?{' '}
-              <a href="mailto:hello@dockpanel.dev" className="text-zinc-400 hover:text-white transition-colors underline underline-offset-4 decoration-zinc-800 hover:decoration-zinc-600">
-                hello@dockpanel.dev
+              <a href="mailto:hello@axiapanel.dev" className="text-zinc-400 hover:text-white transition-colors underline underline-offset-4 decoration-zinc-800 hover:decoration-zinc-600">
+                hello@axiapanel.dev
               </a>
             </p>
           </motion.div>
@@ -700,7 +700,7 @@ export default function Landing() {
                 <div className="w-7 h-7 rounded-md bg-white flex items-center justify-center">
                   <Server className="w-4 h-4 text-zinc-900" />
                 </div>
-                <span className={`text-lg font-bold text-white ${hd}`}>DockPanel</span>
+                <span className={`text-lg font-bold text-white ${hd}`}>AxiaPanel</span>
               </div>
               <p className="text-[13px] text-zinc-600 max-w-xs leading-relaxed">
                 Lightweight, Docker-native server management.<br />
@@ -713,8 +713,8 @@ export default function Landing() {
                 <div className="flex flex-col gap-2.5 text-[13px] text-zinc-600">
                   <a href="#features" className="hover:text-zinc-300 transition-colors">Features</a>
                   <Link to="/security" className="hover:text-zinc-300 transition-colors">Security</Link>
-                  <a href="https://docs.dockpanel.dev" className="hover:text-zinc-300 transition-colors">Docs</a>
-                  <a href="https://github.com/ovexro/dockpanel" className="hover:text-zinc-300 transition-colors">GitHub</a>
+                  <a href="https://docs.axiapanel.dev" className="hover:text-zinc-300 transition-colors">Docs</a>
+                  <a href="https://github.com/ovexro/axiapanel" className="hover:text-zinc-300 transition-colors">GitHub</a>
                 </div>
               </div>
               <div>
@@ -727,7 +727,7 @@ export default function Landing() {
             </div>
           </div>
           <div className="mt-10 pt-6 border-t border-zinc-800/40 flex flex-col sm:flex-row items-center justify-between gap-2">
-            <span className="text-[12px] text-zinc-700">&copy; 2026 DockPanel</span>
+            <span className="text-[12px] text-zinc-700">&copy; 2026 AxiaPanel</span>
             <span className="text-[11px] text-zinc-700">Solo-developed &middot; BSL 1.1</span>
           </div>
         </div>

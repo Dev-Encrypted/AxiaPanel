@@ -168,13 +168,13 @@ async fn query_db(
             Json(serde_json::json!({ "error": "Query is empty" })),
         ));
     }
-    if !body.container.starts_with("dockpanel-db-") {
+    if !body.container.starts_with("axiapanel-db-") {
         return Err((
             StatusCode::BAD_REQUEST,
             Json(serde_json::json!({ "error": "Invalid container name" })),
         ));
     }
-    let suffix = &body.container["dockpanel-db-".len()..];
+    let suffix = &body.container["axiapanel-db-".len()..];
     if !is_valid_name(suffix) {
         return Err((
             StatusCode::BAD_REQUEST,
@@ -250,13 +250,13 @@ async fn reset_password(
     Json(body): Json<ResetPasswordRequest>,
 ) -> Result<Json<serde_json::Value>, (StatusCode, Json<serde_json::Value>)> {
     // Validate container name
-    if !body.container.starts_with("dockpanel-db-") {
+    if !body.container.starts_with("axiapanel-db-") {
         return Err((
             StatusCode::BAD_REQUEST,
             Json(serde_json::json!({ "error": "Invalid container name" })),
         ));
     }
-    let suffix = &body.container["dockpanel-db-".len()..];
+    let suffix = &body.container["axiapanel-db-".len()..];
     if !is_valid_name(suffix) {
         return Err((
             StatusCode::BAD_REQUEST,

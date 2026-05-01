@@ -2,7 +2,7 @@
 
 ## Security Scanner
 
-DockPanel runs a full security scan automatically every 7 days. You can also trigger a scan manually from **Security** > **Run Scan** or via the API.
+AxiaPanel runs a full security scan automatically every 7 days. You can also trigger a scan manually from **Security** > **Run Scan** or via the API.
 
 The scanner checks the server through the agent and reports findings in three severity levels:
 
@@ -28,7 +28,7 @@ A score of 100 means no findings. The score is shown on the Security page and in
 
 ## Firewall (UFW)
 
-DockPanel manages the server firewall through UFW.
+AxiaPanel manages the server firewall through UFW.
 
 ### View firewall status
 
@@ -45,7 +45,7 @@ Go to **Security** > **Firewall** to see all rules and whether UFW is active.
    - **From** (optional): Restrict to a specific IP or CIDR range
 4. Click **Add**
 
-When you create a site, DockPanel automatically configures firewall rules for ports 80 and 443. Docker container proxy ports are blocked from external access by default.
+When you create a site, AxiaPanel automatically configures firewall rules for ports 80 and 443. Docker container proxy ports are blocked from external access by default.
 
 ### Delete a rule
 
@@ -59,9 +59,9 @@ curl -X DELETE https://panel.example.com/api/security/firewall/rules/RULE_NUMBER
 ### From the CLI
 
 ```bash
-dockpanel security firewall list
-dockpanel security firewall allow 8080/tcp
-dockpanel security firewall deny 3306/tcp from 0.0.0.0/0
+axiapanel security firewall list
+axiapanel security firewall allow 8080/tcp
+axiapanel security firewall deny 3306/tcp from 0.0.0.0/0
 ```
 
 ## Fail2Ban
@@ -74,7 +74,7 @@ Go to **Security** > **Fail2Ban** to see running jails, banned IPs, and ban coun
 
 ### Panel Login Jail
 
-DockPanel can create a dedicated Fail2Ban jail that monitors the panel's own login endpoint. Set it up from **Security** > **Panel Jail** > **Setup**.
+AxiaPanel can create a dedicated Fail2Ban jail that monitors the panel's own login endpoint. Set it up from **Security** > **Panel Jail** > **Setup**.
 
 ### Manual Ban / Unban
 
@@ -103,7 +103,7 @@ curl -s https://panel.example.com/api/security/fail2ban/sshd/banned \
 
 ## Two-Factor Authentication (2FA)
 
-DockPanel supports TOTP-based 2FA using any authenticator app (Google Authenticator, Authy, 1Password, etc.).
+AxiaPanel supports TOTP-based 2FA using any authenticator app (Google Authenticator, Authy, 1Password, etc.).
 
 ### Enable 2FA
 
@@ -173,7 +173,7 @@ The report is styled for printing and can be shared with auditors.
 
 ## GDPR Data Export
 
-Users can export all their personal data stored in DockPanel:
+Users can export all their personal data stored in AxiaPanel:
 
 ```bash
 curl -s https://panel.example.com/api/auth/export-my-data \
@@ -243,17 +243,17 @@ The panic button performs an emergency lockdown: kills all active terminal sessi
 
 ### Immutable Audit Log
 
-All security events are written to a tamper-proof audit log. The database uses a PostgreSQL trigger that prevents UPDATE and DELETE operations. Events are also written to append-only files on disk at `/var/lib/dockpanel/audit/`.
+All security events are written to a tamper-proof audit log. The database uses a PostgreSQL trigger that prevents UPDATE and DELETE operations. Events are also written to append-only files on disk at `/var/lib/axiapanel/audit/`.
 
 View the log in **Security** > **Lockdown** tab (Audit Log section).
 
 ### Terminal Session Recording
 
-All terminal sessions are recorded in asciicast v2 format. Recordings are stored at `/var/lib/dockpanel/recordings/` and listed in **Security** > **Recordings** tab. Retention: 30 days.
+All terminal sessions are recorded in asciicast v2 format. Recordings are stored at `/var/lib/axiapanel/recordings/` and listed in **Security** > **Recordings** tab. Retention: 30 days.
 
 ### Geo-IP Login Alerts
 
-When enabled, DockPanel alerts admins when a login or registration occurs from a new IP address, especially from VPN, proxy, or datacenter IPs. Configure in **Settings** > **Account** > **Security Hardening** section.
+When enabled, AxiaPanel alerts admins when a login or registration occurs from a new IP address, especially from VPN, proxy, or datacenter IPs. Configure in **Settings** > **Account** > **Security Hardening** section.
 
 ### Registration Approval Mode
 
@@ -265,7 +265,7 @@ If the system detects a configurable number of suspicious events within a time w
 
 ### Canary Files
 
-DockPanel places hidden canary files in sensitive directories (`/etc/`, `/root/`, `/home/`, `/var/www/`). If these files are accessed, an alert is triggered. The system checks canary file access times every 2 minutes.
+AxiaPanel places hidden canary files in sensitive directories (`/etc/`, `/root/`, `/home/`, `/var/www/`). If these files are accessed, an alert is triggered. The system checks canary file access times every 2 minutes.
 
 ### Backup Integrity Chain
 
@@ -277,4 +277,4 @@ Terminal commands matching dangerous patterns (useradd, chpasswd, su, curl|bash,
 
 ### Panel Database Auto-Backup
 
-DockPanel's own PostgreSQL database is automatically backed up daily to `/var/backups/dockpanel/` with 7-day retention. Enable/disable in **Settings** > **Account** > **Security Hardening**.
+AxiaPanel's own PostgreSQL database is automatically backed up daily to `/var/backups/axiapanel/` with 7-day retention. Enable/disable in **Settings** > **Account** > **Security Hardening**.

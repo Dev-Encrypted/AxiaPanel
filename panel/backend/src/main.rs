@@ -435,7 +435,7 @@ async fn main() {
         .expect("Failed to bind TCP listener");
 
     tracing::info!(
-        "DockPanel API v{} listening on {listen_addr}",
+        "AxiaPanel API v{} listening on {listen_addr}",
         env!("CARGO_PKG_VERSION")
     );
 
@@ -456,7 +456,7 @@ async fn main() {
     shutdown_db.close().await;
     tracing::info!("Database connection pool closed");
 
-    tracing::info!("DockPanel API shut down gracefully");
+    tracing::info!("AxiaPanel API shut down gracefully");
 }
 
 async fn shutdown_signal() {

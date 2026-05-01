@@ -751,7 +751,7 @@ async fn send_weekly_digest(pool: &PgPool) {
 
     let body_html = format!(
         r#"<div style="font-family: sans-serif; max-width: 600px; margin: 0 auto;">
-            <h2 style="color: #4f46e5;">Resumo Semanal do DockPanel</h2>
+            <h2 style="color: #4f46e5;">Resumo Semanal do AxiaPanel</h2>
             <p>Veja o que aconteceu nos últimos 7 dias:</p>
             <table style="border-collapse: collapse; width: 100%; margin: 16px 0;">
                 <tr><td style="padding: 8px; border-bottom: 1px solid #e5e7eb; font-weight: 600;">Alertas</td><td style="padding: 8px; border-bottom: 1px solid #e5e7eb;">{}</td></tr>
@@ -760,7 +760,7 @@ async fn send_weekly_digest(pool: &PgPool) {
                 <tr><td style="padding: 8px; border-bottom: 1px solid #e5e7eb; font-weight: 600;">Deploys</td><td style="padding: 8px; border-bottom: 1px solid #e5e7eb;">{}</td></tr>
                 <tr><td style="padding: 8px; border-bottom: 1px solid #e5e7eb; font-weight: 600;">Verificações de Segurança</td><td style="padding: 8px; border-bottom: 1px solid #e5e7eb;">{}</td></tr>
             </table>
-            <p style="color: #6b7280; font-size: 14px;">Faça login no seu painel DockPanel para ver os detalhes completos.</p>
+            <p style="color: #6b7280; font-size: 14px;">Faça login no seu painel AxiaPanel para ver os detalhes completos.</p>
         </div>"#,
         alerts_7d.0, backups_7d.0, incidents_7d.0, deploys_7d.0, security_scans_7d.0,
     );
@@ -777,7 +777,7 @@ async fn send_weekly_digest(pool: &PgPool) {
         if let Err(e) = crate::services::email::send_email(
             pool,
             email,
-            "Resumo Semanal do DockPanel",
+            "Resumo Semanal do AxiaPanel",
             &body_html,
         )
         .await
@@ -955,7 +955,7 @@ async fn run_retention_cleanup(pool: &PgPool) {
 
         for (backup_id, filename) in &excess {
             // Delete the local backup file if it exists
-            let filepath = format!("/var/backups/dockpanel/{domain}/{filename}");
+            let filepath = format!("/var/backups/axiapanel/{domain}/{filename}");
             let _ = std::fs::remove_file(&filepath);
 
             // Delete the DB record
@@ -985,7 +985,7 @@ async fn run_retention_cleanup(pool: &PgPool) {
         .fetch_all(pool).await.unwrap_or_default();
 
         for (id, filename) in &excess_db {
-            let filepath = format!("/var/backups/dockpanel/databases/{filename}");
+            let filepath = format!("/var/backups/axiapanel/databases/{filename}");
             let _ = std::fs::remove_file(&filepath);
             let _ = sqlx::query("DELETE FROM database_backups WHERE id = $1")
                 .bind(id).execute(pool).await;
@@ -1001,7 +1001,7 @@ async fn run_retention_cleanup(pool: &PgPool) {
         .fetch_all(pool).await.unwrap_or_default();
 
         for (id, filename) in &excess_vol {
-            let filepath = format!("/var/backups/dockpanel/volumes/{filename}");
+            let filepath = format!("/var/backups/axiapanel/volumes/{filename}");
             let _ = std::fs::remove_file(&filepath);
             let _ = sqlx::query("DELETE FROM volume_backups WHERE id = $1")
                 .bind(id).execute(pool).await;
@@ -1023,7 +1023,7 @@ async fn run_retention_cleanup(pool: &PgPool) {
     }
 
     // Clean old session recordings (>30 days)
-    let rec_dir = "/var/lib/dockpanel/recordings";
+    let rec_dir = "/var/lib/axiapanel/recordings";
     if let Ok(entries) = std::fs::read_dir(rec_dir) {
         let mut rec_deleted = 0u64;
         let cutoff = std::time::SystemTime::now() - std::time::Duration::from_secs(30 * 86400);
@@ -1043,7 +1043,7 @@ async fn run_retention_cleanup(pool: &PgPool) {
     }
 
     // Clean old audit log files (>365 days)
-    let audit_dir = "/var/lib/dockpanel/audit";
+    let audit_dir = "/var/lib/axiapanel/audit";
     if let Ok(entries) = std::fs::read_dir(audit_dir) {
         let cutoff = std::time::SystemTime::now() - std::time::Duration::from_secs(365 * 86400);
         for entry in entries.flatten() {
@@ -1059,21 +1059,21 @@ async fn run_retention_cleanup(pool: &PgPool) {
 
     // DB auto-backup: done via direct pg_dump (doesn't need agent client)
     if super::security_hardening::get_setting_bool(pool, "security_db_backup_enabled", true).await {
-        tracing::info!("Triggering DockPanel DB auto-backup...");
+        tracing::info!("Triggering AxiaPanel DB auto-backup...");
         match safe_command("sh")
             .args(["-c", &format!(
-                "docker exec dockpanel-postgres pg_dump -U dockpanel dockpanel | gzip > /var/backups/dockpanel/dockpanel-db-{}.sql.gz",
+                "docker exec axiapanel-postgres pg_dump -U axiapanel axiapanel | gzip > /var/backups/axiapanel/axiapanel-db-{}.sql.gz",
                 chrono::Utc::now().format("%Y%m%d_%H%M%S")
             )])
             .output().await
         {
             Ok(o) if o.status.success() => {
-                tracing::info!("DockPanel DB auto-backup completed");
+                tracing::info!("AxiaPanel DB auto-backup completed");
                 // Cleanup old backups (keep 7)
-                if let Ok(entries) = std::fs::read_dir("/var/backups/dockpanel") {
+                if let Ok(entries) = std::fs::read_dir("/var/backups/axiapanel") {
                     let mut files: Vec<_> = entries
                         .filter_map(|e| e.ok())
-                        .filter(|e| e.file_name().to_string_lossy().starts_with("dockpanel-db-"))
+                        .filter(|e| e.file_name().to_string_lossy().starts_with("axiapanel-db-"))
                         .collect();
                     files.sort_by_key(|e| std::cmp::Reverse(e.file_name().to_string_lossy().to_string()));
                     for old in files.iter().skip(7) {
@@ -1090,10 +1090,10 @@ async fn run_retention_cleanup(pool: &PgPool) {
 // ── Security Hardening Background Tasks ─────────────────────────────
 
 /// Ingest suspicious events written by the agent (from JSONL file).
-/// Reads /var/lib/dockpanel/suspicious-events.jsonl, records each event,
+/// Reads /var/lib/axiapanel/suspicious-events.jsonl, records each event,
 /// then truncates the file. Runs every 2 minutes with auto-healer.
 async fn security_ingest_suspicious_events(pool: &PgPool) {
-    let path = "/var/lib/dockpanel/suspicious-events.jsonl";
+    let path = "/var/lib/axiapanel/suspicious-events.jsonl";
 
     let content = match std::fs::read_to_string(path) {
         Ok(c) if !c.is_empty() => c,
@@ -1151,10 +1151,10 @@ async fn security_check_canary_files(pool: &PgPool) {
     use std::os::unix::fs::MetadataExt;
 
     let canary_paths = [
-        "/etc/.dockpanel-canary",
-        "/root/.dockpanel-canary",
-        "/home/.dockpanel-canary",
-        "/var/www/.dockpanel-canary",
+        "/etc/.axiapanel-canary",
+        "/root/.axiapanel-canary",
+        "/home/.axiapanel-canary",
+        "/var/www/.axiapanel-canary",
     ];
 
     for path in &canary_paths {

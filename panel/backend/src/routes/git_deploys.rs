@@ -1668,7 +1668,7 @@ fn spawn_deploy_task(
                                 Ok(_) => {} // Container is responding — alive
                                 Err(_) => {
                                     // Container might be down — check status
-                                    let container_name = format!("dockpanel-git-{monitor_config_name}");
+                                    let container_name = format!("axiapanel-git-{monitor_config_name}");
                                     tracing::warn!("Auto-rollback: container {container_name} may have crashed, checking...");
 
                                     // Get last successful deploy before this one
@@ -1856,7 +1856,7 @@ async fn set_github_status(token: &str, repo_url: &str, sha: &str, state: &str, 
 
     let target_url = domain.map(|d| format!("https://{d}")).unwrap_or_default();
     let description = match state {
-        "success" => "Deployed successfully via DockPanel",
+        "success" => "Deployed successfully via AxiaPanel",
         "failure" => "Deploy failed",
         "pending" => "Deploying...",
         _ => "Deploy status update",
@@ -1867,12 +1867,12 @@ async fn set_github_status(token: &str, repo_url: &str, sha: &str, state: &str, 
         .post(&format!("https://api.github.com/repos/{owner}/{repo}/statuses/{sha}"))
         .header("Authorization", format!("Bearer {token}"))
         .header("Accept", "application/vnd.github+json")
-        .header("User-Agent", "DockPanel")
+        .header("User-Agent", "AxiaPanel")
         .json(&serde_json::json!({
             "state": state,
             "target_url": target_url,
             "description": description,
-            "context": "dockpanel/deploy",
+            "context": "axiapanel/deploy",
         }))
         .timeout(std::time::Duration::from_secs(10))
         .send()
@@ -2239,7 +2239,7 @@ async fn handle_preview_deploy(state: &AppState, agent: &AgentHandle, config: &G
         None => { tracing::warn!("No preview ports available"); return; }
     };
 
-    let container_name = format!("dockpanel-git-{}-pr-{}", config.name, branch_slug);
+    let container_name = format!("axiapanel-git-{}-pr-{}", config.name, branch_slug);
     let preview_domain = config.domain.as_ref().map(|d| format!("{branch_slug}.{d}"));
 
     // Upsert preview record
@@ -2383,8 +2383,8 @@ pub async fn delete_preview(
         .map_err(|e| internal_error("delete preview", e))?
         .ok_or_else(|| err(StatusCode::NOT_FOUND, "Preview não encontrada"))?;
 
-    // Clean up container — strip "dockpanel-git-" prefix since the agent adds it
-    let cleanup_name = preview.container_name.strip_prefix("dockpanel-git-").unwrap_or(&preview.container_name);
+    // Clean up container — strip "axiapanel-git-" prefix since the agent adds it
+    let cleanup_name = preview.container_name.strip_prefix("axiapanel-git-").unwrap_or(&preview.container_name);
     agent.post("/git/cleanup", Some(serde_json::json!({ "name": cleanup_name }))).await.ok();
 
     if let Err(e) = sqlx::query("DELETE FROM git_previews WHERE id = $1").bind(preview_id).execute(&state.db).await {

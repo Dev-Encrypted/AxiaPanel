@@ -1,19 +1,19 @@
 [Unit]
-Description=DockPanel Agent
+Description=AxiaPanel Agent
 After=network.target nginx.service
 Wants=nginx.service
 
 [Service]
 Type=simple
-ExecStart=/usr/local/bin/dockpanel-agent
-ExecStartPost=/bin/sh -c 'sleep 1 && chgrp www-data /var/run/dockpanel/agent.sock 2>/dev/null; chmod 660 /var/run/dockpanel/agent.sock 2>/dev/null; true'
+ExecStart=/usr/local/bin/axiapanel-agent
+ExecStartPost=/bin/sh -c 'sleep 1 && chgrp www-data /var/run/axiapanel/agent.sock 2>/dev/null; chmod 660 /var/run/axiapanel/agent.sock 2>/dev/null; true'
 Restart=always
 RestartSec=5
 StartLimitBurst=5
 StartLimitIntervalSec=60
 Environment=RUST_LOG=info
-RuntimeDirectory=dockpanel
-ReadWritePaths=/etc/nginx /etc/dockpanel /var/run/dockpanel /var/backups/dockpanel /var/lib/dockpanel /var/www /var/log /etc/letsencrypt
+RuntimeDirectory=axiapanel
+ReadWritePaths=/etc/nginx /etc/axiapanel /var/run/axiapanel /var/backups/axiapanel /var/lib/axiapanel /var/www /var/log /etc/letsencrypt
 NoNewPrivileges=yes
 ProtectSystem=strict
 ProtectHome=yes

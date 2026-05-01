@@ -1,5 +1,5 @@
 // Background sweeper for per-image vulnerability scans.
-// Iterates the deduped set of images currently used by DockPanel-managed
+// Iterates the deduped set of images currently used by AxiaPanel-managed
 // containers and rescans any whose newest finding is older than the
 // configured interval. Distinct from services::security_scanner which
 // runs the full-server scan.
@@ -57,7 +57,7 @@ async fn sweep_once(
         return Ok(());
     }
 
-    // Gather distinct images from running DockPanel-managed apps.
+    // Gather distinct images from running AxiaPanel-managed apps.
     let apps = agent
         .get("/apps")
         .await

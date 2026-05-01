@@ -313,7 +313,7 @@ export default function Dns() {
   // ── Export zone file ──────────────────────────────────────────────────
   const handleExport = () => {
     if (!selectedZone || records.length === 0) return;
-    let output = `; Zone file for ${selectedZone.domain}\n; Exported from DockPanel\n\n$ORIGIN ${selectedZone.domain}.\n$TTL 3600\n\n`;
+    let output = `; Zone file for ${selectedZone.domain}\n; Exported from AxiaPanel\n\n$ORIGIN ${selectedZone.domain}.\n$TTL 3600\n\n`;
     records.forEach(r => {
       const escapedDomain = selectedZone.domain.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
       const shortName = r.name.replace(new RegExp(`\\.?${escapedDomain}\\.?$`), '') || '@';

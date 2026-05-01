@@ -1,6 +1,6 @@
 # Incident Management Guide
 
-DockPanel's incident management gives you a structured way to track outages, communicate with your team, notify subscribers, and produce postmortems. Incidents appear on your Public Status Page automatically.
+AxiaPanel's incident management gives you a structured way to track outages, communicate with your team, notify subscribers, and produce postmortems. Incidents appear on your Public Status Page automatically.
 
 ## Incident Lifecycle
 
@@ -45,7 +45,7 @@ An initial timeline entry is created automatically, and email subscribers are no
 
 ### Auto-Created Incidents
 
-When a monitor detects downtime, DockPanel creates an auto-incident automatically. These appear on the status page alongside manually created incidents. When the monitor recovers, the auto-incident is resolved.
+When a monitor detects downtime, AxiaPanel creates an auto-incident automatically. These appear on the status page alongside manually created incidents. When the monitor recovers, the auto-incident is resolved.
 
 ## Incident Timeline and Updates
 
@@ -85,7 +85,7 @@ When creating or editing an incident, select one or more components from the dro
 
 ## Postmortem
 
-When you move an incident to the **postmortem** status, DockPanel auto-generates a template pre-populated with your timeline:
+When you move an incident to the **postmortem** status, AxiaPanel auto-generates a template pre-populated with your timeline:
 
 ```markdown
 ## Incident Postmortem

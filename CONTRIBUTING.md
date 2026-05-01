@@ -1,4 +1,4 @@
-# Contributing to DockPanel
+# Contributing to AxiaPanel
 
 Thanks for your interest in contributing! This guide covers development setup, code style, and the PR process.
 
@@ -14,22 +14,22 @@ Thanks for your interest in contributing! This guide covers development setup, c
 ### Getting Started
 
 ```bash
-git clone https://github.com/ovexro/dockpanel.git
-cd dockpanel
+git clone https://github.com/ovexro/axiapanel.git
+cd axiapanel
 
 # Start PostgreSQL
-docker run -d --name dockpanel-postgres \
-  -e POSTGRES_USER=dockpanel \
-  -e POSTGRES_PASSWORD=dockpanel \
-  -e POSTGRES_DB=dockpanel \
+docker run -d --name axiapanel-postgres \
+  -e POSTGRES_USER=axiapanel \
+  -e POSTGRES_PASSWORD=axiapanel \
+  -e POSTGRES_DB=axiapanel \
   -p 5450:5432 postgres:16
 
 # Create config
-sudo mkdir -p /etc/dockpanel
-cat <<EOF | sudo tee /etc/dockpanel/api.env
-DATABASE_URL=postgresql://dockpanel:dockpanel@127.0.0.1:5450/dockpanel
+sudo mkdir -p /etc/axiapanel
+cat <<EOF | sudo tee /etc/axiapanel/api.env
+DATABASE_URL=postgresql://axiapanel:axiapanel@127.0.0.1:5450/axiapanel
 JWT_SECRET=$(openssl rand -hex 32)
-AGENT_SOCKET=/var/run/dockpanel/agent.sock
+AGENT_SOCKET=/var/run/axiapanel/agent.sock
 AGENT_TOKEN=$(uuidgen)
 LISTEN_ADDR=127.0.0.1:3080
 EOF
@@ -41,8 +41,8 @@ cargo build --release --manifest-path panel/cli/Cargo.toml
 cd panel/frontend && npm install && npx vite build && cd ../..
 
 # Run (agent needs root for system operations)
-sudo ./panel/agent/target/release/dockpanel-agent &
-./panel/backend/target/release/dockpanel-api &
+sudo ./panel/agent/target/release/axiapanel-agent &
+./panel/backend/target/release/axiapanel-api &
 cd panel/frontend && npm run dev
 ```
 
@@ -94,7 +94,7 @@ panel/
 
 ## Filing Issues
 
-- **Bug reports**: Include OS, DockPanel version, steps to reproduce, and relevant logs (`journalctl -u dockpanel-api -n 50`).
+- **Bug reports**: Include OS, AxiaPanel version, steps to reproduce, and relevant logs (`journalctl -u axiapanel-api -n 50`).
 - **Feature requests**: Describe the use case, not just the solution.
 
 ## Key Files

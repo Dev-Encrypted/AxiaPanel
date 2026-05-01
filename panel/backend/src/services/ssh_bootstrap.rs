@@ -223,23 +223,23 @@ elif command -v yum >/dev/null 2>&1; then
 fi
 
 # Create directories
-log "Creating /etc/dockpanel and runtime dirs"
-mkdir -p /etc/dockpanel/ssl /run/dockpanel /var/lib/dockpanel/git \
-         /var/lib/dockpanel/recordings /var/lib/dockpanel/audit \
-         /var/run/dockpanel /var/backups/dockpanel /var/www
+log "Creating /etc/axiapanel and runtime dirs"
+mkdir -p /etc/axiapanel/ssl /run/axiapanel /var/lib/axiapanel/git \
+         /var/lib/axiapanel/recordings /var/lib/axiapanel/audit \
+         /var/run/axiapanel /var/backups/axiapanel /var/www
 
 # Save token and config
-echo '{token}' > /etc/dockpanel/agent.token
-chmod 600 /etc/dockpanel/agent.token
+echo '{token}' > /etc/axiapanel/agent.token
+chmod 600 /etc/axiapanel/agent.token
 
-cat > /etc/dockpanel/agent.env <<ENVEOF
+cat > /etc/axiapanel/agent.env <<ENVEOF
 AGENT_TOKEN={token}
 AGENT_LISTEN_TCP=0.0.0.0:9443
-DOCKPANEL_SERVER_TOKEN={token}
-DOCKPANEL_SERVER_ID={server_id}
-DOCKPANEL_CENTRAL_URL={panel_url}
+AXIAPANEL_SERVER_TOKEN={token}
+AXIAPANEL_SERVER_ID={server_id}
+AXIAPANEL_CENTRAL_URL={panel_url}
 ENVEOF
-chmod 600 /etc/dockpanel/agent.env
+chmod 600 /etc/axiapanel/agent.env
 
 # Download agent binary from the panel itself.
 # --insecure intentional: the panel may use a self-signed cert during dev,
@@ -248,35 +248,35 @@ chmod 600 /etc/dockpanel/agent.env
 log "Downloading agent binary from panel: {panel_url}/api/agent/binary?arch={arch}"
 if ! curl -fsSL --insecure --connect-timeout 10 --max-time 180 \
     '{panel_url}/api/agent/binary?arch={arch}' \
-    -o /usr/local/bin/dockpanel-agent 2>>"$LOG"; then
+    -o /usr/local/bin/axiapanel-agent 2>>"$LOG"; then
     echo "ERRO: falha ao baixar o binário do agent de {panel_url}/api/agent/binary?arch={arch}" >&2
     echo "Verifique se BASE_URL está acessível deste servidor (curl em modo manual no servidor remoto para diagnosticar)." >&2
     exit 3
 fi
-chmod +x /usr/local/bin/dockpanel-agent
+chmod +x /usr/local/bin/axiapanel-agent
 
 # Sanity check the binary
-if ! file /usr/local/bin/dockpanel-agent 2>>"$LOG" | grep -q ELF; then
+if ! file /usr/local/bin/axiapanel-agent 2>>"$LOG" | grep -q ELF; then
     echo "ERRO: o arquivo baixado não é um binário ELF válido." >&2
-    head -c 500 /usr/local/bin/dockpanel-agent >&2 || true
+    head -c 500 /usr/local/bin/axiapanel-agent >&2 || true
     exit 4
 fi
-log "Binary OK ($(stat -c%s /usr/local/bin/dockpanel-agent) bytes)"
+log "Binary OK ($(stat -c%s /usr/local/bin/axiapanel-agent) bytes)"
 
 # Generate self-signed TLS cert
-if [ ! -f /etc/dockpanel/ssl/agent.crt ]; then
+if [ ! -f /etc/axiapanel/ssl/agent.crt ]; then
     log "Generating self-signed TLS cert"
-    openssl req -x509 -newkey rsa:2048 -keyout /etc/dockpanel/ssl/agent.key \
-        -out /etc/dockpanel/ssl/agent.crt -days 3650 -nodes \
+    openssl req -x509 -newkey rsa:2048 -keyout /etc/axiapanel/ssl/agent.key \
+        -out /etc/axiapanel/ssl/agent.crt -days 3650 -nodes \
         -subj '/CN=axiapanel-agent' >>"$LOG" 2>&1
-    chmod 600 /etc/dockpanel/ssl/agent.key
+    chmod 600 /etc/axiapanel/ssl/agent.key
 fi
 
 # Persist socket dir across reboots
-echo 'd /run/dockpanel 0755 root root -' > /etc/tmpfiles.d/dockpanel.conf
+echo 'd /run/axiapanel 0755 root root -' > /etc/tmpfiles.d/axiapanel.conf
 
 # Create systemd service
-cat > /etc/systemd/system/dockpanel-agent.service <<UNITEOF
+cat > /etc/systemd/system/axiapanel-agent.service <<UNITEOF
 [Unit]
 Description=AxiaPanel Agent
 After=network.target docker.service
@@ -286,9 +286,9 @@ StartLimitIntervalSec=60
 
 [Service]
 Type=simple
-ExecStartPre=/bin/sh -c 'mkdir -p /run/dockpanel /var/lib/dockpanel/git'
-ExecStart=/usr/local/bin/dockpanel-agent
-EnvironmentFile=/etc/dockpanel/agent.env
+ExecStartPre=/bin/sh -c 'mkdir -p /run/axiapanel /var/lib/axiapanel/git'
+ExecStart=/usr/local/bin/axiapanel-agent
+EnvironmentFile=/etc/axiapanel/agent.env
 Environment=RUST_LOG=info
 Restart=always
 RestartSec=5
@@ -315,21 +315,21 @@ elif command -v firewall-cmd >/dev/null 2>&1; then
 fi
 
 # Start agent
-log "Starting dockpanel-agent.service"
+log "Starting axiapanel-agent.service"
 systemctl daemon-reload
-systemctl enable dockpanel-agent >>"$LOG" 2>&1
-systemctl restart dockpanel-agent
+systemctl enable axiapanel-agent >>"$LOG" 2>&1
+systemctl restart axiapanel-agent
 
 # Wait for agent socket (up to 15s) AND for :9443 to accept TLS handshakes (up to 20s)
 log "Waiting for agent socket"
 for i in $(seq 1 15); do
-    [ -S /var/run/dockpanel/agent.sock ] && break
+    [ -S /var/run/axiapanel/agent.sock ] && break
     sleep 1
 done
-if [ ! -S /var/run/dockpanel/agent.sock ]; then
-    echo "ERRO: agent socket /var/run/dockpanel/agent.sock não foi criado." >&2
-    echo "--- journalctl -u dockpanel-agent --no-pager -n 30 ---" >&2
-    journalctl -u dockpanel-agent --no-pager -n 30 >&2 2>/dev/null || true
+if [ ! -S /var/run/axiapanel/agent.sock ]; then
+    echo "ERRO: agent socket /var/run/axiapanel/agent.sock não foi criado." >&2
+    echo "--- journalctl -u axiapanel-agent --no-pager -n 30 ---" >&2
+    journalctl -u axiapanel-agent --no-pager -n 30 >&2 2>/dev/null || true
     exit 5
 fi
 
@@ -344,14 +344,14 @@ for i in $(seq 1 20); do
 done
 if [ "$ready" -ne 1 ]; then
     echo "ERRO: agent rodando mas não respondendo em https://127.0.0.1:9443 após 20s." >&2
-    echo "--- journalctl -u dockpanel-agent --no-pager -n 30 ---" >&2
-    journalctl -u dockpanel-agent --no-pager -n 30 >&2 2>/dev/null || true
+    echo "--- journalctl -u axiapanel-agent --no-pager -n 30 ---" >&2
+    journalctl -u axiapanel-agent --no-pager -n 30 >&2 2>/dev/null || true
     exit 6
 fi
 log "Agent live on :9443"
 
 # Print cert fingerprint as the last stdout line (the panel pins this)
-openssl x509 -in /etc/dockpanel/ssl/agent.crt -fingerprint -sha256 -noout \
+openssl x509 -in /etc/axiapanel/ssl/agent.crt -fingerprint -sha256 -noout \
     | sed 's/.*=//' | tr -d ':' | tr 'A-F' 'a-f'
 "#,
         token = agent_token,

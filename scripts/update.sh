@@ -32,9 +32,9 @@ AGENT_SRC="$REPO_DIR/panel/agent"
 API_SRC="$REPO_DIR/panel/backend"
 CLI_SRC="$REPO_DIR/panel/cli"
 FRONTEND_DIR="$REPO_DIR/panel/frontend"
-AGENT_BIN="/usr/local/bin/dockpanel-agent"
-API_BIN="/usr/local/bin/dockpanel-api"
-CLI_BIN="/usr/local/bin/dockpanel"
+AGENT_BIN="/usr/local/bin/axiapanel-agent"
+API_BIN="/usr/local/bin/axiapanel-api"
+CLI_BIN="/usr/local/bin/axiapanel"
 INSTALL_FROM_RELEASE="${INSTALL_FROM_RELEASE:-0}"
 GITHUB_REPO="Dev-Encrypted/AxiaPanel"
 
@@ -93,10 +93,10 @@ if [ "$INSTALL_FROM_RELEASE" != "1" ] && [ -d "$REPO_DIR/.git" ]; then
 fi
 
 # ── Backup database before upgrade ────────────────────────────────────────
-BACKUP_DIR="/var/backups/dockpanel/db"
+BACKUP_DIR="/var/backups/axiapanel/db"
 mkdir -p "$BACKUP_DIR"
 log "Backing up database..."
-if docker exec dockpanel-postgres pg_dump -U dockpanel dockpanel | gzip > "$BACKUP_DIR/pre-upgrade-$(date +%Y%m%d%H%M%S).sql.gz"; then
+if docker exec axiapanel-postgres pg_dump -U axiapanel axiapanel | gzip > "$BACKUP_DIR/pre-upgrade-$(date +%Y%m%d%H%M%S).sql.gz"; then
     log "Database backup saved to $BACKUP_DIR/"
 else
     error "Database backup failed, aborting upgrade"
@@ -123,24 +123,24 @@ if [ "$INSTALL_FROM_RELEASE" = "1" ]; then
     BASE_URL="https://github.com/${GITHUB_REPO}/releases/download/${RELEASE_TAG}"
 
     log "Downloading agent (${DL_ARCH})..."
-    curl -sfL "${BASE_URL}/dockpanel-agent-linux-${DL_ARCH}" -o /tmp/dockpanel-agent-new
-    chmod +x /tmp/dockpanel-agent-new
+    curl -sfL "${BASE_URL}/axiapanel-agent-linux-${DL_ARCH}" -o /tmp/axiapanel-agent-new
+    chmod +x /tmp/axiapanel-agent-new
 
     log "Downloading API (${DL_ARCH})..."
-    curl -sfL "${BASE_URL}/dockpanel-api-linux-${DL_ARCH}" -o /tmp/dockpanel-api-new
-    chmod +x /tmp/dockpanel-api-new
+    curl -sfL "${BASE_URL}/axiapanel-api-linux-${DL_ARCH}" -o /tmp/axiapanel-api-new
+    chmod +x /tmp/axiapanel-api-new
 
     log "Downloading CLI (${DL_ARCH})..."
-    curl -sfL "${BASE_URL}/dockpanel-cli-linux-${DL_ARCH}" -o /tmp/dockpanel-cli-new
-    chmod +x /tmp/dockpanel-cli-new
+    curl -sfL "${BASE_URL}/axiapanel-cli-linux-${DL_ARCH}" -o /tmp/axiapanel-cli-new
+    chmod +x /tmp/axiapanel-cli-new
 
     # Download and extract frontend
     log "Downloading frontend..."
-    curl -sfL "${BASE_URL}/dockpanel-frontend.tar.gz" -o /tmp/dockpanel-frontend.tar.gz
-    FE_DIR="/opt/dockpanel/frontend"
+    curl -sfL "${BASE_URL}/axiapanel-frontend.tar.gz" -o /tmp/axiapanel-frontend.tar.gz
+    FE_DIR="/opt/axiapanel/frontend"
     mkdir -p "$FE_DIR"
-    tar xzf /tmp/dockpanel-frontend.tar.gz -C "$FE_DIR"
-    rm -f /tmp/dockpanel-frontend.tar.gz
+    tar xzf /tmp/axiapanel-frontend.tar.gz -C "$FE_DIR"
+    rm -f /tmp/axiapanel-frontend.tar.gz
     log "Frontend updated"
 else
     # Build from source
@@ -174,18 +174,18 @@ fi
 
 # ── Ensure required directories exist (may be new in this version) ────────
 log "Ensuring required directories exist..."
-mkdir -p /etc/dockpanel/ssl /var/run/dockpanel /var/backups/dockpanel
+mkdir -p /etc/axiapanel/ssl /var/run/axiapanel /var/backups/axiapanel
 mkdir -p /var/www/acme/.well-known/acme-challenge
-mkdir -p /var/lib/dockpanel/git
+mkdir -p /var/lib/axiapanel/git
 # Directories needed by agent ReadWritePaths (created only if missing)
 for d in /etc/postfix /etc/dovecot /var/vmail /var/spool/postfix /run/opendkim /var/lib/nginx; do
     [ -d "$d" ] || mkdir -p "$d" 2>/dev/null || true
 done
-echo "d /run/dockpanel 0755 root root -" > /etc/tmpfiles.d/dockpanel.conf 2>/dev/null || true
+echo "d /run/axiapanel 0755 root root -" > /etc/tmpfiles.d/axiapanel.conf 2>/dev/null || true
 
 # ── Refresh systemd service files (may have changed between versions) ─────
 log "Updating systemd service files..."
-cat > /etc/systemd/system/dockpanel-agent.service << 'EOF'
+cat > /etc/systemd/system/axiapanel-agent.service << 'EOF'
 [Unit]
 Description=AxiaPanel Agent
 After=network.target nginx.service
@@ -195,9 +195,9 @@ StartLimitIntervalSec=60
 
 [Service]
 Type=simple
-ExecStartPre=/bin/sh -c 'mkdir -p /run/dockpanel /var/lib/dockpanel/git'
-ExecStart=/usr/local/bin/dockpanel-agent
-ExecStartPost=/bin/sh -c 'sleep 1 && chgrp $(getent group www-data >/dev/null 2>&1 && echo www-data || echo nginx) /var/run/dockpanel/agent.sock 2>/dev/null; chmod 660 /var/run/dockpanel/agent.sock 2>/dev/null; true'
+ExecStartPre=/bin/sh -c 'mkdir -p /run/axiapanel /var/lib/axiapanel/git'
+ExecStart=/usr/local/bin/axiapanel-agent
+ExecStartPost=/bin/sh -c 'sleep 1 && chgrp $(getent group www-data >/dev/null 2>&1 && echo www-data || echo nginx) /var/run/axiapanel/agent.sock 2>/dev/null; chmod 660 /var/run/axiapanel/agent.sock 2>/dev/null; true'
 Restart=always
 RestartSec=5
 Environment=RUST_LOG=info
@@ -214,28 +214,28 @@ LimitNOFILE=65535
 WantedBy=multi-user.target
 EOF
 
-cat > /etc/systemd/system/dockpanel-api.service << 'EOF'
+cat > /etc/systemd/system/axiapanel-api.service << 'EOF'
 [Unit]
 Description=AxiaPanel API
-After=network.target docker.service dockpanel-agent.service
-Wants=dockpanel-agent.service
+After=network.target docker.service axiapanel-agent.service
+Wants=axiapanel-agent.service
 StartLimitBurst=5
 StartLimitIntervalSec=60
 
 [Service]
 Type=simple
-ExecStart=/usr/local/bin/dockpanel-api
+ExecStart=/usr/local/bin/axiapanel-api
 Restart=always
 RestartSec=5
 Environment=RUST_LOG=info
-EnvironmentFile=/etc/dockpanel/api.env
+EnvironmentFile=/etc/axiapanel/api.env
 NoNewPrivileges=yes
 PrivateTmp=yes
 ProtectHome=yes
 ProtectKernelLogs=yes
 ProtectKernelModules=yes
 ProtectSystem=no
-ReadWritePaths=/var/run/dockpanel /tmp
+ReadWritePaths=/var/run/axiapanel /tmp
 MemoryMax=1G
 LimitNOFILE=65535
 
@@ -245,10 +245,10 @@ EOF
 
 # ── Update nginx frontend path if needed ──────────────────────────────────
 if [ "$INSTALL_FROM_RELEASE" = "1" ]; then
-    FE_DIST="/opt/dockpanel/frontend/dist"
-    for conf in /etc/nginx/sites-enabled/dockpanel-panel.conf /etc/nginx/conf.d/dockpanel-panel.conf; do
+    FE_DIST="/opt/axiapanel/frontend/dist"
+    for conf in /etc/nginx/sites-enabled/axiapanel-panel.conf /etc/nginx/conf.d/axiapanel-panel.conf; do
         if [ -f "$conf" ] && grep -q "panel/frontend/dist" "$conf" 2>/dev/null; then
-            sed -i "s|/opt/dockpanel/panel/frontend/dist|${FE_DIST}|g" "$conf"
+            sed -i "s|/opt/axiapanel/panel/frontend/dist|${FE_DIST}|g" "$conf"
             log "Updated nginx frontend path in $conf"
             nginx -t > /dev/null 2>&1 && nginx -s reload > /dev/null 2>&1
         fi
@@ -256,17 +256,17 @@ if [ "$INSTALL_FROM_RELEASE" = "1" ]; then
 fi
 
 # Ensure BASE_URL is set in api.env for CORS
-if [ -f /etc/dockpanel/api.env ] && ! grep -q "BASE_URL" /etc/dockpanel/api.env; then
+if [ -f /etc/axiapanel/api.env ] && ! grep -q "BASE_URL" /etc/axiapanel/api.env; then
     # Detect panel URL from nginx config
     PANEL_DOMAIN=""
-    for conf in /etc/nginx/sites-enabled/dockpanel-panel.conf /etc/nginx/conf.d/dockpanel-panel.conf; do
+    for conf in /etc/nginx/sites-enabled/axiapanel-panel.conf /etc/nginx/conf.d/axiapanel-panel.conf; do
         if [ -f "$conf" ]; then
             PANEL_DOMAIN=$(grep "server_name" "$conf" | head -1 | awk '{print $2}' | tr -d ';')
             break
         fi
     done
     if [ -n "$PANEL_DOMAIN" ] && [ "$PANEL_DOMAIN" != "_" ]; then
-        echo "BASE_URL=https://${PANEL_DOMAIN}" >> /etc/dockpanel/api.env
+        echo "BASE_URL=https://${PANEL_DOMAIN}" >> /etc/axiapanel/api.env
         log "Added BASE_URL=https://${PANEL_DOMAIN} to api.env"
     fi
 fi
@@ -279,24 +279,24 @@ cp "$API_BIN" "${API_BIN}.bak" 2>/dev/null || true
 cp "$CLI_BIN" "${CLI_BIN}.bak" 2>/dev/null || true
 
 log "Stopping services..."
-systemctl stop dockpanel-agent dockpanel-api 2>/dev/null || true
+systemctl stop axiapanel-agent axiapanel-api 2>/dev/null || true
 
 if [ "$INSTALL_FROM_RELEASE" = "1" ]; then
-    mv /tmp/dockpanel-agent-new "$AGENT_BIN"
-    mv /tmp/dockpanel-api-new "$API_BIN"
-    mv /tmp/dockpanel-cli-new "$CLI_BIN"
+    mv /tmp/axiapanel-agent-new "$AGENT_BIN"
+    mv /tmp/axiapanel-api-new "$API_BIN"
+    mv /tmp/axiapanel-cli-new "$CLI_BIN"
 else
-    cp "$AGENT_SRC/target/release/dockpanel-agent" "$AGENT_BIN"
-    cp "$API_SRC/target/release/dockpanel-api" "$API_BIN"
-    cp "$CLI_SRC/target/release/dockpanel" "$CLI_BIN"
+    cp "$AGENT_SRC/target/release/axiapanel-agent" "$AGENT_BIN"
+    cp "$API_SRC/target/release/axiapanel-api" "$API_BIN"
+    cp "$CLI_SRC/target/release/axiapanel" "$CLI_BIN"
 fi
 chmod +x "$AGENT_BIN" "$API_BIN" "$CLI_BIN"
 log "Binaries updated (agent: $(du -h "$AGENT_BIN" | cut -f1), api: $(du -h "$API_BIN" | cut -f1), cli: $(du -h "$CLI_BIN" | cut -f1))"
 
 systemctl daemon-reload
-systemctl start dockpanel-agent
+systemctl start axiapanel-agent
 sleep 1
-systemctl start dockpanel-api
+systemctl start axiapanel-api
 log "Services restarted"
 
 # ── Health check with rollback ────────────────────────────────────────────
@@ -306,7 +306,7 @@ rollback() {
     cp "${API_BIN}.bak" "$API_BIN" 2>/dev/null || true
     cp "${CLI_BIN}.bak" "$CLI_BIN" 2>/dev/null || true
     systemctl daemon-reload
-    systemctl restart dockpanel-agent dockpanel-api
+    systemctl restart axiapanel-agent axiapanel-api
     warn "Rolled back to previous binaries"
     exit 1
 }
@@ -334,7 +334,7 @@ if ! curl -sf --max-time 30 http://127.0.0.1:3080/api/system/info > /dev/null 2>
 fi
 
 # CLI health check (non-fatal)
-if ! dockpanel --version > /dev/null 2>&1; then
+if ! axiapanel --version > /dev/null 2>&1; then
     warn "CLI health check failed (non-fatal)"
 fi
 
@@ -345,7 +345,7 @@ rm -f "${AGENT_BIN}.bak" "${API_BIN}.bak" "${CLI_BIN}.bak"
 echo ""
 echo -e "${GREEN}${BOLD}AxiaPanel update complete!${NC}"
 echo ""
-echo -e "  Agent: $(systemctl is-active dockpanel-agent)"
-echo -e "  API:   $(systemctl is-active dockpanel-api)"
+echo -e "  Agent: $(systemctl is-active axiapanel-agent)"
+echo -e "  API:   $(systemctl is-active axiapanel-api)"
 echo -e "  Version: $($CLI_BIN --version 2>/dev/null || echo 'unknown')"
 echo ""

@@ -252,7 +252,7 @@ export default function PublicStatusPage() {
 
         {/* Footer */}
         <div className="text-center mt-10 text-xs text-dark-600 font-mono">
-          Atualizado {timeAgo(data.updated_at)} — Desenvolvido com DockPanel
+          Atualizado {timeAgo(data.updated_at)} — Desenvolvido com AxiaPanel
         </div>
       </div>
     </div>

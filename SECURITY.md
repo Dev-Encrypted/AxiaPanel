@@ -1,10 +1,10 @@
 # Security Policy
 
-> A public posture summary (audit count, supply-chain story, recent advisories, response SLA) lives at **[dockpanel.dev/security](https://dockpanel.dev/security)**. This file is the canonical policy.
+> A public posture summary (audit count, supply-chain story, recent advisories, response SLA) lives at **[axiapanel.dev/security](https://axiapanel.dev/security)**. This file is the canonical policy.
 
 ## Supported Versions
 
-Only the latest release of DockPanel is supported with security updates. We recommend always running the most recent version to ensure you have the latest fixes and protections.
+Only the latest release of AxiaPanel is supported with security updates. We recommend always running the most recent version to ensure you have the latest fixes and protections.
 
 | Version        | Supported |
 | -------------- | --------- |
@@ -13,11 +13,11 @@ Only the latest release of DockPanel is supported with security updates. We reco
 
 ## Reporting a Vulnerability
 
-If you discover a security vulnerability in DockPanel, please report it responsibly. **Do not open a public GitHub issue for security vulnerabilities.**
+If you discover a security vulnerability in AxiaPanel, please report it responsibly. **Do not open a public GitHub issue for security vulnerabilities.**
 
 ### How to Report
 
-Send an email to **security@dockpanel.dev** with the following information:
+Send an email to **security@axiapanel.dev** with the following information:
 
 - A clear description of the vulnerability
 - Step-by-step reproduction instructions
@@ -39,7 +39,7 @@ We ask security researchers to follow responsible disclosure practices:
 - We will **credit researchers** who follow responsible disclosure, with their permission.
 - We **do not pursue legal action** against security researchers acting in good faith. Good-faith research means you made a genuine effort to avoid privacy violations, data destruction, and service disruption.
 
-We appreciate the work of security researchers and are committed to working with the community to keep DockPanel safe.
+We appreciate the work of security researchers and are committed to working with the community to keep AxiaPanel safe.
 
 ## Scope
 
@@ -47,7 +47,7 @@ We appreciate the work of security researchers and are committed to working with
 
 The following components are covered by this security policy:
 
-- DockPanel agent
+- AxiaPanel agent
 - API and backend services
 - Command-line interface (CLI)
 - Frontend web application
@@ -58,13 +58,13 @@ The following components are covered by this security policy:
 The following are not covered by this policy:
 
 - **Third-party dependencies** — Please report these to the upstream project directly
-- **Social engineering attacks** (e.g., phishing DockPanel users or maintainers)
+- **Social engineering attacks** (e.g., phishing AxiaPanel users or maintainers)
 - **Denial of service (DoS) attacks**
-- Vulnerabilities in infrastructure not maintained by the DockPanel project
+- Vulnerabilities in infrastructure not maintained by the AxiaPanel project
 
 ## Security Architecture Summary
 
-DockPanel is designed with defense in depth. Key security properties include:
+AxiaPanel is designed with defense in depth. Key security properties include:
 
 - **Unix socket communication** — The agent communicates via a Unix domain socket and is not exposed to the network.
 - **JWT authentication** — All API endpoints require valid JWT tokens for access.
@@ -77,21 +77,21 @@ DockPanel is designed with defense in depth. Key security properties include:
 - **Input sanitization** — All user-supplied data is validated and sanitized before being passed to system commands.
 - **Systemd hardening** — Generated service units apply systemd security directives to limit the blast radius of any compromise.
 - **Terminal sandboxing** — Terminal sessions run with `PR_SET_NO_NEW_PRIVS`, restricted bash shells, and a command blocklist to prevent privilege escalation and dangerous operations.
-- **Per-image CVE scanning with deploy gating** — Optional but built-in. Every running Docker app can be scanned against Anchore's grype vulnerability database; a configurable soft deploy gate refuses new deploys on images exceeding a critical/high/medium threshold. Scanner binary is self-contained inside `/var/lib/dockpanel/scanners/` (not `/usr/local/bin`) so it lives entirely within the agent's hardened sandbox. Defaults off; admins opt in from Settings → Services.
+- **Per-image CVE scanning with deploy gating** — Optional but built-in. Every running Docker app can be scanned against Anchore's grype vulnerability database; a configurable soft deploy gate refuses new deploys on images exceeding a critical/high/medium threshold. Scanner binary is self-contained inside `/var/lib/axiapanel/scanners/` (not `/usr/local/bin`) so it lives entirely within the agent's hardened sandbox. Defaults off; admins opt in from Settings → Services.
 - **Signed releases + per-binary SBOM** (v2.7.10+) — Every binary and its accompanying SPDX SBOM is signed in CI using cosign keyless via Sigstore. No long-lived signing key exists; the cert is bound to the GitHub Actions OIDC identity of the release workflow and recorded in the public Rekor transparency log.
-- **Per-image SBOM generation** (v2.7.11+) — Optional but built-in. Operators can generate an SPDX 2.3 JSON SBOM for any deployed Docker app's image on demand (syft). The composition companion to per-image CVE scanning — useful for supply-chain audits and EU CRA compliance asks. Like grype, syft installs self-contained inside `/var/lib/dockpanel/scanners/`. Defaults off; admins opt in from Settings → Services.
+- **Per-image SBOM generation** (v2.7.11+) — Optional but built-in. Operators can generate an SPDX 2.3 JSON SBOM for any deployed Docker app's image on demand (syft). The composition companion to per-image CVE scanning — useful for supply-chain audits and EU CRA compliance asks. Like grype, syft installs self-contained inside `/var/lib/axiapanel/scanners/`. Defaults off; admins opt in from Settings → Services.
 
 ## Verifying release signatures
 
-Every release asset since v2.7.10 ships with a `.sig` and `.pem` next to it, plus a `dockpanel-{agent,api,cli}.spdx.json` SBOM (also signed). To verify a downloaded binary:
+Every release asset since v2.7.10 ships with a `.sig` and `.pem` next to it, plus a `axiapanel-{agent,api,cli}.spdx.json` SBOM (also signed). To verify a downloaded binary:
 
 ```bash
 cosign verify-blob \
-  --certificate dockpanel-agent-linux-amd64.pem \
-  --signature  dockpanel-agent-linux-amd64.sig \
-  --certificate-identity-regexp '^https://github\.com/ovexro/dockpanel/\.github/workflows/release\.yml@refs/tags/v.+$' \
+  --certificate axiapanel-agent-linux-amd64.pem \
+  --signature  axiapanel-agent-linux-amd64.sig \
+  --certificate-identity-regexp '^https://github\.com/ovexro/axiapanel/\.github/workflows/release\.yml@refs/tags/v.+$' \
   --certificate-oidc-issuer 'https://token.actions.githubusercontent.com' \
-  dockpanel-agent-linux-amd64
+  axiapanel-agent-linux-amd64
 ```
 
 The same command works against the SBOM JSON files. A successful verification proves the asset was produced by this repository's release workflow and recorded in the Sigstore transparency log.
@@ -105,7 +105,7 @@ Seven-surface parallel audit with a twelve-day CVE refresh (2026-04-03 to 2026-0
 - **tar symlink following** — Three backup paths (full-site, WordPress pre-update snapshot, mailbox) created archives without `--no-dereference`. Symlinks inside the site root would have been archived as target content. Added `--no-dereference` to all three.
 - **Cron command filter** — Newline/carriage-return explicitly rejected (was implicit via the blocklist); hardens against scheduled-job injection on storage-layer bypass.
 - **Terminal command denylist** — Added `chroot`, `pivot_root`, `capsh`, `mknod`, `debugfs`, `kexec` to the web-terminal block patterns (were absent; users with terminal access could invoke them).
-- **Agent systemd unit hardening** — `ProtectKernelTunables`, `ProtectControlGroups`, `ProtectClock`, `ProtectHostname`, `RestrictRealtime`, `RestrictSUIDSGID`, `LockPersonality`, `RestrictNamespaces=~CLONE_NEWUSER` added to `dockpanel-agent.service`.
+- **Agent systemd unit hardening** — `ProtectKernelTunables`, `ProtectControlGroups`, `ProtectClock`, `ProtectHostname`, `RestrictRealtime`, `RestrictSUIDSGID`, `LockPersonality`, `RestrictNamespaces=~CLONE_NEWUSER` added to `axiapanel-agent.service`.
 - **Frontend URL validation** — Telemetry's update-release link and the public status page's operator-supplied logo now reject any scheme except `http(s)://`, preventing `javascript:` / `data:` XSS via backend-controlled fields.
 - **Security-scan alert pileup** — Each weekly scan fired a fresh alert without resolving the previous one, so unacknowledged alerts compounded and the escalation loop re-notified every 2–5 minutes. New scans now auto-resolve prior firing/acknowledged security alerts before firing their own, so the most recent scan is always the single source of truth.
 
@@ -138,7 +138,7 @@ Audited all agent and backend code for silent error suppression and missing func
 
 ### Audit Round 3: Research-Driven Audit (March 2026)
 
-A research-driven security audit studied real-world CVEs from CyberPanel, HestiaCP, CloudPanel, VestaCP, Webmin, and cPanel, then audited DockPanel against those attack patterns. This round identified **55 findings** (12 HIGH, 28 MEDIUM, 15 LOW), including:
+A research-driven security audit studied real-world CVEs from CyberPanel, HestiaCP, CloudPanel, VestaCP, Webmin, and cPanel, then audited AxiaPanel against those attack patterns. This round identified **55 findings** (12 HIGH, 28 MEDIUM, 15 LOW), including:
 
 - **Command execution safety** — Added `safe_command()` with `env_clear()` on all 341 `Command::new()` calls across 44 files to prevent LD_PRELOAD/PATH hijacking.
 - **Credential encryption at rest** — All stored credentials encrypted with AES-256-GCM using dedicated key derivation.
@@ -164,4 +164,4 @@ All identified issues across all seven audit rounds have been fixed. Combined to
 
 ## Contact
 
-For security-related inquiries, reach us at **security@dockpanel.dev**.
+For security-related inquiries, reach us at **security@axiapanel.dev**.

@@ -9,7 +9,7 @@
 #   - PostgreSQL 16 (Docker container on port 5450)
 #   - Agent (Rust binary, systemd, Unix socket)
 #   - API (Rust binary, systemd, port 3080)
-#   - CLI (Rust binary, /usr/local/bin/dockpanel)
+#   - CLI (Rust binary, /usr/local/bin/axiapanel)
 #   - Frontend (Vite build, served by nginx)
 #   - Nginx (reverse proxy + static files)
 #
@@ -24,12 +24,12 @@ set -euo pipefail
 # ── Configuration (override with env vars) ──────────────────────────────
 PANEL_DOMAIN="${PANEL_DOMAIN:-}"
 PANEL_PORT="${PANEL_PORT:-8443}"
-CONFIG_DIR="/etc/dockpanel"
-AGENT_BIN="/usr/local/bin/dockpanel-agent"
-API_BIN="/usr/local/bin/dockpanel-api"
-CLI_BIN="/usr/local/bin/dockpanel"
+CONFIG_DIR="/etc/axiapanel"
+AGENT_BIN="/usr/local/bin/axiapanel-agent"
+API_BIN="/usr/local/bin/axiapanel-api"
+CLI_BIN="/usr/local/bin/axiapanel"
 DB_PORT=5450
-DB_CONTAINER="dockpanel-postgres"
+DB_CONTAINER="axiapanel-postgres"
 INSTALL_FROM_RELEASE="${INSTALL_FROM_RELEASE:-0}"
 GITHUB_REPO="Dev-Encrypted/AxiaPanel"
 
@@ -333,19 +333,19 @@ create_directories() {
     header "Creating Directories"
 
     mkdir -p -m 0700 "$CONFIG_DIR"
-    mkdir -p /var/run/dockpanel
-    mkdir -p /etc/dockpanel/ssl
-    mkdir -p /var/backups/dockpanel
+    mkdir -p /var/run/axiapanel
+    mkdir -p /etc/axiapanel/ssl
+    mkdir -p /var/backups/axiapanel
     mkdir -p /var/www/acme
 
     # Ensure socket directory persists across tmpfiles cleanup/reboot
-    echo "d /run/dockpanel 0755 root root -" > /etc/tmpfiles.d/dockpanel.conf
+    echo "d /run/axiapanel 0755 root root -" > /etc/tmpfiles.d/axiapanel.conf
 
     # Create all directories/files required by systemd ReadWritePaths
     # (these may not exist yet on a fresh install — services are installed later)
     mkdir -p /etc/postfix /etc/dovecot /var/vmail /var/spool/postfix /run/opendkim
     mkdir -p /var/lib/nginx /etc/letsencrypt /var/lib/dpkg /var/cache/apt /var/lib/apt
-    mkdir -p /etc/php /var/spool/cron /var/lib/dockpanel/git /var/lib/dockpanel/recordings
+    mkdir -p /etc/php /var/spool/cron /var/lib/axiapanel/git /var/lib/axiapanel/recordings
     touch /etc/opendkim.conf /run/nginx.pid 2>/dev/null || true
 
     log "Directories created"
@@ -368,7 +368,7 @@ generate_secrets() {
 
     # Reuse from existing api.env if present (idempotent reinstall)
     if [ -f "$CONFIG_DIR/api.env" ]; then
-        EXISTING_DB_PW=$(grep '^DATABASE_URL=' "$CONFIG_DIR/api.env" 2>/dev/null | sed 's|.*://dockpanel:\(.*\)@.*|\1|' || true)
+        EXISTING_DB_PW=$(grep '^DATABASE_URL=' "$CONFIG_DIR/api.env" 2>/dev/null | sed 's|.*://axiapanel:\(.*\)@.*|\1|' || true)
         EXISTING_JWT=$(grep '^JWT_SECRET=' "$CONFIG_DIR/api.env" 2>/dev/null | cut -d= -f2- || true)
     fi
 
@@ -398,20 +398,20 @@ setup_database() {
         # Remove stale volume from previous failed install (PostgreSQL ignores
         # POSTGRES_PASSWORD when an existing data directory is found, causing
         # password mismatch if the password was regenerated)
-        if docker volume inspect dockpanel-pgdata > /dev/null 2>&1; then
+        if docker volume inspect axiapanel-pgdata > /dev/null 2>&1; then
             warn "Removing stale database volume from previous install..."
-            docker volume rm dockpanel-pgdata > /dev/null 2>&1 || true
+            docker volume rm axiapanel-pgdata > /dev/null 2>&1 || true
         fi
 
         log "Creating PostgreSQL 16 container..."
         docker run -d \
             --name "$DB_CONTAINER" \
             --restart unless-stopped \
-            -e POSTGRES_DB=dockpanel \
-            -e POSTGRES_USER=dockpanel \
+            -e POSTGRES_DB=axiapanel \
+            -e POSTGRES_USER=axiapanel \
             -e "POSTGRES_PASSWORD=$DB_PASSWORD" \
             -p "127.0.0.1:${DB_PORT}:5432" \
-            -v dockpanel-pgdata:/var/lib/postgresql/data \
+            -v axiapanel-pgdata:/var/lib/postgresql/data \
             postgres:16-alpine > /dev/null 2>&1
         log "PostgreSQL container created (port $DB_PORT)"
     fi
@@ -420,7 +420,7 @@ setup_database() {
     log "Waiting for PostgreSQL..."
     local WAITED=0
     while [ "$WAITED" -lt 30 ]; do
-        if docker exec "$DB_CONTAINER" pg_isready -U dockpanel > /dev/null 2>&1; then
+        if docker exec "$DB_CONTAINER" pg_isready -U axiapanel > /dev/null 2>&1; then
             log "PostgreSQL ready"
             return
         fi
@@ -452,34 +452,34 @@ download_binaries() {
     # busy" (exit 23) because Linux refuses to overwrite a running executable.
     # systemctl stop is a no-op if the unit is inactive or missing.
     if command -v systemctl >/dev/null 2>&1; then
-        systemctl stop dockpanel-api dockpanel-agent 2>/dev/null || true
+        systemctl stop axiapanel-api axiapanel-agent 2>/dev/null || true
     fi
 
     # Download agent
     log "Downloading agent (${DL_ARCH})..."
-    curl -sfL "${BASE_URL}/dockpanel-agent-linux-${DL_ARCH}" -o "$AGENT_BIN"
+    curl -sfL "${BASE_URL}/axiapanel-agent-linux-${DL_ARCH}" -o "$AGENT_BIN"
     chmod +x "$AGENT_BIN"
     log "Agent downloaded ($(du -h "$AGENT_BIN" | cut -f1))"
 
     # Download API
     log "Downloading API (${DL_ARCH})..."
-    curl -sfL "${BASE_URL}/dockpanel-api-linux-${DL_ARCH}" -o "$API_BIN"
+    curl -sfL "${BASE_URL}/axiapanel-api-linux-${DL_ARCH}" -o "$API_BIN"
     chmod +x "$API_BIN"
     log "API downloaded ($(du -h "$API_BIN" | cut -f1))"
 
     # Download CLI
     log "Downloading CLI (${DL_ARCH})..."
-    curl -sfL "${BASE_URL}/dockpanel-cli-linux-${DL_ARCH}" -o "$CLI_BIN"
+    curl -sfL "${BASE_URL}/axiapanel-cli-linux-${DL_ARCH}" -o "$CLI_BIN"
     chmod +x "$CLI_BIN"
     log "CLI downloaded ($(du -h "$CLI_BIN" | cut -f1))"
 
     # Download frontend
     log "Downloading frontend..."
-    local FE_TARBALL="/tmp/dockpanel-frontend.tar.gz"
-    curl -sfL "${BASE_URL}/dockpanel-frontend.tar.gz" -o "$FE_TARBALL"
+    local FE_TARBALL="/tmp/axiapanel-frontend.tar.gz"
+    curl -sfL "${BASE_URL}/axiapanel-frontend.tar.gz" -o "$FE_TARBALL"
 
     # Extract frontend — need a target directory
-    local FE_DIR="/opt/dockpanel/frontend"
+    local FE_DIR="/opt/axiapanel/frontend"
     mkdir -p "$FE_DIR"
     tar xzf "$FE_TARBALL" -C "$FE_DIR"
     rm -f "$FE_TARBALL"
@@ -534,27 +534,27 @@ build_binaries() {
     # Stop running services so cp can overwrite their binaries (see note in
     # download_binaries — same "Text file busy" trap).
     if command -v systemctl >/dev/null 2>&1; then
-        systemctl stop dockpanel-api dockpanel-agent 2>/dev/null || true
+        systemctl stop axiapanel-api axiapanel-agent 2>/dev/null || true
     fi
 
     # Build agent
     log "Building agent..."
     cargo_build_with_progress "$AGENT_SRC" "Agent"
-    cp "$AGENT_SRC/target/release/dockpanel-agent" "$AGENT_BIN"
+    cp "$AGENT_SRC/target/release/axiapanel-agent" "$AGENT_BIN"
     chmod +x "$AGENT_BIN"
     log "Agent built ($(du -h "$AGENT_BIN" | cut -f1))"
 
     # Build API
     log "Building API..."
     cargo_build_with_progress "$API_SRC" "API"
-    cp "$API_SRC/target/release/dockpanel-api" "$API_BIN"
+    cp "$API_SRC/target/release/axiapanel-api" "$API_BIN"
     chmod +x "$API_BIN"
     log "API built ($(du -h "$API_BIN" | cut -f1))"
 
     # Build CLI
     log "Building CLI..."
     cargo_build_with_progress "$CLI_SRC" "CLI"
-    cp "$CLI_SRC/target/release/dockpanel" "$CLI_BIN"
+    cp "$CLI_SRC/target/release/axiapanel" "$CLI_BIN"
     chmod +x "$CLI_BIN"
     log "CLI built ($(du -h "$CLI_BIN" | cut -f1))"
 }
@@ -581,7 +581,7 @@ create_services() {
     header "Systemd Services"
 
     # Agent service
-    cat > /etc/systemd/system/dockpanel-agent.service << 'EOF'
+    cat > /etc/systemd/system/axiapanel-agent.service << 'EOF'
 [Unit]
 Description=AxiaPanel Agent
 After=network.target nginx.service
@@ -591,9 +591,9 @@ StartLimitIntervalSec=60
 
 [Service]
 Type=simple
-ExecStartPre=/bin/sh -c 'mkdir -p /run/dockpanel /var/lib/dockpanel/git'
-ExecStart=/usr/local/bin/dockpanel-agent
-ExecStartPost=/bin/sh -c 'sleep 1 && chgrp $(getent group www-data >/dev/null 2>&1 && echo www-data || echo nginx) /var/run/dockpanel/agent.sock 2>/dev/null; chmod 660 /var/run/dockpanel/agent.sock 2>/dev/null; true'
+ExecStartPre=/bin/sh -c 'mkdir -p /run/axiapanel /var/lib/axiapanel/git'
+ExecStart=/usr/local/bin/axiapanel-agent
+ExecStartPost=/bin/sh -c 'sleep 1 && chgrp $(getent group www-data >/dev/null 2>&1 && echo www-data || echo nginx) /var/run/axiapanel/agent.sock 2>/dev/null; chmod 660 /var/run/axiapanel/agent.sock 2>/dev/null; true'
 Restart=always
 RestartSec=5
 Environment=RUST_LOG=info
@@ -611,28 +611,28 @@ WantedBy=multi-user.target
 EOF
 
     # API service
-    cat > /etc/systemd/system/dockpanel-api.service << 'EOF'
+    cat > /etc/systemd/system/axiapanel-api.service << 'EOF'
 [Unit]
 Description=AxiaPanel API
-After=network.target docker.service dockpanel-agent.service
-Wants=dockpanel-agent.service
+After=network.target docker.service axiapanel-agent.service
+Wants=axiapanel-agent.service
 StartLimitBurst=5
 StartLimitIntervalSec=60
 
 [Service]
 Type=simple
-ExecStart=/usr/local/bin/dockpanel-api
+ExecStart=/usr/local/bin/axiapanel-api
 Restart=always
 RestartSec=5
 Environment=RUST_LOG=info
-EnvironmentFile=/etc/dockpanel/api.env
+EnvironmentFile=/etc/axiapanel/api.env
 NoNewPrivileges=yes
 PrivateTmp=yes
 ProtectHome=yes
 ProtectKernelLogs=yes
 ProtectKernelModules=yes
 ProtectSystem=no
-ReadWritePaths=/var/run/dockpanel /tmp
+ReadWritePaths=/var/run/axiapanel /tmp
 MemoryMax=1G
 LimitNOFILE=65535
 
@@ -647,9 +647,9 @@ EOF
     fi
 
     cat > "$CONFIG_DIR/api.env" << EOF
-DATABASE_URL=postgresql://dockpanel:${DB_PASSWORD}@127.0.0.1:${DB_PORT}/dockpanel
+DATABASE_URL=postgresql://axiapanel:${DB_PASSWORD}@127.0.0.1:${DB_PORT}/axiapanel
 JWT_SECRET=${JWT_SECRET}
-AGENT_SOCKET=/var/run/dockpanel/agent.sock
+AGENT_SOCKET=/var/run/axiapanel/agent.sock
 AGENT_TOKEN=${AGENT_TOKEN}
 LISTEN_ADDR=127.0.0.1:3080
 BASE_URL=${API_BASE_URL}
@@ -659,28 +659,28 @@ EOF
     systemctl daemon-reload
 
     # Start agent
-    systemctl enable dockpanel-agent > /dev/null 2>&1
-    systemctl restart dockpanel-agent
+    systemctl enable axiapanel-agent > /dev/null 2>&1
+    systemctl restart axiapanel-agent
     sleep 2
 
-    if systemctl is-active --quiet dockpanel-agent; then
+    if systemctl is-active --quiet axiapanel-agent; then
         log "Agent service running"
     else
         error "Agent failed to start"
-        journalctl -u dockpanel-agent --no-pager -n 10
+        journalctl -u axiapanel-agent --no-pager -n 10
         exit 1
     fi
 
     # Start API
-    systemctl enable dockpanel-api > /dev/null 2>&1
-    systemctl restart dockpanel-api
+    systemctl enable axiapanel-api > /dev/null 2>&1
+    systemctl restart axiapanel-api
     sleep 2
 
-    if systemctl is-active --quiet dockpanel-api; then
+    if systemctl is-active --quiet axiapanel-api; then
         log "API service running"
     else
         error "API failed to start"
-        journalctl -u dockpanel-api --no-pager -n 10
+        journalctl -u axiapanel-api --no-pager -n 10
         exit 1
     fi
 }
@@ -700,11 +700,11 @@ configure_nginx() {
 
     # Determine config directory
     if [ -d /etc/nginx/sites-enabled ]; then
-        NGINX_CONF="/etc/nginx/sites-enabled/dockpanel-panel.conf"
+        NGINX_CONF="/etc/nginx/sites-enabled/axiapanel-panel.conf"
     elif [ -d /etc/nginx/conf.d ]; then
-        NGINX_CONF="/etc/nginx/conf.d/dockpanel-panel.conf"
+        NGINX_CONF="/etc/nginx/conf.d/axiapanel-panel.conf"
     else
-        NGINX_CONF="/etc/nginx/conf.d/dockpanel-panel.conf"
+        NGINX_CONF="/etc/nginx/conf.d/axiapanel-panel.conf"
         mkdir -p /etc/nginx/conf.d
     fi
 
@@ -752,7 +752,7 @@ server {
 
     # Agent proxy (for frontend /agent/* calls)
     location /agent/ {
-        proxy_pass http://unix:/var/run/dockpanel/agent.sock:/;
+        proxy_pass http://unix:/var/run/axiapanel/agent.sock:/;
         proxy_http_version 1.1;
         proxy_set_header Host \$host;
         proxy_set_header X-Real-IP \$remote_addr;
@@ -760,7 +760,7 @@ server {
 
     # Agent WebSocket terminal
     location /agent/terminal/ws {
-        proxy_pass http://unix:/var/run/dockpanel/agent.sock:/terminal/ws;
+        proxy_pass http://unix:/var/run/axiapanel/agent.sock:/terminal/ws;
         proxy_http_version 1.1;
         proxy_set_header Upgrade \$http_upgrade;
         proxy_set_header Connection "upgrade";
@@ -772,7 +772,7 @@ server {
 
     # Agent WebSocket log stream
     location /agent/logs/stream {
-        proxy_pass http://unix:/var/run/dockpanel/agent.sock:/logs/stream;
+        proxy_pass http://unix:/var/run/axiapanel/agent.sock:/logs/stream;
         proxy_http_version 1.1;
         proxy_set_header Upgrade \$http_upgrade;
         proxy_set_header Connection "upgrade";
@@ -835,7 +835,7 @@ wait_for_health() {
         WAITED=$((WAITED + 2))
     done
 
-    warn "API not responding on port 3080 yet — check: journalctl -u dockpanel-api -n 20"
+    warn "API not responding on port 3080 yet — check: journalctl -u axiapanel-api -n 20"
 }
 
 # ── Summary ──────────────────────────────────────────────────────────────
@@ -990,26 +990,26 @@ print_summary() {
     echo ""
     echo -e "  ${BOLD}First step:${NC}     Open the URL and create your admin account"
     echo ""
-    echo -e "  ${BOLD}CLI:${NC}            dockpanel status"
-    echo -e "                  dockpanel diagnose"
-    echo -e "                  dockpanel --help"
+    echo -e "  ${BOLD}CLI:${NC}            axiapanel status"
+    echo -e "                  axiapanel diagnose"
+    echo -e "                  axiapanel --help"
     echo ""
     echo -e "  ${BOLD}Service commands:${NC}"
-    echo -e "    Agent status:   systemctl status dockpanel-agent"
-    echo -e "    API status:     systemctl status dockpanel-api"
-    echo -e "    Agent logs:     journalctl -u dockpanel-agent -f"
-    echo -e "    API logs:       journalctl -u dockpanel-api -f"
-    echo -e "    Restart all:    systemctl restart dockpanel-agent dockpanel-api"
+    echo -e "    Agent status:   systemctl status axiapanel-agent"
+    echo -e "    API status:     systemctl status axiapanel-api"
+    echo -e "    Agent logs:     journalctl -u axiapanel-agent -f"
+    echo -e "    API logs:       journalctl -u axiapanel-api -f"
+    echo -e "    Restart all:    systemctl restart axiapanel-agent axiapanel-api"
     echo ""
     echo -e "  ${BOLD}Paths:${NC}"
     echo -e "    Config:         ${CONFIG_DIR}/"
     echo -e "    Agent token:    ${CONFIG_DIR}/agent.token"
     echo -e "    API env:        ${CONFIG_DIR}/api.env"
-    echo -e "    Backups:        /var/backups/dockpanel/"
+    echo -e "    Backups:        /var/backups/axiapanel/"
     echo ""
     echo -e "  ${BOLD}Database:${NC}"
     echo -e "    Container:      ${DB_CONTAINER} (port ${DB_PORT})"
-    echo -e "    Connect:        docker exec -it ${DB_CONTAINER} psql -U dockpanel -d dockpanel"
+    echo -e "    Connect:        docker exec -it ${DB_CONTAINER} psql -U axiapanel -d axiapanel"
     echo ""
     echo -e "  ${BOLD}Installed services:${NC}"
     echo -e "    Docker, Nginx, PHP-FPM, Certbot, UFW, Fail2Ban"
@@ -1025,7 +1025,7 @@ print_summary() {
     echo -e "    3. Provision SSL (click the lock icon on any site)"
     echo -e "    4. Run diagnostics (Diagnostics → Run Scan)"
     echo ""
-    echo -e "  ${YELLOW}Update:${NC}   Run: bash /opt/dockpanel/scripts/update.sh"
+    echo -e "  ${YELLOW}Update:${NC}   Run: bash /opt/axiapanel/scripts/update.sh"
     echo ""
 }
 
@@ -1033,15 +1033,15 @@ print_summary() {
 setup_db_backup() {
     header "PostgreSQL Backup"
 
-    local BACKUP_SCRIPT="/opt/dockpanel/scripts/db-backup.sh"
-    mkdir -p /opt/dockpanel/scripts
+    local BACKUP_SCRIPT="/opt/axiapanel/scripts/db-backup.sh"
+    mkdir -p /opt/axiapanel/scripts
 
     cat > "$BACKUP_SCRIPT" << 'BKEOF'
 #!/bin/bash
-BACKUP_DIR="/var/backups/dockpanel/db"
+BACKUP_DIR="/var/backups/axiapanel/db"
 mkdir -p "$BACKUP_DIR"
 TIMESTAMP=$(date +%Y%m%d_%H%M%S)
-docker exec dockpanel-postgres pg_dump -U dockpanel -d dockpanel | gzip > "$BACKUP_DIR/dockpanel_$TIMESTAMP.sql.gz"
+docker exec axiapanel-postgres pg_dump -U axiapanel -d axiapanel | gzip > "$BACKUP_DIR/axiapanel_$TIMESTAMP.sql.gz"
 # Keep last 7 days
 find "$BACKUP_DIR" -name "*.sql.gz" -mtime +7 -delete
 BKEOF
@@ -1132,8 +1132,8 @@ main() {
     sleep 3
 
     # Start services (may already be started by create_services)
-    systemctl start dockpanel-agent 2>/dev/null
-    systemctl start dockpanel-api 2>/dev/null
+    systemctl start axiapanel-agent 2>/dev/null
+    systemctl start axiapanel-api 2>/dev/null
     sleep 2
 
     install_recommended_services

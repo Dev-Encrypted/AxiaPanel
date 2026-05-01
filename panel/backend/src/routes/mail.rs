@@ -256,7 +256,7 @@ pub async fn create_domain(
 
     // Generate DKIM keys via agent
     let dkim_result = agent
-        .post("/mail/dkim/generate", Some(serde_json::json!({ "domain": domain, "selector": "dockpanel" })))
+        .post("/mail/dkim/generate", Some(serde_json::json!({ "domain": domain, "selector": "axiapanel" })))
         .await;
 
     let (private_key, public_key) = match dkim_result {
@@ -396,7 +396,7 @@ pub async fn delete_domain(
     .await
     .ok()
     .flatten();
-    let dkim_selector = dkim_info.map(|d| d.0).unwrap_or_else(|| "dockpanel".to_string());
+    let dkim_selector = dkim_info.map(|d| d.0).unwrap_or_else(|| "axiapanel".to_string());
 
     // Remove from Postfix/Dovecot via agent
     let _ = agent
@@ -981,7 +981,7 @@ async fn auto_create_mail_dns(
 
         // 5. DKIM TXT record (if key available)
         if let Some(dkim_val) = &dkim_txt {
-            let dkim_name = format!("dockpanel._domainkey.{domain}");
+            let dkim_name = format!("axiapanel._domainkey.{domain}");
             let _ = client.post(&cf_url).headers(headers.clone()).json(&serde_json::json!({
                 "type": "TXT", "name": dkim_name, "content": dkim_val, "ttl": 1,
             })).send().await;
@@ -1044,7 +1044,7 @@ async fn auto_create_mail_dns(
 
         // DKIM TXT record
         if let Some(dkim_val) = &dkim_txt {
-            let dkim_name = format!("dockpanel._domainkey.{domain_fqdn}");
+            let dkim_name = format!("axiapanel._domainkey.{domain_fqdn}");
             let dkim_quoted = format!("\"{dkim_val}\"");
             rrsets.push(serde_json::json!({
                 "name": &dkim_name, "type": "TXT", "ttl": 300, "changetype": "REPLACE",
@@ -1314,7 +1314,7 @@ pub async fn dns_check(
         .map_err(|e| internal_error("dns check", e))?;
 
     let (domain, selector, _dkim_pub) = domain.ok_or_else(|| err(StatusCode::NOT_FOUND, "Domínio não encontrado"))?;
-    let selector = selector.unwrap_or_else(|| "dockpanel".to_string());
+    let selector = selector.unwrap_or_else(|| "axiapanel".to_string());
 
     let mut checks = Vec::new();
 

@@ -128,16 +128,16 @@ const SUPPLY_CHAIN = [
 ];
 
 const VERIFY_CMD = `cosign verify-blob \\
-  --certificate dockpanel-agent-linux-amd64.pem \\
-  --signature  dockpanel-agent-linux-amd64.sig \\
-  --certificate-identity-regexp '^https://github\\.com/ovexro/dockpanel/\\.github/workflows/release\\.yml@refs/tags/v.+$' \\
+  --certificate axiapanel-agent-linux-amd64.pem \\
+  --signature  axiapanel-agent-linux-amd64.sig \\
+  --certificate-identity-regexp '^https://github\\.com/ovexro/axiapanel/\\.github/workflows/release\\.yml@refs/tags/v.+$' \\
   --certificate-oidc-issuer 'https://token.actions.githubusercontent.com' \\
-  dockpanel-agent-linux-amd64`;
+  axiapanel-agent-linux-amd64`;
 
 const RECENT_ADVISORIES = [
   { ver: '2.7.11', date: '2026-04-15', text: 'Per-image SBOM generation (syft) shipped — supply-chain transparency for every deployed container.' },
   { ver: '2.7.10', date: '2026-04-15', text: 'Signed releases via cosign keyless + per-binary SPDX SBOMs in CI.' },
-  { ver: '2.7.9',  date: '2026-04-15', text: 'Per-image CVE scanning (grype) shipped; agent sandbox gap (/var/lib/dockpanel missing from ReadWritePaths) closed.' },
+  { ver: '2.7.9',  date: '2026-04-15', text: 'Per-image CVE scanning (grype) shipped; agent sandbox gap (/var/lib/axiapanel missing from ReadWritePaths) closed.' },
   { ver: '2.7.8',  date: '2026-04-15', text: 'Audit Round 7 fixes: tar --no-dereference, terminal denylist, agent unit hardening, URL guards, alert-pileup fix.' },
   { ver: '2.7.x',  date: '2026-03',    text: 'Audit Round 6: 30 findings closed including MySQL SQL injection, deploy RCE, CSRF, Compose YAML AST validation, HKDF.' },
   { ver: '2.7.x',  date: '2026-03',    text: 'Audit Round 3: research-driven sweep against real-world panel CVEs — 55 findings, env_clear() on 341 Command::new() calls, AES-256-GCM credentials at rest.' },
@@ -174,7 +174,7 @@ export default function Security() {
           </h1>
           <p className="mt-4 max-w-2xl text-zinc-400 leading-relaxed">
             Every other panel that skipped this page eventually wrote a postmortem instead.
-            DockPanel takes the opposite approach: continuous internal audits, supply-chain
+            AxiaPanel takes the opposite approach: continuous internal audits, supply-chain
             transparency, signed releases, and a public response SLA. Here&apos;s the receipts.
           </p>
         </section>
@@ -202,7 +202,7 @@ export default function Security() {
           <h2 className={`text-2xl font-bold text-white ${hd}`}>Supply chain</h2>
           <p className="mt-2 text-sm text-zinc-500">
             What we ship, signed. What you run, scannable. EU CRA compliance lands September 2026 —
-            DockPanel is ready today.
+            AxiaPanel is ready today.
           </p>
           <div className="mt-6 grid gap-4 md:grid-cols-2">
             {SUPPLY_CHAIN.map((row) => (
@@ -227,7 +227,7 @@ export default function Security() {
                 Verify a downloaded binary
               </span>
               <a
-                href="https://github.com/ovexro/dockpanel/blob/main/SECURITY.md#verifying-release-signatures"
+                href="https://github.com/ovexro/axiapanel/blob/main/SECURITY.md#verifying-release-signatures"
                 className="flex items-center gap-1 text-[11px] text-zinc-500 hover:text-white"
                 target="_blank"
                 rel="noopener noreferrer"
@@ -245,7 +245,7 @@ export default function Security() {
         <section className="mt-16">
           <h2 className={`text-2xl font-bold text-white ${hd}`}>CVE response SLA</h2>
           <p className="mt-2 text-sm text-zinc-500">
-            From <a href="https://github.com/ovexro/dockpanel/blob/main/SECURITY.md" className="text-emerald-400 underline underline-offset-2 hover:text-emerald-300" target="_blank" rel="noopener noreferrer">SECURITY.md</a>.
+            From <a href="https://github.com/ovexro/axiapanel/blob/main/SECURITY.md" className="text-emerald-400 underline underline-offset-2 hover:text-emerald-300" target="_blank" rel="noopener noreferrer">SECURITY.md</a>.
             We don&apos;t pursue legal action against good-faith researchers.
           </p>
           <div className="mt-6 grid gap-4 md:grid-cols-3">
@@ -288,7 +288,7 @@ export default function Security() {
           <div className="mt-4 text-[12px] text-zinc-600">
             Full write-ups in{' '}
             <a
-              href="https://github.com/ovexro/dockpanel/blob/main/SECURITY.md#past-security-work"
+              href="https://github.com/ovexro/axiapanel/blob/main/SECURITY.md#past-security-work"
               className="text-emerald-400 underline underline-offset-2 hover:text-emerald-300"
               target="_blank"
               rel="noopener noreferrer"
@@ -304,7 +304,7 @@ export default function Security() {
           <p className="mt-2 text-sm text-zinc-500">
             What we&apos;ve shipped to harden the panel. From the{' '}
             <a
-              href="https://github.com/ovexro/dockpanel/blob/main/CHANGELOG.md"
+              href="https://github.com/ovexro/axiapanel/blob/main/CHANGELOG.md"
               className="text-emerald-400 underline underline-offset-2 hover:text-emerald-300"
               target="_blank"
               rel="noopener noreferrer"
@@ -332,7 +332,7 @@ export default function Security() {
         <section className="mt-16">
           <h2 className={`text-2xl font-bold text-white ${hd}`}>Defense in depth</h2>
           <p className="mt-2 text-sm text-zinc-500">
-            The properties every DockPanel install ships with by default.
+            The properties every AxiaPanel install ships with by default.
           </p>
           <div className="mt-6 grid gap-3 md:grid-cols-2">
             {[
@@ -371,13 +371,13 @@ export default function Security() {
           </p>
           <div className="mt-5 flex flex-wrap gap-3">
             <a
-              href="mailto:security@dockpanel.dev"
+              href="mailto:security@axiapanel.dev"
               className="inline-flex items-center gap-2 rounded-md bg-white px-4 py-2 text-[13px] font-semibold text-zinc-900 transition hover:bg-zinc-200"
             >
-              <Mail className="h-4 w-4" /> security@dockpanel.dev
+              <Mail className="h-4 w-4" /> security@axiapanel.dev
             </a>
             <a
-              href="https://github.com/ovexro/dockpanel/security/advisories/new"
+              href="https://github.com/ovexro/axiapanel/security/advisories/new"
               target="_blank"
               rel="noopener noreferrer"
               className="inline-flex items-center gap-2 rounded-md border border-zinc-800 bg-zinc-900/50 px-4 py-2 text-[13px] font-semibold text-zinc-200 transition hover:border-zinc-700"
@@ -385,7 +385,7 @@ export default function Security() {
               <Github className="h-4 w-4" /> GitHub Security Advisory
             </a>
             <a
-              href="https://github.com/ovexro/dockpanel/blob/main/SECURITY.md"
+              href="https://github.com/ovexro/axiapanel/blob/main/SECURITY.md"
               target="_blank"
               rel="noopener noreferrer"
               className="inline-flex items-center gap-2 rounded-md border border-zinc-800 bg-zinc-900/50 px-4 py-2 text-[13px] font-semibold text-zinc-200 transition hover:border-zinc-700"
@@ -398,7 +398,7 @@ export default function Security() {
         <div className="mt-16 border-t border-zinc-800/60 pt-6 text-[12px] text-zinc-600">
           Page reflects state at {POSTURE.currentVersion}. Audit and finding counts are tracked in{' '}
           <a
-            href="https://github.com/ovexro/dockpanel/blob/main/SECURITY.md"
+            href="https://github.com/ovexro/axiapanel/blob/main/SECURITY.md"
             className="text-emerald-400 underline underline-offset-2 hover:text-emerald-300"
             target="_blank"
             rel="noopener noreferrer"
@@ -407,7 +407,7 @@ export default function Security() {
           </a>{' '}
           and the{' '}
           <a
-            href="https://github.com/ovexro/dockpanel/blob/main/CHANGELOG.md"
+            href="https://github.com/ovexro/axiapanel/blob/main/CHANGELOG.md"
             className="text-emerald-400 underline underline-offset-2 hover:text-emerald-300"
             target="_blank"
             rel="noopener noreferrer"

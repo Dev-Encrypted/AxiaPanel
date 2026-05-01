@@ -6,7 +6,7 @@ use crate::safe_cmd::safe_command_sync;
 
 use super::command_filter;
 
-const SERVICE_PREFIX: &str = "dockpanel-app-";
+const SERVICE_PREFIX: &str = "axiapanel-app-";
 
 /// Service unit name for a domain.
 fn service_name(domain: &str) -> String {
@@ -60,7 +60,7 @@ pub fn create_app_service(
 
     let unit = format!(
         r#"[Unit]
-Description=DockPanel App: {domain}
+Description=AxiaPanel App: {domain}
 After=network.target
 
 [Service]

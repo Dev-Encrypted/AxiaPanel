@@ -57,8 +57,8 @@ const SITE_LOG_TYPES = [
 ];
 
 const SERVICES = [
-  "dockpanel-agent",
-  "dockpanel-api",
+  "axiapanel-agent",
+  "axiapanel-api",
   "nginx",
   "postfix",
   "dovecot",
@@ -109,7 +109,7 @@ function SiteLogsContent() {
   const [selectedContainer, setSelectedContainer] = useState("");
 
   // Feature #4: Service logs
-  const [selectedService, setSelectedService] = useState("dockpanel-api");
+  const [selectedService, setSelectedService] = useState("axiapanel-api");
 
   // Feature #6: Error alerting
   const [errorCheck, setErrorCheck] = useState<ErrorCheckResult | null>(null);

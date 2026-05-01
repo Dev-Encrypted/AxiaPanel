@@ -232,14 +232,14 @@ pub fn render_site_config(
             config
                 .ssl_cert
                 .as_deref()
-                .unwrap_or(&format!("/etc/dockpanel/ssl/{domain}/fullchain.pem")),
+                .unwrap_or(&format!("/etc/axiapanel/ssl/{domain}/fullchain.pem")),
         );
         ctx.insert(
             "ssl_key",
             config
                 .ssl_key
                 .as_deref()
-                .unwrap_or(&format!("/etc/dockpanel/ssl/{domain}/privkey.pem")),
+                .unwrap_or(&format!("/etc/axiapanel/ssl/{domain}/privkey.pem")),
         );
     }
 

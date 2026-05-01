@@ -171,7 +171,7 @@ export default function Telemetry() {
       const url = URL.createObjectURL(blob);
       const a = document.createElement("a");
       a.href = url;
-      a.download = `dockpanel-telemetry-${new Date().toISOString().slice(0, 10)}.json`;
+      a.download = `axiapanel-telemetry-${new Date().toISOString().slice(0, 10)}.json`;
       a.click();
       URL.revokeObjectURL(url);
       flash("Relatório exportado", "success");
@@ -258,7 +258,7 @@ export default function Telemetry() {
             <svg className="w-5 h-5 text-rust-400 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}><path strokeLinecap="round" strokeLinejoin="round" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" /></svg>
             <div>
               <span className="text-sm font-medium text-rust-300">
-                DockPanel v{config.update_available_version} disponível
+                AxiaPanel v{config.update_available_version} disponível
               </span>
               <span className="text-xs text-dark-400 ml-2">
                 (atual: v{config.current_version})
@@ -483,7 +483,7 @@ export default function Telemetry() {
               <h3 className="text-sm font-medium text-dark-100 mb-3">Instruções de Atualização</h3>
               <div className="bg-dark-900 rounded-lg p-3 border border-dark-700">
                 <pre className="text-xs font-mono text-dark-300 whitespace-pre-wrap">{`# SSH into your server and run:
-cd /path/to/dockpanel
+cd /path/to/axiapanel
 
 # Pull latest changes
 git pull origin main
@@ -494,13 +494,13 @@ cd panel/agent && cargo build --release && cd ../..
 cd panel/backend && cargo build --release && cd ../..
 
 # Deploy
-systemctl stop dockpanel-agent dockpanel-api
-cp panel/agent/target/release/dockpanel-agent /usr/local/bin/
-cp panel/backend/target/release/dockpanel-api /usr/local/bin/
-systemctl start dockpanel-agent dockpanel-api
+systemctl stop axiapanel-agent axiapanel-api
+cp panel/agent/target/release/axiapanel-agent /usr/local/bin/
+cp panel/backend/target/release/axiapanel-api /usr/local/bin/
+systemctl start axiapanel-agent axiapanel-api
 
 # Verify
-systemctl is-active dockpanel-agent dockpanel-api`}</pre>
+systemctl is-active axiapanel-agent axiapanel-api`}</pre>
               </div>
             </div>
           )}
@@ -558,7 +558,7 @@ systemctl is-active dockpanel-agent dockpanel-api`}</pre>
                 <li>Mensagens de erro e contexto de stack (sem caminhos de arquivo ou dados de usuário)</li>
                 <li>Status de saúde dos serviços (rodando/parado)</li>
                 <li>Specs do sistema (OS, RAM, contagem de CPU — sem endereços IP ou hostnames)</li>
-                <li>Versão do DockPanel</li>
+                <li>Versão do AxiaPanel</li>
               </ul>
               <p>Todas as informações pessoais (IPs, emails, domínios, nomes de usuário, tokens) são <strong className="text-dark-100">removidas automaticamente</strong> antes do envio.</p>
               <p>Use o botão <strong className="text-dark-100">Visualizar Relatório</strong> para ver exatamente o que seria enviado.</p>

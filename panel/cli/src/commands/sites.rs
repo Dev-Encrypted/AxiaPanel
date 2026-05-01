@@ -20,8 +20,8 @@ pub fn list_nginx_sites() -> Vec<SiteInfo> {
         let path = entry.path();
         let filename = path.file_name().and_then(|n| n.to_str()).unwrap_or("");
 
-        if filename == "dockpanel-panel.conf"
-            || filename == "dockpanel.dev.conf"
+        if filename == "axiapanel-panel.conf"
+            || filename == "axiapanel.dev.conf"
             || filename == "default"
         {
             continue;
@@ -169,7 +169,7 @@ pub async fn cmd_sites_create(
             Err(e) => {
                 eprintln!("\x1b[33mwarning:\x1b[0m SSL provisioning failed: {e}");
                 eprintln!("  Site created without SSL. Provision manually with:");
-                eprintln!("  dockpanel ssl provision {domain} --email {}", ssl_email.unwrap_or("you@example.com"));
+                eprintln!("  axiapanel ssl provision {domain} --email {}", ssl_email.unwrap_or("you@example.com"));
             }
         }
     }

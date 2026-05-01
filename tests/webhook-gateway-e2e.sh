@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 #
-# DockPanel Webhook Gateway E2E Test Suite
+# AxiaPanel Webhook Gateway E2E Test Suite
 #
 # Usage: bash tests/webhook-gateway-e2e.sh <host> [port]
 #
@@ -22,7 +22,7 @@ api_get() { curl -sf -H "Authorization: Bearer $AUTH_TOKEN" "${API}$1" 2>/dev/nu
 api_post() { curl -sf -H "Authorization: Bearer $AUTH_TOKEN" -X POST "${API}$1" -H "Content-Type: application/json" -d "$2" 2>/dev/null; }
 api_delete() { curl -sf -H "Authorization: Bearer $AUTH_TOKEN" -X DELETE "${API}$1" 2>/dev/null; }
 
-echo -e "${BOLD}DockPanel Webhook Gateway E2E Tests${NC}"
+echo -e "${BOLD}AxiaPanel Webhook Gateway E2E Tests${NC}"
 echo "Target: ${HOST}:${PORT}"
 
 # Auth

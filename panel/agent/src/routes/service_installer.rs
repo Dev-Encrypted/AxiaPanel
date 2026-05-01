@@ -316,7 +316,7 @@ async fn install_powerdns() -> Result<Json<serde_json::Value>, ApiErr> {
     let db_exists = tokio::time::timeout(
         Duration::from_secs(120),
         safe_command("docker")
-            .args(["exec", "dockpanel-postgres", "psql", "-U", "dockpanel", "-lqt"])
+            .args(["exec", "axiapanel-postgres", "psql", "-U", "axiapanel", "-lqt"])
             .output()
     ).await
         .ok()
@@ -328,7 +328,7 @@ async fn install_powerdns() -> Result<Json<serde_json::Value>, ApiErr> {
         let _ = tokio::time::timeout(
             Duration::from_secs(120),
             safe_command("docker")
-                .args(["exec", "dockpanel-postgres", "psql", "-U", "dockpanel", "-c", "CREATE DATABASE pdns;"])
+                .args(["exec", "axiapanel-postgres", "psql", "-U", "axiapanel", "-c", "CREATE DATABASE pdns;"])
                 .output()
         ).await;
 
@@ -339,7 +339,7 @@ async fn install_powerdns() -> Result<Json<serde_json::Value>, ApiErr> {
             let _ = tokio::time::timeout(
                 Duration::from_secs(120),
                 safe_command("sh")
-                    .args(["-c", &format!("cat {} | docker exec -i dockpanel-postgres psql -U dockpanel -d pdns", schema_path)])
+                    .args(["-c", &format!("cat {} | docker exec -i axiapanel-postgres psql -U axiapanel -d pdns", schema_path)])
                     .output()
             ).await;
         }
@@ -369,12 +369,12 @@ async fn install_powerdns() -> Result<Json<serde_json::Value>, ApiErr> {
         });
 
     // 4. Write PowerDNS config
-    let pdns_conf = format!(r#"# DockPanel PowerDNS configuration
+    let pdns_conf = format!(r#"# AxiaPanel PowerDNS configuration
 launch=gpgsql
 gpgsql-host=127.0.0.1
 gpgsql-port=5450
 gpgsql-dbname=pdns
-gpgsql-user=dockpanel
+gpgsql-user=axiapanel
 gpgsql-password={pdns_db_password}
 
 # HTTP API
@@ -864,7 +864,7 @@ async fn install_waf() -> Result<Json<serde_json::Value>, ApiErr> {
     }
 
     // 4. Write base ModSecurity config
-    let modsec_conf = r#"# ModSecurity base config (managed by DockPanel)
+    let modsec_conf = r#"# ModSecurity base config (managed by AxiaPanel)
 SecRuleEngine DetectionOnly
 SecRequestBodyAccess On
 SecRequestBodyLimit 13107200

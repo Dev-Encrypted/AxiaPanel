@@ -1,6 +1,6 @@
 # Changelog
 
-All notable changes to DockPanel will be documented in this file.
+All notable changes to AxiaPanel will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/).
 
@@ -8,9 +8,9 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/).
 
 ### Security
 
-- **rustls-webpki 0.103.12 → 0.103.13** in both `dockpanel-api` and
-  `dockpanel-agent` Cargo locks — fixes `RUSTSEC-2026-0104` (reachable
-  panic in CRL parsing). DockPanel calls into rustls-webpki for ACME
+- **rustls-webpki 0.103.12 → 0.103.13** in both `axiapanel-api` and
+  `axiapanel-agent` Cargo locks — fixes `RUSTSEC-2026-0104` (reachable
+  panic in CRL parsing). AxiaPanel calls into rustls-webpki for ACME
   cert verification and pinned-fingerprint TLS (Phase 3 #3 Tier 2), so
   a malformed CRL from a malicious or buggy CA could have crashed the
   process. Patch release, no API changes.
@@ -31,7 +31,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/).
   returns `{ buckets: bool[], window_hours, bucket_minutes }`. Owner-
   scoped (404 on a server that belongs to a different user); same auth
   shape as the rest of the `/api/servers/*` surface.
-- **Pre-built Grafana dashboard (`dashboards/dockpanel-grafana.json`).**
+- **Pre-built Grafana dashboard (`dashboards/axiapanel-grafana.json`).**
   Drop-in companion to the v2.7.16 Prometheus exporter. Covers fleet
   stats (version / servers reporting / sites / alerts firing by
   severity / GPUs reporting), per-server CPU / memory / disk timeseries
@@ -39,7 +39,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/).
   donut, a collapsible GPUs row (utilization, VRAM%, temperature, power
   draw), and an alerts-firing stacked-bars timeseries. Uses a
   `Datasource` template input so it imports cleanly onto any Prometheus
-  that's already scraping `/api/metrics`. UID `dockpanel-fleet` is
+  that's already scraping `/api/metrics`. UID `axiapanel-fleet` is
   stable so runbook deep-links survive re-imports. A `Server` template
   variable lets operators focus on a single host or any subset. See
   `docs/guides/prometheus.md` "Pre-built Grafana dashboard" for import
@@ -57,7 +57,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/).
   `POST /api/servers/{id}/test` and asserts status exactly 502
   (graceful connect failure) — a panic would surface as 500 and be
   caught. The suite is self-provisioning: it mints an admin JWT
-  locally from `/etc/dockpanel/api.env` when `DOCKPANEL_TEST_PASSWORD`
+  locally from `/etc/axiapanel/api.env` when `AXIAPANEL_TEST_PASSWORD`
   is unset, and cleans up all DB rows it creates via an `EXIT` trap.
   Wired into `tests/full-e2e.sh` as a sub-suite at the end of the run.
 
@@ -74,7 +74,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/).
   `CryptoProvider::get_default()`. Pure single-host installs were not
   affected; any multi-server deployment using the pinned verifier was.
   Fix: call `rustls::crypto::aws_lc_rs::default_provider().install_default()`
-  at `dockpanel-api` startup (the agent already did this at `main.rs:24`).
+  at `axiapanel-api` startup (the agent already did this at `main.rs:24`).
   Caught by the v2.7.18 fresh-VPS test before v2.7.18 was declared
   public-ready. No API changes; the Tier 2 part 2 verification flows
   (TOFU capture, MITM 403, rotate-pin, re-TOFU, PinnedFingerprintVerifier
@@ -103,7 +103,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/).
   The agent's multi-server listener now terminates TLS instead of shipping
   auth tokens in plaintext, and the central panel captures each agent's
   cert fingerprint on first checkin for later pinning.
-  - Agent loads `/etc/dockpanel/ssl/agent.{crt,key}` at startup (generated
+  - Agent loads `/etc/axiapanel/ssl/agent.{crt,key}` at startup (generated
     at install time by `install-agent.sh`, or generated on first boot via
     `rcgen` when missing). `AGENT_LISTEN_TCP=0.0.0.0:9443` now binds a
     TLS listener via `axum-server` + `rustls` — the old plaintext bind
@@ -148,7 +148,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/).
 
 ### Added
 
-- **2026-ready ACME (Phase 3 #2 — Tier 1).** DockPanel is now ready for
+- **2026-ready ACME (Phase 3 #2 — Tier 1).** AxiaPanel is now ready for
   Let's Encrypt's May 13 2026 `tlsserver` → 45-day flip, the existing 6-day
   `shortlived` profile, and the Feb 2027 / Feb 2028 `classic` reductions.
   - **RFC 9773 ARI-driven renewal.** The auto-healer now queries the CA's
@@ -186,7 +186,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/).
   exposition text — no extra crate, respects the lightness axis. Gated by a
   SHA-256-hashed scrape token (constant-time compare via `subtle`); returns
   404 when disabled so an off panel doesn't advertise a scrape surface.
-  Exposes `dockpanel_info`, per-server cpu/memory/disk percents, per-GPU
+  Exposes `axiapanel_info`, per-server cpu/memory/disk percents, per-GPU
   utilization / VRAM / temperature / power, per-status site counts, and
   alerts firing by severity. New `PrometheusSettings` card in Settings
   with auto-generated token, reveal-once banner, rotate button, and a
@@ -225,9 +225,9 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/).
   **Operators currently stuck on v2.7.11 or v2.7.12** (where the broken
   health check rolls every upgrade back) need to bootstrap once:
   ```
-  sudo curl -fsSL https://raw.githubusercontent.com/ovexro/dockpanel/main/scripts/update.sh \
-       -o /opt/dockpanel/scripts/update.sh
-  sudo INSTALL_FROM_RELEASE=1 bash /opt/dockpanel/scripts/update.sh
+  sudo curl -fsSL https://raw.githubusercontent.com/ovexro/axiapanel/main/scripts/update.sh \
+       -o /opt/axiapanel/scripts/update.sh
+  sudo INSTALL_FROM_RELEASE=1 bash /opt/axiapanel/scripts/update.sh
   ```
   After the first successful upgrade, future runs self-refresh
   automatically.
@@ -282,10 +282,10 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/).
 
 ### Public
 
-- **dockpanel.dev/security launched.** Public security posture page —
+- **axiapanel.dev/security launched.** Public security posture page —
   audit count, signed-releases / SBOM story, response SLA, all 7 audit
   rounds with headline fixes, recent advisories, defense-in-depth grid,
-  vulnerability-report CTA. Counter-positions DockPanel against the
+  vulnerability-report CTA. Counter-positions AxiaPanel against the
   Coolify/CyberPanel narratives. Linked from main nav (between Compare
   and Pricing) and footer Product column. SECURITY.md cross-references
   the page at the top.
@@ -300,7 +300,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/).
   vulnerability scanning. Defaults to **off**; admins opt in from
   Settings → Services → SBOM Generation.
   - **Install button** pulls Anchore's signed syft installer into
-    `/var/lib/dockpanel/scanners/syft` (same self-contained, sandbox-safe
+    `/var/lib/axiapanel/scanners/syft` (same self-contained, sandbox-safe
     pattern as grype — works under `ProtectSystem=strict`).
   - **Download SBOM button** in each app's scan drawer. Click runs syft against
     the app's image (10 – 60 s on first generation), persists the SPDX
@@ -328,7 +328,7 @@ and to feed external tooling like Dependency-Track or Grype-on-SBOM.
   in the public Rekor transparency log. Verification snippet in
   [SECURITY.md](SECURITY.md#verifying-release-signatures).
 - **Per-binary SPDX 2.3 SBOMs.** `cargo-sbom` runs in CI for the agent, API,
-  and CLI crates, emitting `dockpanel-{agent,api,cli}.spdx.json` alongside the
+  and CLI crates, emitting `axiapanel-{agent,api,cli}.spdx.json` alongside the
   binaries (also signed). Local builds via `scripts/release.sh` now generate
   SBOMs too; signing remains CI-only so the OIDC-bound certificate identity is
   always traceable to this repository's release workflow.
@@ -348,7 +348,7 @@ exposes per-deployed-container SBOMs in-panel.
   installs see no behaviour change on upgrade — admins opt in from
   Settings → Services → Image Vulnerability Scanning.
   - **Install button** pulls Anchore's signed grype installer into
-    `/var/lib/dockpanel/scanners/` (self-contained — doesn't pollute
+    `/var/lib/axiapanel/scanners/` (self-contained — doesn't pollute
     `/usr/local/bin` and works under the hardened agent sandbox). The
     vulnerability database primes during install.
   - **Scheduled scans** rescan every running app's image in the background at
@@ -365,14 +365,14 @@ exposes per-deployed-container SBOMs in-panel.
 
 ### Fixed
 
-- **`/var/lib/dockpanel` was missing from the hardened agent sandbox's
+- **`/var/lib/axiapanel` was missing from the hardened agent sandbox's
   `ReadWritePaths`.** Audit 7 introduced `ProtectSystem=strict` on the agent
-  unit file (`panel/agent/dockpanel-agent.service`) but only listed
-  `/etc/nginx`, `/etc/dockpanel`, `/var/run/dockpanel`, `/var/backups/dockpanel`,
+  unit file (`panel/agent/axiapanel-agent.service`) but only listed
+  `/etc/nginx`, `/etc/axiapanel`, `/var/run/axiapanel`, `/var/backups/axiapanel`,
   `/var/www`, `/var/log`, `/etc/letsencrypt` — which meant git builds, terminal
   recordings, mail backups, Docker app volumes, and the new image scanner would
   all have silently failed if anyone deployed the hardened unit verbatim. Added
-  `/var/lib/dockpanel` to the path list. (Installer scripts still emit
+  `/var/lib/axiapanel` to the path list. (Installer scripts still emit
   `ProtectSystem=no` units, so fresh installs from `install.sh` / `update.sh`
   were not affected.)
 
@@ -426,7 +426,7 @@ exposes per-deployed-container SBOMs in-panel.
   `read < /dev/tty` fail silently and cleared `PANEL_DOMAIN`. Now prints a
   clear "no tty — set PANEL_DOMAIN to configure" notice and points at the
   env var.
-- **`/var/lib/dockpanel/recordings` was never created on fresh install.** The
+- **`/var/lib/axiapanel/recordings` was never created on fresh install.** The
   terminal-recording API and auto-healer retention sweep both reference it.
   Added to the installer's `mkdir -p` list.
 
@@ -556,7 +556,7 @@ exposes per-deployed-container SBOMs in-panel.
 - WordPress plugin/theme: slug validation (alphanumeric + hyphens only)
 - Dashboard intelligence: scoped queries to authenticated user (cross-user leak)
 - Backup paths: traversal validation on agent URL construction
-- Migration: container name validation (DockPanel-managed only)
+- Migration: container name validation (AxiaPanel-managed only)
 - Stack templates: random passwords generated at selection time
 - Unix socket: permissions tightened from 0o660 to 0o600
 - Raw `Command::new()`: replaced 3 instances with `safe_command` (env sanitization)
@@ -588,7 +588,7 @@ exposes per-deployed-container SBOMs in-panel.
 - Mail queue endpoint returns empty result when Postfix not installed (was causing 502 errors every 15s on dashboard)
 - Onboarding widget template count updated from 34 to 151
 - Real Vultr IP in test script examples replaced with RFC 5737 documentation IP
-- Monitoring screenshot scrubbed of test.dockpanel.dev URL
+- Monitoring screenshot scrubbed of test.axiapanel.dev URL
 
 ### Added
 - 17 fresh screenshots from live VPS for all major pages (dashboard, sites, Docker apps, terminal, security, etc.)
@@ -672,7 +672,7 @@ exposes per-deployed-container SBOMs in-panel.
 ## [2.6.5] - 2026-03-25
 
 ### Security
-- **Research-driven security audit**: Studied CVEs from CyberPanel, HestiaCP, CloudPanel, VestaCP, Webmin, cPanel — then audited DockPanel against those attack patterns. 55 findings (12 HIGH, 28 MEDIUM, 15 LOW).
+- **Research-driven security audit**: Studied CVEs from CyberPanel, HestiaCP, CloudPanel, VestaCP, Webmin, cPanel — then audited AxiaPanel against those attack patterns. 55 findings (12 HIGH, 28 MEDIUM, 15 LOW).
 - **Command execution safety**: Added `safe_command()` module — `env_clear()` on all 341 `Command::new()` calls across 44 files. Prevents LD_PRELOAD/PATH hijacking.
 - **Credential encryption at rest**: All stored credentials (DB passwords, SMTP, S3/SFTP, OAuth, TOTP, DKIM) encrypted with AES-256-GCM using dedicated key derivation.
 - **Shell injection fix**: Rewrote database_backup.rs — piped `docker exec` + `gzip` instead of `bash -c` with interpolated strings.
@@ -775,7 +775,7 @@ exposes per-deployed-container SBOMs in-panel.
 - **GAP 12: Docker apps auto-get monitor + status component** — Docker apps deployed with a domain now auto-create an HTTP monitor and a status page component under "Docker Apps" group.
 - **GAP 13: Git deploy auto-creates gateway endpoint** — New git deploys auto-create a webhook gateway endpoint for webhook inspection/replay capabilities.
 - **GAP 16: Incident resolve cleans up alerts + components** — Resolving a managed incident auto-resolves linked alerts and clears status_override on affected status page components.
-- **GAP 17: Vault export/import** — New `GET /api/secrets/vaults/{id}/export` and `POST /api/secrets/vaults/{id}/import` endpoints for encrypted vault backup and transfer between DockPanel instances.
+- **GAP 17: Vault export/import** — New `GET /api/secrets/vaults/{id}/export` and `POST /api/secrets/vaults/{id}/import` endpoints for encrypted vault backup and transfer between AxiaPanel instances.
 
 ### Automation Audit: Complete
 All 21 identified gaps now addressed. Zero manual steps required for: backup scheduling, uptime monitoring, secret injection, incident creation, status page updates, or webhook delivery.
@@ -878,7 +878,7 @@ All 21 identified gaps now addressed. Zero manual steps required for: backup sch
   - **Backup health dashboard**: Global overview with total counts, storage usage, 24h success/failure rates, active policies, verification stats, and stale backup warnings.
   - **Background verifier**: Supervised service running every 6 hours that automatically verifies unverified backups and fires alerts on failures.
   - **B2 and GCS destinations**: Backblaze B2 and Google Cloud Storage now supported as backup destinations (S3-compatible API).
-  - **CLI commands**: `dockpanel backup db-create`, `db-list`, `vol-create`, `vol-list`, `verify`, `health` — full backup management from the command line.
+  - **CLI commands**: `axiapanel backup db-create`, `db-list`, `vol-create`, `vol-list`, `verify`, `health` — full backup management from the command line.
   - **E2E test suite**: Dedicated backup orchestrator test script (`tests/backup-orchestrator-e2e.sh`) covering health, policies CRUD, database backup lifecycle with verification.
 - **Nav item**: "Backups" in Operations section links to the new Backup Orchestrator page.
 
@@ -967,7 +967,7 @@ All 21 identified gaps now addressed. Zero manual steps required for: backup sch
 ## [2.0.3] - 2026-03-20
 
 ### Added
-- **Documentation site** at `docs.dockpanel.dev`: mdBook-generated, 8 pages (getting-started, troubleshooting, CLI reference, WordPress, Git deploy, email, multi-server, backups). 1855 lines.
+- **Documentation site** at `docs.axiapanel.dev`: mdBook-generated, 8 pages (getting-started, troubleshooting, CLI reference, WordPress, Git deploy, email, multi-server, backups). 1855 lines.
 
 ### Changed
 - **Docker app templates pinned**: 33 of 39 `:latest` tags replaced with specific major versions (e.g., `redis:7`, `ghost:5`, `grafana/grafana:11`). 6 kept at `:latest` due to non-standard versioning (minio, nocodb, etc.).
@@ -988,7 +988,7 @@ All 21 identified gaps now addressed. Zero manual steps required for: backup sch
 - **OAuth bypasses 2FA**: OAuth login issued full session without checking `totp_enabled`. Now redirects to 2FA challenge when enabled.
 - **Setup script missing build tools**: Fresh VPS source builds failed — added `build-essential cmake pkg-config` installation.
 - **No swap on x86_64 low-RAM VPS**: Swap creation only triggered on ARM. Now applies to all architectures when building from source.
-- **install-agent.sh wrong env vars**: Remote agents never entered phone-home mode (`AGENT_TOKEN` vs `DOCKPANEL_SERVER_TOKEN`). Fixed to write both sets.
+- **install-agent.sh wrong env vars**: Remote agents never entered phone-home mode (`AGENT_TOKEN` vs `AXIAPANEL_SERVER_TOKEN`). Fixed to write both sets.
 - **Systemd services never updated during upgrade**: `update.sh` now rewrites service files with current `ReadWritePaths` and hardening.
 - **Required directories not created during upgrade**: `update.sh` now creates `/etc/postfix`, `/var/vmail`, and other directories needed by new features.
 
@@ -998,7 +998,7 @@ All 21 identified gaps now addressed. Zero manual steps required for: backup sch
 - **`read` prompt broken in curl-pipe-bash**: Domain prompt now reads from `/dev/tty` when stdin is piped.
 - **Frontend path mismatch after upgrade**: `update.sh` now fixes nginx root path when switching between source and release modes.
 - **config.rs default LISTEN_ADDR was 0.0.0.0:3000**: Changed to `127.0.0.1:3080` to match all scripts and nginx config.
-- **uninstall.sh incomplete cleanup**: Now removes CLI binary, tmpfiles.d, crontab entries, `/var/www/acme`, `/var/lib/dockpanel`.
+- **uninstall.sh incomplete cleanup**: Now removes CLI binary, tmpfiles.d, crontab entries, `/var/www/acme`, `/var/lib/axiapanel`.
 - **Stacks INSERT missing server_id**: Docker Compose stacks now include `server_id` in INSERT.
 - **Staging site INSERT missing server_id**: Staging environments now inherit parent site's server_id.
 - **No domain uniqueness across sites + git_deploys**: Cross-table domain conflict check prevents silent hijacking.
@@ -1022,7 +1022,7 @@ All 21 identified gaps now addressed. Zero manual steps required for: backup sch
 - **Nginx version disclosure**: Added `server_tokens off` to nginx config.
 
 ### Fixed — Disaster Recovery
-- **Agent fails after every reboot**: Removed `ReadWritePaths` and `PrivateTmp=yes` from agent systemd service (redundant with `ProtectSystem=no`, and caused NAMESPACE errors for missing dirs). Added `ExecStartPre` to create `/run/dockpanel`.
+- **Agent fails after every reboot**: Removed `ReadWritePaths` and `PrivateTmp=yes` from agent systemd service (redundant with `ProtectSystem=no`, and caused NAMESPACE errors for missing dirs). Added `ExecStartPre` to create `/run/axiapanel`.
 - **Health endpoint false "ok"**: `/api/health` now checks DB connectivity, returns `"degraded"` when database is unreachable.
 - **StartLimitIntervalSec in wrong section**: Moved from `[Service]` to `[Unit]` in all 3 scripts.
 
@@ -1053,10 +1053,10 @@ All 21 identified gaps now addressed. Zero manual steps required for: backup sch
 - **OS support**: Hero section now includes Rocky Linux 9+ alongside other supported distros.
 
 ### Fixed
-- **install-agent.sh binary naming**: Was downloading `dockpanel-agent-x86_64` / `dockpanel-agent-aarch64` but GitHub Releases publishes `dockpanel-agent-linux-amd64` / `dockpanel-agent-linux-arm64`. Fixed to match release naming.
+- **install-agent.sh binary naming**: Was downloading `axiapanel-agent-x86_64` / `axiapanel-agent-aarch64` but GitHub Releases publishes `axiapanel-agent-linux-amd64` / `axiapanel-agent-linux-arm64`. Fixed to match release naming.
 - **install-agent.sh apt-get hardcoding**: Now detects package manager (apt/dnf/yum) instead of hardcoding apt-get. CentOS, Rocky, Fedora, and Amazon Linux now supported for remote agent installs.
-- **install-agent.sh server-id persistence**: `--server-id` was accepted but never written to config. Now persisted to `/etc/dockpanel/api.env` as `SERVER_ID`.
-- **install-agent.sh tmpfiles.d**: Added `/run/dockpanel` tmpfiles.d entry so socket directory survives reboots.
+- **install-agent.sh server-id persistence**: `--server-id` was accepted but never written to config. Now persisted to `/etc/axiapanel/api.env` as `SERVER_ID`.
+- **install-agent.sh tmpfiles.d**: Added `/run/axiapanel` tmpfiles.d entry so socket directory survives reboots.
 - **install-agent.sh systemd hardening**: Remote agent service now matches local agent hardening (MemoryMax, LimitNOFILE, PrivateTmp, ProtectKernelLogs/Modules).
 - **update.sh pre-built binary path**: Added `INSTALL_FROM_RELEASE=1` support so ARM users who installed via release binaries can update without Rust toolchain.
 - **update.sh redundant health check**: Removed duplicate wait-for-health loop after rollback-capable check.
@@ -1065,7 +1065,7 @@ All 21 identified gaps now addressed. Zero manual steps required for: backup sch
 
 ### Added — High-Impact Features
 - **Multi-Server Management**: Manage unlimited remote servers from one panel. AgentRegistry dispatches to local (Unix socket) or remote (HTTPS) agents. Server selector in sidebar, test connection, install script for remote agents. ServerScope extractor with user ownership verification on every request.
-- **Reseller / Multi-Tenant Accounts**: Admin → Reseller → User hierarchy. Reseller quotas (max users/sites/databases), server allocation, per-reseller branding (logo, colors, hide DockPanel name). Quota enforcement on site/database creation with counter sync.
+- **Reseller / Multi-Tenant Accounts**: Admin → Reseller → User hierarchy. Reseller quotas (max users/sites/databases), server allocation, per-reseller branding (logo, colors, hide AxiaPanel name). Quota enforcement on site/database creation with counter sync.
 - **Nixpacks Auto-Detection**: Build any app without a Dockerfile using Nixpacks (30+ languages). Dynamic version resolution from GitHub releases. Deploy pipeline: try Nixpacks → fall back to auto-detect (6 langs) → docker build. Build method tracked per deploy.
 - **Preview Environments**: TTL-based auto-cleanup of preview deployments. Branch deletion webhook auto-removes previews. Configurable preview_ttl_hours per deploy. Background cleanup service (5-minute interval).
 - **Migration Wizard**: Import sites, databases, and email from cPanel, Plesk, or HestiaCP. 4-step wizard: select source → analyze backup (auto-detect domains, DBs, mail) → select items → SSE-streamed import. cPanel full parser, Plesk/HestiaCP beta stubs.

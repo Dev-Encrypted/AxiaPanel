@@ -13,7 +13,7 @@ async function request<T = unknown>(
   options?: RequestInit
 ): Promise<T> {
   const headers: Record<string, string> = {
-    "X-Requested-With": "DockPanel",
+    "X-Requested-With": "AxiaPanel",
   };
   if (options?.body) headers["Content-Type"] = "application/json";
 
@@ -43,7 +43,7 @@ async function request<T = unknown>(
     let message = (data as { error?: string }).error || `Request failed (${res.status})`;
     // Translate common backend errors into user-friendly messages
     if (res.status === 502 || message.includes("agent connection failed")) {
-      message = "Agent offline — the DockPanel agent is not responding.";
+      message = "Agent offline — the AxiaPanel agent is not responding.";
     }
     throw new ApiError(res.status, message);
   }

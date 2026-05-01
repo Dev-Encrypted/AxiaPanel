@@ -199,7 +199,7 @@ async fn run_scheduled_backup(
         .get("size_bytes")
         .and_then(|v| v.as_u64())
         .unwrap_or(0) as i64;
-    let filepath = format!("/var/backups/dockpanel/{}/{}", row.domain, filename);
+    let filepath = format!("/var/backups/axiapanel/{}/{}", row.domain, filename);
 
     // 2. Upload to remote destination (if configured)
     let _uploaded_remote = if let (Some(dest_dtype), Some(dest_config)) =

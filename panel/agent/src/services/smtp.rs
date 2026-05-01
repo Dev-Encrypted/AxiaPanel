@@ -69,7 +69,7 @@ pub fn configure(
     };
 
     let config = format!(
-        r#"# DockPanel SMTP configuration — managed automatically
+        r#"# AxiaPanel SMTP configuration — managed automatically
 defaults
 auth           on
 tls            {tls}
@@ -138,14 +138,14 @@ pub async fn send_test(to: &str, from: &str, from_name: &str) -> Result<String, 
             return Err(format!("{label} must not contain newlines or null bytes"));
         }
     }
-    let subject = "DockPanel SMTP Test";
+    let subject = "AxiaPanel SMTP Test";
     let body = format!(
         "From: {from_name} <{from}>\r\n\
          To: {to}\r\n\
          Subject: {subject}\r\n\
          Content-Type: text/plain; charset=utf-8\r\n\
          \r\n\
-         This is a test email from DockPanel.\r\n\
+         This is a test email from AxiaPanel.\r\n\
          If you received this, your SMTP configuration is working correctly.\r\n"
     );
 

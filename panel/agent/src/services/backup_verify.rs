@@ -21,7 +21,7 @@ pub async fn verify_site_backup(domain: &str, filename: &str) -> Result<Verifica
     let start = std::time::Instant::now();
     let mut checks = Vec::new();
 
-    let backup_path = format!("/var/backups/dockpanel/{domain}/{filename}");
+    let backup_path = format!("/var/backups/axiapanel/{domain}/{filename}");
     if !std::path::Path::new(&backup_path).exists() {
         return Err("Backup file not found".to_string());
     }
@@ -36,7 +36,7 @@ pub async fn verify_site_backup(domain: &str, filename: &str) -> Result<Verifica
     });
 
     // Check 2: Extract to temp dir and verify contents
-    let temp_dir = format!("/tmp/dockpanel-verify-{}", uuid::Uuid::new_v4());
+    let temp_dir = format!("/tmp/axiapanel-verify-{}", uuid::Uuid::new_v4());
     std::fs::create_dir_all(&temp_dir).map_err(|e| format!("Temp dir: {e}"))?;
 
     let extract_ok = tokio::time::timeout(
@@ -123,7 +123,7 @@ pub async fn verify_db_backup(
         return Err("Invalid filename".to_string());
     }
 
-    let backup_path = format!("/var/backups/dockpanel/databases/{db_name}/{filename}");
+    let backup_path = format!("/var/backups/axiapanel/databases/{db_name}/{filename}");
     if !std::path::Path::new(&backup_path).exists() {
         return Err("Backup file not found".to_string());
     }
@@ -137,7 +137,7 @@ pub async fn verify_db_backup(
         message: format!("Dump file size: {} bytes", meta.len()),
     });
 
-    let container_name = format!("dockpanel-verify-{}", &uuid::Uuid::new_v4().to_string()[..8]);
+    let container_name = format!("axiapanel-verify-{}", &uuid::Uuid::new_v4().to_string()[..8]);
     let test_password = "verify_test_pass_12345";
 
     // Check 2: Spin up temporary database container and restore
@@ -440,7 +440,7 @@ pub async fn verify_volume_backup(
         return Err("Invalid filename".to_string());
     }
 
-    let backup_path = format!("/var/backups/dockpanel/volumes/{container_name}/{filename}");
+    let backup_path = format!("/var/backups/axiapanel/volumes/{container_name}/{filename}");
     if !std::path::Path::new(&backup_path).exists() {
         return Err("Backup file not found".to_string());
     }
@@ -455,7 +455,7 @@ pub async fn verify_volume_backup(
     });
 
     // Check 2: Extract to temp dir
-    let temp_dir = format!("/tmp/dockpanel-verify-{}", uuid::Uuid::new_v4());
+    let temp_dir = format!("/tmp/axiapanel-verify-{}", uuid::Uuid::new_v4());
     std::fs::create_dir_all(&temp_dir).map_err(|e| format!("Temp dir: {e}"))?;
 
     let extract_ok = tokio::time::timeout(

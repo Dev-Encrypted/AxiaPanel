@@ -9,8 +9,8 @@ use tera::Tera;
 use crate::routes::nginx::SiteConfig;
 use crate::services::nginx;
 
-const ACME_ACCOUNT_PATH: &str = "/etc/dockpanel/ssl/acme-account.json";
-const SSL_DIR: &str = "/etc/dockpanel/ssl";
+const ACME_ACCOUNT_PATH: &str = "/etc/axiapanel/ssl/acme-account.json";
+const SSL_DIR: &str = "/etc/axiapanel/ssl";
 const ACME_WEBROOT: &str = "/var/www/acme";
 
 /// Options controlling an ACME order — profile selection + ARI replacement chain.

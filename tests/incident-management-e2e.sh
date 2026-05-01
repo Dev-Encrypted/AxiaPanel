@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 #
-# DockPanel Incident Management + Status Page E2E Test Suite
+# AxiaPanel Incident Management + Status Page E2E Test Suite
 #
 # Usage: bash tests/incident-management-e2e.sh <host> [port]
 # Example: bash tests/incident-management-e2e.sh 203.0.113.10 8443
@@ -36,7 +36,7 @@ api_post() { curl -sf -H "Authorization: Bearer $AUTH_TOKEN" -X POST "${API}$1" 
 api_put() { curl -sf -H "Authorization: Bearer $AUTH_TOKEN" -X PUT "${API}$1" -H "Content-Type: application/json" -d "$2" 2>/dev/null; }
 api_delete() { curl -sf -H "Authorization: Bearer $AUTH_TOKEN" -X DELETE "${API}$1" 2>/dev/null; }
 
-echo -e "${BOLD}DockPanel Incident Management E2E Tests${NC}"
+echo -e "${BOLD}AxiaPanel Incident Management E2E Tests${NC}"
 echo "Target: ${HOST}:${PORT}"
 
 # ── Auth ───────────────────────────────────────────────────────────────

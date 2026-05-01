@@ -87,39 +87,39 @@ pkg_install curl openssl
 
 # Create directories
 echo "[3/7] Creating directories..."
-mkdir -p /etc/dockpanel/ssl
-mkdir -p /var/run/dockpanel
+mkdir -p /etc/axiapanel/ssl
+mkdir -p /var/run/axiapanel
 mkdir -p /var/www
-mkdir -p /var/backups/dockpanel
-mkdir -p /var/lib/dockpanel/git
+mkdir -p /var/backups/axiapanel
+mkdir -p /var/lib/axiapanel/git
 
 # Ensure socket directory persists across reboots
-echo "d /run/dockpanel 0755 root root -" > /etc/tmpfiles.d/dockpanel.conf
+echo "d /run/axiapanel 0755 root root -" > /etc/tmpfiles.d/axiapanel.conf
 
 # Save agent token and server ID
 echo "[4/7] Saving configuration..."
-echo "$TOKEN" > /etc/dockpanel/agent.token
-chmod 600 /etc/dockpanel/agent.token
+echo "$TOKEN" > /etc/axiapanel/agent.token
+chmod 600 /etc/axiapanel/agent.token
 
 # Persist agent configuration
 # AGENT_TOKEN + AGENT_LISTEN_TCP = direct multi-server TCP access
-# DOCKPANEL_* vars = phone-home mode (agent checks in with central panel)
-cat > /etc/dockpanel/agent.env << ENVEOF
+# AXIAPANEL_* vars = phone-home mode (agent checks in with central panel)
+cat > /etc/axiapanel/agent.env << ENVEOF
 AGENT_TOKEN=$TOKEN
 AGENT_LISTEN_TCP=0.0.0.0:$AGENT_PORT
-DOCKPANEL_SERVER_TOKEN=$TOKEN
-DOCKPANEL_SERVER_ID=$SERVER_ID
-DOCKPANEL_CENTRAL_URL=$PANEL_URL
+AXIAPANEL_SERVER_TOKEN=$TOKEN
+AXIAPANEL_SERVER_ID=$SERVER_ID
+AXIAPANEL_CENTRAL_URL=$PANEL_URL
 ENVEOF
-chmod 600 /etc/dockpanel/agent.env
+chmod 600 /etc/axiapanel/agent.env
 
 # Download agent binary (naming matches GitHub release assets)
 echo "[5/7] Downloading agent binary..."
-DOWNLOAD_URL="https://github.com/Dev-Encrypted/AxiaPanel/releases/latest/download/dockpanel-agent-linux-${ARCH_LABEL}"
-if ! curl -fsSL "$DOWNLOAD_URL" -o /usr/local/bin/dockpanel-agent; then
+DOWNLOAD_URL="https://github.com/Dev-Encrypted/AxiaPanel/releases/latest/download/axiapanel-agent-linux-${ARCH_LABEL}"
+if ! curl -fsSL "$DOWNLOAD_URL" -o /usr/local/bin/axiapanel-agent; then
     echo "  Release download failed. Trying panel download..."
     if [[ -n "$PANEL_URL" ]]; then
-        curl -fsSL "${PANEL_URL}/api/agent/download?arch=${ARCH_LABEL}" -o /usr/local/bin/dockpanel-agent || {
+        curl -fsSL "${PANEL_URL}/api/agent/download?arch=${ARCH_LABEL}" -o /usr/local/bin/axiapanel-agent || {
             echo "Error: Could not download agent binary"
             exit 1
         }
@@ -128,20 +128,20 @@ if ! curl -fsSL "$DOWNLOAD_URL" -o /usr/local/bin/dockpanel-agent; then
         exit 1
     fi
 fi
-chmod +x /usr/local/bin/dockpanel-agent
+chmod +x /usr/local/bin/axiapanel-agent
 
 # Generate self-signed TLS cert for agent HTTPS
 echo "[6/7] Generating TLS certificate..."
-if [[ ! -f /etc/dockpanel/ssl/agent.crt ]]; then
-    openssl req -x509 -newkey rsa:2048 -keyout /etc/dockpanel/ssl/agent.key \
-        -out /etc/dockpanel/ssl/agent.crt -days 3650 -nodes \
-        -subj "/CN=dockpanel-agent" > /dev/null 2>&1
-    chmod 600 /etc/dockpanel/ssl/agent.key
+if [[ ! -f /etc/axiapanel/ssl/agent.crt ]]; then
+    openssl req -x509 -newkey rsa:2048 -keyout /etc/axiapanel/ssl/agent.key \
+        -out /etc/axiapanel/ssl/agent.crt -days 3650 -nodes \
+        -subj "/CN=axiapanel-agent" > /dev/null 2>&1
+    chmod 600 /etc/axiapanel/ssl/agent.key
 fi
 
 # Create systemd service (matching local agent hardening)
 echo "[7/7] Creating systemd service..."
-cat > /etc/systemd/system/dockpanel-agent.service << 'UNIT'
+cat > /etc/systemd/system/axiapanel-agent.service << 'UNIT'
 [Unit]
 Description=AxiaPanel Agent
 After=network.target docker.service
@@ -151,9 +151,9 @@ StartLimitIntervalSec=60
 
 [Service]
 Type=simple
-ExecStartPre=/bin/sh -c 'mkdir -p /run/dockpanel /var/lib/dockpanel/git'
-ExecStart=/usr/local/bin/dockpanel-agent
-EnvironmentFile=/etc/dockpanel/agent.env
+ExecStartPre=/bin/sh -c 'mkdir -p /run/axiapanel /var/lib/axiapanel/git'
+ExecStart=/usr/local/bin/axiapanel-agent
+EnvironmentFile=/etc/axiapanel/agent.env
 Environment=RUST_LOG=info
 Restart=always
 RestartSec=5
@@ -180,8 +180,8 @@ fi
 
 # Start agent
 systemctl daemon-reload
-systemctl enable dockpanel-agent
-systemctl start dockpanel-agent
+systemctl enable axiapanel-agent
+systemctl start axiapanel-agent
 
 echo ""
 echo "======================================"
@@ -191,7 +191,7 @@ echo ""
 echo "  Agent listening on: 0.0.0.0:${AGENT_PORT}"
 echo "  Token: ${TOKEN:0:12}..."
 echo "  Server ID: ${SERVER_ID}"
-echo "  Config: /etc/dockpanel/agent.env"
+echo "  Config: /etc/axiapanel/agent.env"
 echo ""
 echo "  Return to your AxiaPanel and click"
 echo "  'Test Connection' to verify."

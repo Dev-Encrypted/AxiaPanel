@@ -15,7 +15,7 @@ pub struct SystemInfo {
     pub total_disk_mb: u64,
     pub cpu_count: u32,
     pub uptime_seconds: u64,
-    pub dockpanel_agent_version: String,
+    pub axiapanel_agent_version: String,
     pub services: Vec<ServiceStatus>,
 }
 
@@ -134,10 +134,10 @@ async fn system_info() -> Json<SystemInfo> {
         .map(|f| f as u64)
         .unwrap_or(0);
 
-    // Service status for key DockPanel services
+    // Service status for key AxiaPanel services
     let service_names = [
-        "dockpanel-agent",
-        "dockpanel-api",
+        "axiapanel-agent",
+        "axiapanel-api",
         "nginx",
         "postgresql",
         "docker",
@@ -177,7 +177,7 @@ async fn system_info() -> Json<SystemInfo> {
         total_disk_mb,
         cpu_count,
         uptime_seconds,
-        dockpanel_agent_version: env!("CARGO_PKG_VERSION").to_string(),
+        axiapanel_agent_version: env!("CARGO_PKG_VERSION").to_string(),
         services,
     })
 }

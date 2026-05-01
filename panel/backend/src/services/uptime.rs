@@ -418,7 +418,7 @@ async fn send_alerts(pool: &PgPool, monitor: &MonitorRow, message: &str) {
         muted_types: String::new(),
     };
 
-    let subject = format!("Alerta DockPanel: {}", monitor.name);
+    let subject = format!("Alerta AxiaPanel: {}", monitor.name);
     let html = format!(
         "<h2>Alerta de Monitor</h2>\
          <p><strong>{}</strong></p>\
