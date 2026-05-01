@@ -2,6 +2,9 @@ import { useState, useEffect, FormEvent, useCallback } from "react";
 import { useNavigate, Link, Navigate } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
 import { useBranding } from "../context/BrandingContext";
+import {
+  IconEmail, IconLock, IconShield, IconKey, IconArrow, IconAlert, BrandMark,
+} from "../components/AuthIcons";
 
 function base64urlToBuffer(b64: string): ArrayBuffer {
   const pad = b64.length % 4 === 0 ? "" : "=".repeat(4 - (b64.length % 4));
@@ -17,75 +20,6 @@ function bufferToBase64url(buf: ArrayBuffer): string {
   let binary = "";
   for (let i = 0; i < arr.length; i++) binary += String.fromCharCode(arr[i]);
   return btoa(binary).replace(/\+/g, "-").replace(/\//g, "_").replace(/=+$/, "");
-}
-
-/* ─── Custom-drawn icons ─── */
-
-function IconEmail() {
-  return (
-    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round">
-      <rect x="3" y="5" width="18" height="14" rx="3" />
-      <path d="M3 8.5l8.4 5.6a1.2 1.2 0 0 0 1.2 0L21 8.5" />
-    </svg>
-  );
-}
-
-function IconLock() {
-  return (
-    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round">
-      <rect x="4" y="10" width="16" height="11" rx="2.5" />
-      <path d="M8 10V7a4 4 0 0 1 8 0v3" />
-      <circle cx="12" cy="15.5" r="1.4" fill="currentColor" stroke="none" />
-    </svg>
-  );
-}
-
-function IconShield() {
-  // 2FA / verify icon
-  return (
-    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round">
-      <path d="M12 3 4 6v6c0 4.5 3.2 8.5 8 9.5 4.8-1 8-5 8-9.5V6l-8-3z" />
-      <path d="M9.5 12l2 2 3.5-3.5" />
-    </svg>
-  );
-}
-
-function IconKey() {
-  // Passkey
-  return (
-    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round">
-      <circle cx="8" cy="12" r="4.5" />
-      <path d="M12.5 12H21l-2 2 1 1.5-1.5 1.5L17 16l-2 2-2.5-2.5" />
-    </svg>
-  );
-}
-
-function IconArrow() {
-  return (
-    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-      <path d="M5 12h14M13 6l6 6-6 6" />
-    </svg>
-  );
-}
-
-function IconAlert() {
-  return (
-    <svg className="auth-error-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
-      <circle cx="12" cy="12" r="10" />
-      <line x1="12" y1="7.5" x2="12" y2="13" />
-      <circle cx="12" cy="16.5" r="0.8" fill="currentColor" stroke="none" />
-    </svg>
-  );
-}
-
-function BrandMark() {
-  // Custom logo mark — rounded square with stylized "A" cut + accent dot
-  return (
-    <svg width="22" height="22" viewBox="0 0 32 32" fill="none">
-      <path d="M16 4 L26 26 H22 L20 21 H12 L10 26 H6 L16 4z" fill="currentColor" />
-      <circle cx="16" cy="14" r="2" fill="#ffffff" />
-    </svg>
-  );
 }
 
 export default function Login() {

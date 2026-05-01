@@ -1,10 +1,15 @@
 import { useState, FormEvent } from "react";
 import { Link, Navigate } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
+import { useBranding } from "../context/BrandingContext";
 import { api } from "../api";
+import {
+  IconEmail, IconLock, IconArrow, IconAlert, IconCheck, BrandMark,
+} from "../components/AuthIcons";
 
 export default function Register() {
   const { user, loading } = useAuth();
+  const branding = useBranding();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [confirm, setConfirm] = useState("");
@@ -36,92 +41,141 @@ export default function Register() {
     }
   };
 
+  const brandName = branding.panelName || "AxiaPanel";
+
   return (
-    <div className="min-h-screen flex items-center justify-center bg-dark-950 px-4">
-      <div className="w-full max-w-sm">
-        <div className="text-center mb-8">
-          <div className="inline-flex items-center justify-center w-14 h-14 bg-rust-500 rounded-xl mb-4">
-            <svg className="w-8 h-8 text-white" viewBox="0 0 32 32" fill="currentColor">
-              <rect x="4" y="4" width="10" height="10" rx="2" opacity="0.9" />
-              <rect x="18" y="4" width="10" height="10" rx="2" opacity="0.7" />
-              <rect x="4" y="18" width="10" height="10" rx="2" opacity="0.7" />
-              <rect x="18" y="18" width="10" height="10" rx="2" opacity="0.5" />
-            </svg>
-          </div>
-          <h1 className="text-base font-bold text-rust-500 uppercase font-mono tracking-widest">AxiaPanel</h1>
-          <p className="text-dark-200 text-sm mt-1">Comece a gerenciar seus servidores</p>
-        </div>
-
-        {success ? (
-          <div className="bg-dark-800 rounded-lg border border-dark-600 p-6 space-y-4">
-            <div className="bg-rust-500/10 text-rust-400 text-sm px-4 py-3 rounded-lg border border-rust-500/20">
-              {success}
-            </div>
-            <Link
-              to="/login"
-              className="block w-full py-2.5 bg-rust-500 text-white rounded-lg font-medium hover:bg-rust-600 text-center text-sm"
-            >
-              Ir para Login
-            </Link>
-          </div>
-        ) : (
-          <form onSubmit={handleSubmit} className="bg-dark-800 rounded-lg border border-dark-600 p-6 space-y-4">
-            {error && (
-              <div className="bg-danger-500/10 text-danger-400 text-sm px-4 py-3 rounded-lg border border-danger-500/20">
-                {error}
-              </div>
+    <main className="auth-page">
+      <section className="auth-stage">
+        <div className="auth-card">
+          <Link to="/" className="auth-brand" aria-label={brandName}>
+            {branding.logoUrl ? (
+              <img src={branding.logoUrl} alt={brandName} className="h-9 w-auto max-h-9 object-contain" />
+            ) : (
+              <span className="auth-brand-mark"><BrandMark /></span>
             )}
-            <div>
-              <label htmlFor="reg-email" className="block text-sm font-medium text-dark-100 mb-1">Email</label>
-              <input
-                id="reg-email"
-                type="email"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                required
-                autoFocus
-                className="w-full px-3 py-2.5 border border-dark-500 rounded-lg focus:ring-2 focus:ring-accent-500 focus:border-accent-500 outline-none transition-shadow text-sm"
-                placeholder="you@example.com"
-              />
-            </div>
-            <div>
-              <label htmlFor="reg-password" className="block text-sm font-medium text-dark-100 mb-1">Senha</label>
-              <input
-                id="reg-password"
-                type="password"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                required
-                minLength={8}
-                className="w-full px-3 py-2.5 border border-dark-500 rounded-lg focus:ring-2 focus:ring-accent-500 focus:border-accent-500 outline-none transition-shadow text-sm"
-              />
-            </div>
-            <div>
-              <label htmlFor="reg-confirm" className="block text-sm font-medium text-dark-100 mb-1">Confirmar Senha</label>
-              <input
-                id="reg-confirm"
-                type="password"
-                value={confirm}
-                onChange={(e) => setConfirm(e.target.value)}
-                required
-                className="w-full px-3 py-2.5 border border-dark-500 rounded-lg focus:ring-2 focus:ring-accent-500 focus:border-accent-500 outline-none transition-shadow text-sm"
-              />
-            </div>
-            <button
-              type="submit"
-              disabled={submitting}
-              className="w-full py-2.5 bg-rust-500 text-white rounded-lg font-medium hover:bg-rust-600 disabled:opacity-50 transition-colors text-sm"
-            >
-              {submitting ? "Criando conta..." : "Criar Conta"}
-            </button>
-          </form>
-        )}
+            {!branding.hideBranding && (
+              <span className="auth-brand-name">
+                {brandName === "AxiaPanel" ? (
+                  <>Axia<span className="auth-brand-faint">Panel</span></>
+                ) : brandName}
+              </span>
+            )}
+          </Link>
 
-        <p className="text-center text-dark-300 text-xs mt-6">
-          Já tem uma conta?{" "}
-          <Link to="/login" className="text-rust-400 hover:text-rust-300">Entrar</Link>
-        </p>
-      </div>
-    </div>
+          <h1 className="auth-heading">
+            {success ? "Tudo certo" : "Crie sua conta"}
+          </h1>
+          <p className="auth-subheading">
+            {success
+              ? "Verifique seu email para confirmar e começar."
+              : "Comece a gerenciar seus servidores em minutos."}
+          </p>
+
+          {error && (
+            <div role="alert" className="auth-error">
+              <IconAlert />
+              <span>{error}</span>
+            </div>
+          )}
+
+          {success ? (
+            <div className="auth-form">
+              <div className="auth-success">
+                <IconCheck />
+                <span>{success}</span>
+              </div>
+              <Link to="/login" className="auth-btn auth-btn-primary">
+                <span>Ir para login</span>
+                <IconArrow />
+              </Link>
+            </div>
+          ) : (
+            <form onSubmit={handleSubmit} className="auth-form">
+              <div className="auth-field">
+                <label htmlFor="reg-email" className="auth-field-head">
+                  <span className="auth-field-label">Email</span>
+                </label>
+                <div className="auth-field-body">
+                  <span className="auth-field-icon" aria-hidden="true"><IconEmail /></span>
+                  <input
+                    id="reg-email"
+                    type="email"
+                    value={email}
+                    onChange={(e) => setEmail(e.target.value)}
+                    required
+                    autoFocus
+                    placeholder="seu@email.com"
+                    className="auth-input"
+                  />
+                </div>
+              </div>
+
+              <div className="auth-field">
+                <label htmlFor="reg-password" className="auth-field-head">
+                  <span className="auth-field-label">Senha</span>
+                  <span className="auth-field-hint">mínimo 8 caracteres</span>
+                </label>
+                <div className="auth-field-body">
+                  <span className="auth-field-icon" aria-hidden="true"><IconLock /></span>
+                  <input
+                    id="reg-password"
+                    type="password"
+                    value={password}
+                    onChange={(e) => setPassword(e.target.value)}
+                    required
+                    minLength={8}
+                    placeholder="••••••••"
+                    className="auth-input"
+                  />
+                </div>
+              </div>
+
+              <div className="auth-field">
+                <label htmlFor="reg-confirm" className="auth-field-head">
+                  <span className="auth-field-label">Confirmar senha</span>
+                </label>
+                <div className="auth-field-body">
+                  <span className="auth-field-icon" aria-hidden="true"><IconLock /></span>
+                  <input
+                    id="reg-confirm"
+                    type="password"
+                    value={confirm}
+                    onChange={(e) => setConfirm(e.target.value)}
+                    required
+                    placeholder="••••••••"
+                    className="auth-input"
+                  />
+                </div>
+              </div>
+
+              <button
+                type="submit"
+                disabled={submitting}
+                className="auth-btn auth-btn-primary"
+              >
+                {submitting ? (
+                  <><span className="auth-btn-spinner" /><span>Criando conta…</span></>
+                ) : (
+                  <><span>Criar conta</span><IconArrow /></>
+                )}
+              </button>
+            </form>
+          )}
+
+          {!success && (
+            <p className="auth-altline">
+              Já tem uma conta?
+              <Link to="/login" className="auth-altline-link">Entrar</Link>
+            </p>
+          )}
+        </div>
+      </section>
+
+      <footer className="auth-footer">
+        <span>© {new Date().getFullYear()} {brandName}</span>
+        <span className="auth-footer-dot">·</span>
+        <a href="/status" className="auth-footer-link">Status</a>
+      </footer>
+    </main>
   );
 }
