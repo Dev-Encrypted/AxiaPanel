@@ -1,0 +1,22 @@
+[package]
+name = "dockpanel"
+version = "2.7.20"
+edition = "2024"
+description = "CLI for DockPanel — self-hosted server management"
+
+[[bin]]
+name = "dockpanel"
+path = "src/main.rs"
+
+[profile.release]
+strip = true
+lto = true
+codegen-units = 1
+
+[dependencies]
+clap = { version = "4", features = ["derive"] }
+clap_complete = "4"
+tokio = { version = "1", features = ["full", "net"] }
+serde = { version = "1", features = ["derive"] }
+serde_json = "1"
+serde_yaml_ng = "0.10"
