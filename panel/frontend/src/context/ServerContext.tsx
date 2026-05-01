@@ -1,5 +1,6 @@
 import { createContext, useContext, useEffect, useState, useCallback, type ReactNode } from "react";
 import { api } from "../api";
+import { useAuth } from "./AuthContext";
 
 export interface Server {
   id: string;
@@ -42,6 +43,7 @@ const ServerContext = createContext<ServerContextType>({
 });
 
 export function ServerProvider({ children }: { children: ReactNode }) {
+  const { user, loading: authLoading } = useAuth();
   const [servers, setServers] = useState<Server[]>([]);
   const [activeServerId, setActiveServerIdState] = useState<string | null>(
     () => localStorage.getItem("dp-active-server")
@@ -63,18 +65,26 @@ export function ServerProvider({ children }: { children: ReactNode }) {
         }
       }
     } catch {
-      // Not logged in yet or API error — ignore
+      // Auth/API error — ignore (will retry on next interval if still authenticated)
     } finally {
       setLoading(false);
     }
   }, []);
 
   useEffect(() => {
+    // Wait for auth to settle. Only fetch when user is authenticated;
+    // skip entirely on the login/setup pages so we don't log a 401.
+    if (authLoading) return;
+    if (!user) {
+      setServers([]);
+      setLoading(false);
+      return;
+    }
     fetchServers();
     // Refresh server list every 60s
     const interval = setInterval(fetchServers, 60000);
     return () => clearInterval(interval);
-  }, [fetchServers]);
+  }, [authLoading, user, fetchServers]);
 
   const setActiveServerId = useCallback((id: string | null) => {
     if (id) {
