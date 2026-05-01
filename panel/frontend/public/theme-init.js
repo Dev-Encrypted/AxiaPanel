@@ -1,6 +1,7 @@
 (function(){
   var t=localStorage.getItem('dp-theme');
-  if(!t||t==='dark')t='midnight';
+  if(!t)t='arctic';
+  else if(t==='dark')t='midnight';
   else if(t==='light')t='arctic';
   else if(t==='nexus')t='clean';
   else if(t==='nexus-dark')t='clean-dark';

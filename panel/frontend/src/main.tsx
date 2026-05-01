@@ -13,7 +13,7 @@ import "./index.css";
 // Theme initialization — runs before first paint, migrates old values
 (() => {
   const stored = localStorage.getItem("dp-theme");
-  let theme = stored || "midnight";
+  let theme = stored || "arctic";
   if (theme === "dark") theme = "midnight";
   if (theme === "light") theme = "arctic";
   if (theme === "nexus") theme = "clean";
