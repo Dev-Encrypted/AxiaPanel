@@ -569,14 +569,32 @@ pub async fn bootstrap_ssh(
     .await
     .map_err(|e| internal_error("create server (ssh bootstrap)", e))?;
 
-    let panel_url = if state.config.base_url.is_empty() {
+    let panel_url = state.config.base_url.clone();
+    if panel_url.is_empty() {
         return Err(err(
             StatusCode::BAD_REQUEST,
-            "BASE_URL não configurada — defina em /etc/dockpanel/api.env",
+            "BASE_URL não configurada — defina em /etc/dockpanel/api.env e reinicie o backend",
         ));
-    } else {
-        state.config.base_url.clone()
-    };
+    }
+    // Reject loopback addresses — the remote server can't reach 127.0.0.1 of the panel
+    let parsed = url::Url::parse(&panel_url)
+        .map_err(|_| err(StatusCode::BAD_REQUEST, "BASE_URL inválida"))?;
+    let host_part = parsed.host_str().unwrap_or("");
+    let is_loopback = host_part == "localhost"
+        || host_part == "::1"
+        || host_part.starts_with("127.")
+        || host_part == "0.0.0.0";
+    if is_loopback {
+        return Err(err(
+            StatusCode::BAD_REQUEST,
+            &format!(
+                "BASE_URL aponta para {} (loopback) — o servidor remoto não consegue alcançar isso. \
+                 Configure BASE_URL com um endereço público ou IP acessível pelo servidor remoto, \
+                 e reinicie o backend.",
+                host_part
+            ),
+        ));
+    }
 
     // Connect via SSH
     let mut session = SshSession::connect(
@@ -632,10 +650,20 @@ pub async fn bootstrap_ssh(
             let _ = sqlx::query("DELETE FROM servers WHERE id = $1").bind(id).execute(&db).await;
         });
         let _ = session.close().await;
-        let tail = exec.stderr.lines().rev().take(10).collect::<Vec<_>>().into_iter().rev().collect::<Vec<_>>().join("\n");
+        // Collect up to 40 lines of stderr (the script's trap handler dumps log tail there)
+        let tail: String = exec.stderr.lines().rev().take(40).collect::<Vec<_>>()
+            .into_iter().rev().collect::<Vec<_>>().join("\n");
+        let summary = match exec.exit_code {
+            2 => "usuário SSH não é root",
+            3 => "falha ao baixar o binário do agent (BASE_URL inacessível pelo servidor remoto?)",
+            4 => "binário baixado não é um ELF válido",
+            5 => "agent não criou o socket Unix",
+            6 => "agent não respondeu em :9443",
+            _ => "erro desconhecido",
+        };
         return Err(err(
             StatusCode::BAD_GATEWAY,
-            &format!("Bootstrap falhou (exit {}): {}", exec.exit_code, tail),
+            &format!("Bootstrap falhou (exit {} — {}):\n{}", exec.exit_code, summary, tail),
         ));
     }
 

@@ -166,10 +166,19 @@ impl SshSession {
 }
 
 /// Build the bootstrap script that will be run via SSH on the remote server.
-/// It installs Docker, sets up agent dirs/config, downloads the agent binary
-/// from the panel itself, generates a self-signed cert, registers a systemd
-/// unit, and starts the agent. Finally prints the cert SHA-256 fingerprint
-/// to stdout so the panel can pin it.
+/// Installs Docker, sets up agent dirs/config, downloads the agent binary,
+/// registers a systemd unit, and starts the agent. Validates connectivity
+/// on :9443 before exiting. Prints the cert SHA-256 fingerprint as the
+/// last line of stdout so the panel can pin it.
+///
+/// Design notes:
+/// - All non-fingerprint output is teed to /tmp/axiapanel-bootstrap.log.
+/// - On any failure (set -e) the trap dumps the last 40 log lines to
+///   stderr so the panel sees the real error, not /dev/null.
+/// - Aborts immediately if not running as root (the script touches
+///   /etc/, /usr/local/bin/, and systemd — sudo NOPASSWD wouldn't help
+///   here because the script is fed through `bash -s` over SSH and would
+///   need every command prefixed individually).
 pub fn bootstrap_script(
     panel_url: &str,
     agent_token: &str,
@@ -177,26 +186,44 @@ pub fn bootstrap_script(
     arch: &str,
 ) -> String {
     format!(
-        r#"set -e
+        r#"set -eu
 export DEBIAN_FRONTEND=noninteractive
+LOG=/tmp/axiapanel-bootstrap.log
+: > "$LOG"
+
+# On any error, dump the tail of the log to stderr so the panel sees it
+trap 'rc=$?; echo "--- BOOTSTRAP FAILED (exit $rc) — last 40 log lines ---" >&2; tail -n 40 "$LOG" >&2 || true; exit $rc' ERR
+
+log() {{ echo "[$(date +%H:%M:%S)] $*" >> "$LOG"; }}
+
+# Must be root — touching /etc, /usr/local/bin, systemd
+if [ "$(id -u)" -ne 0 ]; then
+    echo "ERRO: o bootstrap precisa rodar como root (uid 0). Conecte como root ou ajuste o usuário SSH." >&2
+    exit 2
+fi
+
+log "Starting AxiaPanel agent bootstrap on $(uname -a)"
 
 # Install Docker if missing
 if ! command -v docker >/dev/null 2>&1; then
-    curl -fsSL https://get.docker.com | sh >/dev/null 2>&1
+    log "Installing Docker via get.docker.com"
+    curl -fsSL https://get.docker.com | sh >>"$LOG" 2>&1
 fi
-systemctl enable --now docker >/dev/null 2>&1 || true
+systemctl enable --now docker >>"$LOG" 2>&1 || true
 
 # Install curl and openssl
+log "Installing curl + openssl"
 if command -v apt-get >/dev/null 2>&1; then
-    apt-get update -qq >/dev/null 2>&1
-    apt-get install -y -qq curl openssl >/dev/null 2>&1
+    apt-get update -qq >>"$LOG" 2>&1
+    apt-get install -y -qq curl openssl >>"$LOG" 2>&1
 elif command -v dnf >/dev/null 2>&1; then
-    dnf install -y -q curl openssl >/dev/null 2>&1
+    dnf install -y -q curl openssl >>"$LOG" 2>&1
 elif command -v yum >/dev/null 2>&1; then
-    yum install -y -q curl openssl >/dev/null 2>&1
+    yum install -y -q curl openssl >>"$LOG" 2>&1
 fi
 
 # Create directories
+log "Creating /etc/dockpanel and runtime dirs"
 mkdir -p /etc/dockpanel/ssl /run/dockpanel /var/lib/dockpanel/git \
          /var/lib/dockpanel/recordings /var/lib/dockpanel/audit \
          /var/run/dockpanel /var/backups/dockpanel /var/www
@@ -214,16 +241,34 @@ DOCKPANEL_CENTRAL_URL={panel_url}
 ENVEOF
 chmod 600 /etc/dockpanel/agent.env
 
-# Download agent binary from the panel itself
-curl -fsSL --insecure '{panel_url}/api/agent/binary?arch={arch}' \
-    -o /usr/local/bin/dockpanel-agent
+# Download agent binary from the panel itself.
+# --insecure intentional: the panel may use a self-signed cert during dev,
+# and we authenticate the binary via cert fingerprint pinning later, not
+# via TLS chain trust at download time.
+log "Downloading agent binary from panel: {panel_url}/api/agent/binary?arch={arch}"
+if ! curl -fsSL --insecure --connect-timeout 10 --max-time 180 \
+    '{panel_url}/api/agent/binary?arch={arch}' \
+    -o /usr/local/bin/dockpanel-agent 2>>"$LOG"; then
+    echo "ERRO: falha ao baixar o binário do agent de {panel_url}/api/agent/binary?arch={arch}" >&2
+    echo "Verifique se BASE_URL está acessível deste servidor (curl em modo manual no servidor remoto para diagnosticar)." >&2
+    exit 3
+fi
 chmod +x /usr/local/bin/dockpanel-agent
+
+# Sanity check the binary
+if ! file /usr/local/bin/dockpanel-agent 2>>"$LOG" | grep -q ELF; then
+    echo "ERRO: o arquivo baixado não é um binário ELF válido." >&2
+    head -c 500 /usr/local/bin/dockpanel-agent >&2 || true
+    exit 4
+fi
+log "Binary OK ($(stat -c%s /usr/local/bin/dockpanel-agent) bytes)"
 
 # Generate self-signed TLS cert
 if [ ! -f /etc/dockpanel/ssl/agent.crt ]; then
+    log "Generating self-signed TLS cert"
     openssl req -x509 -newkey rsa:2048 -keyout /etc/dockpanel/ssl/agent.key \
         -out /etc/dockpanel/ssl/agent.crt -days 3650 -nodes \
-        -subj '/CN=axiapanel-agent' >/dev/null 2>&1
+        -subj '/CN=axiapanel-agent' >>"$LOG" 2>&1
     chmod 600 /etc/dockpanel/ssl/agent.key
 fi
 
@@ -261,27 +306,51 @@ WantedBy=multi-user.target
 UNITEOF
 
 # Open firewall port
+log "Opening firewall :9443"
 if command -v ufw >/dev/null 2>&1; then
-    ufw allow 9443/tcp >/dev/null 2>&1 || true
+    ufw allow 9443/tcp >>"$LOG" 2>&1 || true
 elif command -v firewall-cmd >/dev/null 2>&1; then
-    firewall-cmd --permanent --add-port=9443/tcp >/dev/null 2>&1 || true
-    firewall-cmd --reload >/dev/null 2>&1 || true
+    firewall-cmd --permanent --add-port=9443/tcp >>"$LOG" 2>&1 || true
+    firewall-cmd --reload >>"$LOG" 2>&1 || true
 fi
 
 # Start agent
+log "Starting dockpanel-agent.service"
 systemctl daemon-reload
-systemctl enable dockpanel-agent >/dev/null 2>&1
-systemctl start dockpanel-agent
+systemctl enable dockpanel-agent >>"$LOG" 2>&1
+systemctl restart dockpanel-agent
 
-# Wait for agent to be ready (up to 15s)
+# Wait for agent socket (up to 15s) AND for :9443 to accept TLS handshakes (up to 20s)
+log "Waiting for agent socket"
 for i in $(seq 1 15); do
-    if [ -S /var/run/dockpanel/agent.sock ]; then
+    [ -S /var/run/dockpanel/agent.sock ] && break
+    sleep 1
+done
+if [ ! -S /var/run/dockpanel/agent.sock ]; then
+    echo "ERRO: agent socket /var/run/dockpanel/agent.sock não foi criado." >&2
+    echo "--- journalctl -u dockpanel-agent --no-pager -n 30 ---" >&2
+    journalctl -u dockpanel-agent --no-pager -n 30 >&2 2>/dev/null || true
+    exit 5
+fi
+
+log "Waiting for HTTPS :9443 to be live"
+ready=0
+for i in $(seq 1 20); do
+    if curl -sk --connect-timeout 1 --max-time 2 https://127.0.0.1:9443/health >/dev/null 2>&1; then
+        ready=1
         break
     fi
     sleep 1
 done
+if [ "$ready" -ne 1 ]; then
+    echo "ERRO: agent rodando mas não respondendo em https://127.0.0.1:9443 após 20s." >&2
+    echo "--- journalctl -u dockpanel-agent --no-pager -n 30 ---" >&2
+    journalctl -u dockpanel-agent --no-pager -n 30 >&2 2>/dev/null || true
+    exit 6
+fi
+log "Agent live on :9443"
 
-# Print cert fingerprint (the panel will pin this for future requests)
+# Print cert fingerprint as the last stdout line (the panel pins this)
 openssl x509 -in /etc/dockpanel/ssl/agent.crt -fingerprint -sha256 -noout \
     | sed 's/.*=//' | tr -d ':' | tr 'A-F' 'a-f'
 "#,
