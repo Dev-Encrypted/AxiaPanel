@@ -13,14 +13,14 @@ import "./index.css";
 // Theme initialization — runs before first paint, migrates old values
 (() => {
   let stored = localStorage.getItem("dp-theme");
-  // One-shot migration: AxiaPanel defaults to light. Old installs had midnight as default.
-  if (localStorage.getItem("dp-theme-migrated-axia") !== "1") {
-    stored = "arctic";
-    localStorage.setItem("dp-theme-migrated-axia", "1");
+  // One-shot migration v2: AxiaPanel ships with the new "axia" theme as default.
+  if (localStorage.getItem("dp-theme-migrated-axia-v2") !== "1") {
+    stored = "axia";
+    localStorage.setItem("dp-theme-migrated-axia-v2", "1");
   }
-  let theme = stored || "arctic";
+  let theme = stored || "axia";
   if (theme === "dark") theme = "midnight";
-  if (theme === "light") theme = "arctic";
+  if (theme === "light") theme = "axia";
   if (theme === "nexus") theme = "clean";
   if (theme === "nexus-dark") theme = "clean-dark";
   // Layout initialization
@@ -28,7 +28,7 @@ import "./index.css";
   localStorage.setItem("dp-theme", theme);
   document.documentElement.setAttribute("data-theme", theme);
   document.documentElement.setAttribute("data-layout", layout);
-  document.documentElement.setAttribute("data-color-scheme", (theme === "clean" || theme === "arctic") ? "light" : "dark");
+  document.documentElement.setAttribute("data-color-scheme", (theme === "clean" || theme === "arctic" || theme === "axia") ? "light" : "dark");
 })();
 
 // Retry lazy import — handles stale chunks after deploy

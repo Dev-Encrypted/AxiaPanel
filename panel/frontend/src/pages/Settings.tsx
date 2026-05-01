@@ -137,7 +137,7 @@ export default function Settings() {
   const [hostname, setHostname] = useState("");
 
   // Theme
-  const [currentTheme, setCurrentTheme] = useState(() => localStorage.getItem("dp-theme") || "midnight");
+  const [currentTheme, setCurrentTheme] = useState(() => localStorage.getItem("dp-theme") || "axia");
   const [showHeader, setShowHeader] = useState(() => localStorage.getItem("dp-show-header") === "true");
   const [flatNav, setFlatNav] = useState(() => localStorage.getItem("dp-flat-nav") === "true");
 
@@ -852,10 +852,10 @@ export default function Settings() {
                 ] as const).map(l => {
                   const currentLayout = localStorage.getItem("dp-layout") || "command";
                   const isActive = currentLayout === l.id;
-                  const accent = currentTheme === "midnight" ? "#3b82f6" : currentTheme === "arctic" ? "#0d9488" : currentTheme === "ember" ? "#f97316" : "#22c55e";
-                  const bg = currentTheme === "arctic" ? "#f7f9fc" : currentTheme === "midnight" ? "#0a1628" : currentTheme === "ember" ? "#1a1614" : "#111113";
-                  const bar = currentTheme === "arctic" ? "#dce3ed" : currentTheme === "midnight" ? "#182d50" : currentTheme === "ember" ? "#332b26" : "#27272a";
-                  const text = currentTheme === "arctic" ? "#8d9bb0" : currentTheme === "midnight" ? "#6280a8" : currentTheme === "ember" ? "#8a7968" : "#71717a";
+                  const accent = currentTheme === "axia" ? "#0891b2" : currentTheme === "midnight" ? "#3b82f6" : currentTheme === "arctic" ? "#0d9488" : currentTheme === "ember" ? "#f97316" : "#22c55e";
+                  const bg = currentTheme === "axia" ? "#f7f9fc" : currentTheme === "arctic" ? "#f7f9fc" : currentTheme === "midnight" ? "#0a1628" : currentTheme === "ember" ? "#1a1614" : "#111113";
+                  const bar = currentTheme === "axia" ? "#eaeef4" : currentTheme === "arctic" ? "#dce3ed" : currentTheme === "midnight" ? "#182d50" : currentTheme === "ember" ? "#332b26" : "#27272a";
+                  const text = currentTheme === "axia" ? "#8a96aa" : currentTheme === "arctic" ? "#8d9bb0" : currentTheme === "midnight" ? "#6280a8" : currentTheme === "ember" ? "#8a7968" : "#71717a";
                   return (
                     <button key={l.id} onClick={() => {
                       localStorage.setItem("dp-layout", l.id);
@@ -915,6 +915,7 @@ export default function Settings() {
               <p className="text-sm text-dark-100 mb-3">Tema</p>
               <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
                 {([
+                  { id: "axia", name: "Axia", desc: "Padrão — teal moderno, gradient mesh", bg: "#f7f9fc", sidebar: "#ffffff", accent: "#0891b2", card: "#ffffff", text: "#8a96aa", bar: "#eaeef4" },
                   { id: "terminal", name: "Terminal", desc: "Estética hacker", bg: "#111113", sidebar: "#09090b", accent: "#22c55e", card: "#18181b", text: "#71717a", bar: "#27272a" },
                   { id: "midnight", name: "Midnight", desc: "Azul-marinho, moderno", bg: "#0a1628", sidebar: "#050a18", accent: "#3b82f6", card: "#0f1f3a", text: "#6280a8", bar: "#182d50" },
                   { id: "ember", name: "Ember", desc: "Quente e premium", bg: "#1a1614", sidebar: "#0c0a09", accent: "#f97316", card: "#241f1c", text: "#8a7968", bar: "#332b26" },
@@ -927,7 +928,7 @@ export default function Settings() {
                     <button key={t.id} onClick={() => {
                       localStorage.setItem("dp-theme", t.id);
                       document.documentElement.setAttribute("data-theme", t.id);
-                      document.documentElement.setAttribute("data-color-scheme", (t.id === "arctic" || t.id === "clean") ? "light" : "dark");
+                      document.documentElement.setAttribute("data-color-scheme", (t.id === "arctic" || t.id === "clean" || t.id === "axia") ? "light" : "dark");
                       setCurrentTheme(t.id);
                     }}
                       className="group text-left transition-all duration-150"

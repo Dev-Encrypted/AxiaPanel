@@ -3,7 +3,7 @@ import { useAuth } from "../context/AuthContext";
 import { api } from "../api";
 import { navGroups, type NavGroup } from "../data/navItems";
 
-const themeOrder = ["terminal", "midnight", "ember", "arctic", "clean", "clean-dark"] as const;
+const themeOrder = ["axia", "terminal", "midnight", "ember", "arctic", "clean", "clean-dark"] as const;
 
 export interface LayoutState {
   user: { email: string; role: string };
@@ -36,8 +36,9 @@ export function useLayoutState(): LayoutState {
 
   const [theme, setThemeRaw] = useState(() => {
     const stored = localStorage.getItem("dp-theme");
-    if (!stored || stored === "dark") return "midnight";
-    if (stored === "light") return "arctic";
+    if (!stored) return "axia";
+    if (stored === "dark") return "midnight";
+    if (stored === "light") return "axia";
     if (stored === "nexus") return "clean";
     if (stored === "nexus-dark") return "clean-dark";
     return stored;
@@ -49,7 +50,7 @@ export function useLayoutState(): LayoutState {
     setThemeRaw(t);
     localStorage.setItem("dp-theme", t);
     document.documentElement.setAttribute("data-theme", t);
-    document.documentElement.setAttribute("data-color-scheme", (t === "clean" || t === "arctic") ? "light" : "dark");
+    document.documentElement.setAttribute("data-color-scheme", (t === "clean" || t === "arctic" || t === "axia") ? "light" : "dark");
   };
 
   const cycleTheme = () => {

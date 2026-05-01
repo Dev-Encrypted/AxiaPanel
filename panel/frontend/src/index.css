@@ -1122,6 +1122,314 @@ body {
 
 
 /* ═══════════════════════════════════════════════════════
+   THEME: AXIA — Modern teal+gold, soft shadows, gradient mesh
+   Default theme. Inspired by Linear, Vercel, Stripe.
+   ═══════════════════════════════════════════════════════ */
+
+[data-theme="axia"] {
+  /* Surfaces — cool soft light, almost imperceptible blue tint */
+  --color-dark-950: #ffffff;        /* highest surface (cards, modals) */
+  --color-dark-900: #fbfcfd;        /* page surface */
+  --color-dark-800: #f4f6fa;        /* secondary surface (inputs, hover) */
+  --color-dark-700: #e6ebf2;        /* dividers, soft borders */
+  --color-dark-600: #ccd5e0;        /* visible borders */
+  --color-dark-500: #8a96aa;        /* muted text */
+  --color-dark-400: #5d6b82;        /* secondary text */
+  --color-dark-300: #404a60;        /* primary body text */
+  --color-dark-200: #232a3d;        /* heading text */
+  --color-dark-100: #131825;        /* high contrast */
+  --color-dark-50:  #0a0d16;        /* highest contrast */
+
+  /* Primary teal — rich and confident, AA on white */
+  --color-rust-50:  #ecfeff;
+  --color-rust-100: #cffafe;
+  --color-rust-200: #a5f3fc;
+  --color-rust-300: #67e8f9;
+  --color-rust-400: #06b6d4;
+  --color-rust-500: #0891b2;        /* main brand action color */
+  --color-rust-600: #0e7490;
+  --color-rust-700: #155e75;
+  --color-rust-800: #164e63;
+  --color-rust-900: #083344;
+
+  /* Accent sky — links, secondary highlights */
+  --color-accent-50:  #f0f9ff;
+  --color-accent-100: #e0f2fe;
+  --color-accent-200: #bae6fd;
+  --color-accent-300: #7dd3fc;
+  --color-accent-400: #38bdf8;
+  --color-accent-500: #0284c7;
+  --color-accent-600: #0369a1;
+  --color-accent-700: #075985;
+  --color-accent-800: #0c4a6e;
+  --color-accent-900: #082f49;
+
+  /* Status — adjusted for light backgrounds */
+  --color-warn-400: #d97706;
+  --color-warn-500: #b45309;
+  --color-warn-600: #92400e;
+  --color-danger-400: #dc2626;
+  --color-danger-500: #b91c1c;
+  --color-danger-600: #991b1b;
+
+  /* Custom gold — for premium accents (badges, special highlights) */
+  --color-axia-gold: #c8941e;
+  --color-axia-gold-soft: #f4e2a3;
+  --color-axia-gold-glow: rgba(200, 148, 30, 0.25);
+
+  /* Shadow palette — colored, soft */
+  --axia-shadow-sm: 0 1px 2px rgba(15, 23, 42, 0.04), 0 1px 3px rgba(15, 23, 42, 0.03);
+  --axia-shadow-md: 0 2px 4px rgba(15, 23, 42, 0.04), 0 4px 12px rgba(15, 23, 42, 0.05);
+  --axia-shadow-lg: 0 4px 8px rgba(15, 23, 42, 0.05), 0 12px 28px rgba(15, 23, 42, 0.08);
+  --axia-glow-teal: 0 1px 2px rgba(8, 145, 178, 0.18), 0 8px 20px rgba(8, 145, 178, 0.16);
+  --axia-glow-teal-strong: 0 2px 4px rgba(8, 145, 178, 0.22), 0 12px 28px rgba(8, 145, 178, 0.22);
+
+  /* Inter — primary; mono kept for code only */
+  --font-sans: 'Inter', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+
+  /* Soft modern radii — 10px is the sweet spot */
+  --radius-xs: 6px;
+  --radius-sm: 8px;
+  --radius:    10px;
+  --radius-md: 10px;
+  --radius-lg: 14px;
+  --radius-xl: 18px;
+  --radius-2xl: 22px;
+  --radius-3xl: 28px;
+}
+
+/* Body — gradient mesh background (subtle, fixed) */
+[data-theme="axia"] body {
+  background-color: #f7f9fc;
+  background-image:
+    radial-gradient(at 8% 14%, rgba(8, 145, 178, 0.07) 0px, transparent 42%),
+    radial-gradient(at 92% 8%, rgba(200, 148, 30, 0.045) 0px, transparent 40%),
+    radial-gradient(at 78% 88%, rgba(6, 182, 212, 0.055) 0px, transparent 45%),
+    radial-gradient(at 14% 92%, rgba(2, 132, 199, 0.04) 0px, transparent 40%);
+  background-attachment: fixed;
+  font-feature-settings: "cv02", "cv03", "cv04", "cv11", "ss01";
+  letter-spacing: -0.005em;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* Headings — slightly tighter, modern */
+[data-theme="axia"] h1,
+[data-theme="axia"] h2,
+[data-theme="axia"] h3,
+[data-theme="axia"] h4 {
+  letter-spacing: -0.018em;
+  font-weight: 600;
+}
+
+/* Logo — gradient + soft glow */
+[data-theme="axia"] .logo-glow {
+  background: linear-gradient(135deg, #0e7490 0%, #0891b2 50%, #0284c7 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  text-shadow: none;
+}
+[data-theme="axia"] .logo-icon-glow {
+  background: linear-gradient(135deg, #0891b2 0%, #0284c7 100%) !important;
+  box-shadow:
+    0 4px 12px rgba(8, 145, 178, 0.3),
+    0 1px 3px rgba(8, 145, 178, 0.15),
+    inset 0 1px 0 rgba(255, 255, 255, 0.25);
+}
+
+/* Sidebar surface — pure white, soft right edge */
+[data-theme="axia"] aside {
+  background-color: #ffffff !important;
+  border-right: 1px solid #eaeef4 !important;
+  box-shadow: 1px 0 0 rgba(15, 23, 42, 0.02);
+}
+
+/* Active nav link (NavLink uses aria-current="page") — animated gradient bar + soft tint */
+[data-theme="axia"] nav a[aria-current="page"] {
+  background: linear-gradient(90deg,
+    rgba(8, 145, 178, 0.10) 0%,
+    rgba(6, 182, 212, 0.05) 55%,
+    rgba(200, 148, 30, 0.03) 100%) !important;
+  color: var(--color-rust-600) !important;
+  position: relative;
+  font-weight: 600;
+  border-color: transparent !important;
+  box-shadow: 0 1px 0 rgba(8, 145, 178, 0.04);
+}
+[data-theme="axia"] nav a[aria-current="page"] > span:first-child {
+  color: var(--color-rust-500) !important;
+}
+[data-theme="axia"] nav a[aria-current="page"]::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  top: 6px;
+  bottom: 6px;
+  width: 3px;
+  border-radius: 2px;
+  background: linear-gradient(180deg,
+    #0891b2 0%,
+    #06b6d4 45%,
+    #c8941e 100%);
+  background-size: 100% 220%;
+  animation: axia-shift 4.5s ease-in-out infinite;
+  box-shadow: 0 0 12px rgba(8, 145, 178, 0.35);
+}
+@keyframes axia-shift {
+  0%, 100% { background-position: 0% 0%; }
+  50%      { background-position: 0% 100%; }
+}
+
+/* Sidebar nav links — smooth hover with horizontal nudge */
+[data-theme="axia"] nav a {
+  transition: background-color 0.18s ease, color 0.18s ease, transform 0.18s ease, padding 0.18s ease;
+}
+[data-theme="axia"] nav a:hover:not([aria-current="page"]) {
+  background-color: rgba(8, 145, 178, 0.05) !important;
+  color: var(--color-dark-100) !important;
+}
+
+/* Group labels — slightly more refined */
+[data-theme="axia"] nav .uppercase {
+  color: var(--color-dark-400) !important;
+  letter-spacing: 0.12em;
+  font-weight: 500;
+}
+
+/* Page header — frosted glass effect */
+[data-theme="axia"] .page-header {
+  background-color: rgba(255, 255, 255, 0.72);
+  backdrop-filter: saturate(180%) blur(14px);
+  -webkit-backdrop-filter: saturate(180%) blur(14px);
+  border-bottom: 1px solid rgba(230, 235, 242, 0.85);
+  box-shadow: 0 1px 0 rgba(15, 23, 42, 0.02);
+}
+
+/* Cards — soft elevation with hover lift */
+[data-theme="axia"] .elevation-1,
+[data-theme="axia"] .elevation-2 {
+  box-shadow: var(--axia-shadow-sm) !important;
+  border-color: #eaeef4 !important;
+  transition: box-shadow 0.2s ease, transform 0.18s ease, border-color 0.18s ease;
+}
+[data-theme="axia"] .card-interactive {
+  transition: box-shadow 0.2s ease, transform 0.18s ease, border-color 0.18s ease;
+}
+[data-theme="axia"] .card-interactive:hover {
+  box-shadow: var(--axia-shadow-md) !important;
+  border-color: #d4dbe6 !important;
+  transform: translateY(-1px);
+}
+
+/* Inputs — soft borders with colored focus glow */
+[data-theme="axia"] input,
+[data-theme="axia"] textarea,
+[data-theme="axia"] select {
+  background-color: #ffffff;
+  border-color: #d6dde8;
+  color: var(--color-dark-100);
+  transition: border-color 0.15s ease, box-shadow 0.15s ease;
+}
+[data-theme="axia"] input::placeholder,
+[data-theme="axia"] textarea::placeholder {
+  color: #95a0b3;
+}
+[data-theme="axia"] input:focus,
+[data-theme="axia"] input:focus-visible,
+[data-theme="axia"] textarea:focus,
+[data-theme="axia"] textarea:focus-visible,
+[data-theme="axia"] select:focus,
+[data-theme="axia"] select:focus-visible {
+  border-color: #0891b2 !important;
+  outline: none !important;
+  box-shadow:
+    0 0 0 3px rgba(8, 145, 178, 0.15),
+    0 1px 2px rgba(8, 145, 178, 0.08);
+}
+
+/* Buttons — handled by setting global behaviour for elements with rust bg */
+[data-theme="axia"] button,
+[data-theme="axia"] [role="button"] {
+  transition: transform 0.15s ease, box-shadow 0.18s ease, filter 0.18s ease, background-color 0.15s ease;
+}
+[data-theme="axia"] button:not(:disabled):active,
+[data-theme="axia"] [role="button"]:not(:disabled):active {
+  transform: translateY(0);
+}
+
+/* Buttons & links with primary fill — gradient + colored glow + lift */
+[data-theme="axia"] .btn-primary,
+[data-theme="axia"] button.bg-rust-500:not(:disabled),
+[data-theme="axia"] button.bg-rust-600:not(:disabled),
+[data-theme="axia"] a.bg-rust-500,
+[data-theme="axia"] a.bg-rust-600 {
+  background: linear-gradient(135deg, #0891b2 0%, #0e7490 100%) !important;
+  box-shadow: var(--axia-glow-teal);
+  color: #ffffff !important;
+  font-weight: 500;
+}
+[data-theme="axia"] .btn-primary:hover:not(:disabled),
+[data-theme="axia"] button.bg-rust-500:not(:disabled):hover,
+[data-theme="axia"] button.bg-rust-600:not(:disabled):hover,
+[data-theme="axia"] a.bg-rust-500:hover,
+[data-theme="axia"] a.bg-rust-600:hover {
+  background: linear-gradient(135deg, #0aa4c9 0%, #0891b2 100%) !important;
+  box-shadow: var(--axia-glow-teal-strong);
+  transform: translateY(-1px);
+}
+
+/* Scrollbars — slim, soft, themed */
+[data-theme="axia"] ::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+[data-theme="axia"] ::-webkit-scrollbar-track {
+  background: transparent;
+  border: none;
+}
+[data-theme="axia"] ::-webkit-scrollbar-thumb {
+  background: #ccd5e0;
+  border-radius: 4px;
+  border: 2px solid transparent;
+  background-clip: padding-box;
+}
+[data-theme="axia"] ::-webkit-scrollbar-thumb:hover {
+  background: #8a96aa;
+  border: 2px solid transparent;
+  background-clip: padding-box;
+}
+
+/* Tables — softer hover */
+[data-theme="axia"] tr.table-row-hover:hover {
+  background-color: rgba(8, 145, 178, 0.04) !important;
+}
+
+/* Selection — teal tinted */
+[data-theme="axia"] ::selection {
+  background-color: rgba(8, 145, 178, 0.22);
+  color: var(--color-dark-50);
+}
+
+/* Disable scanline effect (already handled in body, but ensure full coverage) */
+[data-theme="axia"] body {
+  background-image:
+    radial-gradient(at 8% 14%, rgba(8, 145, 178, 0.07) 0px, transparent 42%),
+    radial-gradient(at 92% 8%, rgba(200, 148, 30, 0.045) 0px, transparent 40%),
+    radial-gradient(at 78% 88%, rgba(6, 182, 212, 0.055) 0px, transparent 45%),
+    radial-gradient(at 14% 92%, rgba(2, 132, 199, 0.04) 0px, transparent 40%);
+}
+
+/* Utility: optional gold accent class for special elements */
+[data-theme="axia"] .axia-gold {
+  color: var(--color-axia-gold) !important;
+}
+[data-theme="axia"] .axia-gold-bg {
+  background-color: var(--color-axia-gold-soft) !important;
+  color: #6b4d05 !important;
+}
+
+
+/* ═══════════════════════════════════════════════════════
    SHARED RULES — form elements, scrollbar, focus, etc.
    ═══════════════════════════════════════════════════════ */
 
