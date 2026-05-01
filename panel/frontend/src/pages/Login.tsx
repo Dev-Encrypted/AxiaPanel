@@ -19,7 +19,7 @@ function bufferToBase64url(buf: ArrayBuffer): string {
   return btoa(binary).replace(/\+/g, "-").replace(/\//g, "_").replace(/=+$/, "");
 }
 
-/* ─── Custom geometric sigils (no off-the-shelf icon library) ─── */
+/* ─── Custom geometric sigils ─── */
 
 function SigilEmail() {
   return (
@@ -33,7 +33,6 @@ function SigilEmail() {
 }
 
 function SigilLock() {
-  // Concentric rings — abstract "encrypted" sigil instead of a padlock
   return (
     <svg className="auth-sigil" viewBox="0 0 20 20" width="14" height="14" fill="none" stroke="currentColor" strokeWidth="1.25">
       <circle cx="10" cy="10" r="8" />
@@ -48,7 +47,6 @@ function SigilLock() {
 }
 
 function SigilToken() {
-  // Six-cell ribbon — for 2FA code
   return (
     <svg className="auth-sigil" viewBox="0 0 20 20" width="14" height="14" fill="none" stroke="currentColor" strokeWidth="1.25">
       <rect x="1.5" y="6.5" width="2.5" height="7" />
@@ -62,7 +60,6 @@ function SigilToken() {
 }
 
 function SigilKey() {
-  // Custom passkey mark: square with a notch + dot, no off-the-shelf "key" icon
   return (
     <svg viewBox="0 0 20 20" width="14" height="14" fill="none" stroke="currentColor" strokeWidth="1.25">
       <rect x="2.5" y="5" width="9" height="10" />
@@ -75,7 +72,6 @@ function SigilKey() {
 }
 
 function LogoSigil({ size = 28 }: { size?: number }) {
-  // Brand sigil — no rectangle-with-bars cliché. Square + offset square + bisector.
   return (
     <svg className="auth-logo-sigil" viewBox="0 0 32 32" width={size} height={size} fill="none" stroke="currentColor" strokeWidth="1.5">
       <rect x="4" y="4" width="14" height="14" />
@@ -87,13 +83,34 @@ function LogoSigil({ size = 28 }: { size?: number }) {
 }
 
 function FrameMark() {
-  // L-shaped corner registration mark used in print
   return (
     <svg viewBox="0 0 12 12" width="10" height="10" fill="none" stroke="currentColor" strokeWidth="1.25" aria-hidden="true">
       <polyline points="0,4 0,0 4,0" />
     </svg>
   );
 }
+
+/* Live clock — updates every 30s */
+function useClock() {
+  const [now, setNow] = useState(() => new Date());
+  useEffect(() => {
+    const id = setInterval(() => setNow(new Date()), 30_000);
+    return () => clearInterval(id);
+  }, []);
+  return now;
+}
+
+function formatTime(d: Date) {
+  return `${String(d.getHours()).padStart(2, "0")}:${String(d.getMinutes()).padStart(2, "0")}`;
+}
+
+function formatDateMeta(d: Date) {
+  // YY.MM.DD
+  return `${String(d.getFullYear()).slice(-2)}.${String(d.getMonth() + 1).padStart(2, "0")}.${String(d.getDate()).padStart(2, "0")}`;
+}
+
+/* Build hash — stamped at build time by Vite (vite.config.ts) */
+const BUILD_HASH = (typeof __APP_BUILD__ !== "undefined" ? __APP_BUILD__ : "DEV").slice(0, 7);
 
 export default function Login() {
   const { user, login, verify2fa, loading } = useAuth();
@@ -105,10 +122,11 @@ export default function Login() {
   const [submitting, setSubmitting] = useState(false);
   const [needsSetup, setNeedsSetup] = useState(false);
 
-  // 2FA state
   const [twoFaToken, setTwoFaToken] = useState("");
   const [twoFaCode, setTwoFaCode] = useState("");
   const [passkeySupported, setPasskeySupported] = useState(false);
+
+  const clock = useClock();
 
   useEffect(() => {
     if (window.PublicKeyCredential) {
@@ -212,6 +230,7 @@ export default function Login() {
   };
 
   const brandName = branding.panelName || "AxiaPanel";
+  const host = typeof window !== "undefined" ? window.location.hostname : "—";
 
   return (
     <main className="auth-page">
@@ -240,18 +259,33 @@ export default function Login() {
           )}
         </Link>
 
-        <div className="auth-chip" aria-hidden="true">
-          <span className="auth-chip-bracket">[</span>
-          <span className="auth-chip-key">SYS</span>
-          <span className="auth-chip-sep">:</span>
-          <span className="auth-chip-val">READY</span>
-          <span className="auth-chip-bracket">]</span>
+        <div className="auth-topbar-right">
+          <span className="auth-meta-pair">
+            <span className="auth-meta-key">{formatDateMeta(clock)}</span>
+            <span className="auth-meta-sep">·</span>
+            <span className="auth-meta-val auth-meta-tnum">{formatTime(clock)}</span>
+          </span>
+          <span className="auth-topbar-divider" aria-hidden="true" />
+          <span className="auth-meta-pair">
+            <span className="auth-meta-key">LOCALE</span>
+            <span className="auth-meta-sep">·</span>
+            <span className="auth-meta-val">PT-BR</span>
+          </span>
+          <span className="auth-topbar-divider" aria-hidden="true" />
+          <span className="auth-chip" aria-hidden="true">
+            <span className="auth-chip-dot" />
+            <span className="auth-chip-key">SYS</span>
+            <span className="auth-chip-sep">:</span>
+            <span className="auth-chip-val">READY</span>
+          </span>
         </div>
       </header>
 
       {/* Stage */}
       <section className="auth-stage">
         <div className="auth-card">
+          <span className="auth-card-stripe" aria-hidden="true" />
+
           {/* Section number */}
           <div className="auth-section">
             <span className="auth-section-num">01</span>
@@ -283,6 +317,7 @@ export default function Login() {
           {twoFaToken ? (
             <form onSubmit={handle2fa} className="auth-form">
               <FieldRow
+                index="01"
                 label="CÓDIGO"
                 meta="6 DÍGITOS"
                 sigil={<SigilToken />}
@@ -308,7 +343,7 @@ export default function Login() {
                 className="auth-btn auth-btn-primary"
               >
                 <span>{submitting ? "VERIFICANDO" : "VERIFICAR"}</span>
-                <span className="auth-btn-mark" aria-hidden="true">→</span>
+                <span className="auth-btn-kbd" aria-hidden="true">↵</span>
               </button>
 
               <button
@@ -324,8 +359,9 @@ export default function Login() {
             /* Login Form */
             <form onSubmit={handleSubmit} className="auth-form">
               <FieldRow
+                index="01"
                 label="EMAIL"
-                meta="01"
+                meta="OBRIGATÓRIO"
                 sigil={<SigilEmail />}
                 input={
                   <input
@@ -342,8 +378,8 @@ export default function Login() {
               />
 
               <FieldRow
+                index="02"
                 label="SENHA"
-                meta="02"
                 sigil={<SigilLock />}
                 trailing={
                   <Link to="/forgot-password" className="auth-field-link">
@@ -369,7 +405,7 @@ export default function Login() {
                 className="auth-btn auth-btn-primary"
               >
                 <span>{submitting ? "ENTRANDO" : "ENTRAR"}</span>
-                <span className="auth-btn-mark" aria-hidden="true">→</span>
+                <span className="auth-btn-kbd" aria-hidden="true">↵</span>
               </button>
 
               {passkeySupported && (
@@ -420,6 +456,64 @@ export default function Login() {
             </form>
           )}
         </div>
+
+        {/* Right rail — system metadata */}
+        <aside className="auth-rail" aria-label="Informações do sistema">
+          <div className="auth-rail-vert" aria-hidden="true">AXIA · TERMINAL</div>
+
+          <div className="auth-rail-card">
+            <div className="auth-rail-head">
+              <span className="auth-rail-tag">SYSTEM</span>
+              <span className="auth-rail-marker">·</span>
+              <span className="auth-rail-id">02</span>
+            </div>
+            <dl className="auth-rail-list">
+              <div className="auth-rail-row">
+                <dt>HOST</dt>
+                <dd className="auth-meta-tnum" title={host}>{host}</dd>
+              </div>
+              <div className="auth-rail-row">
+                <dt>AGENT</dt>
+                <dd className="auth-meta-tnum">v2.7.20</dd>
+              </div>
+              <div className="auth-rail-row">
+                <dt>BUILD</dt>
+                <dd className="auth-meta-tnum">{BUILD_HASH}</dd>
+              </div>
+              <div className="auth-rail-row">
+                <dt>RUNTIME</dt>
+                <dd>Rust · 2024</dd>
+              </div>
+              <div className="auth-rail-row">
+                <dt>NODES</dt>
+                <dd className="auth-meta-tnum">01 / 01</dd>
+              </div>
+              <div className="auth-rail-row">
+                <dt>STATUS</dt>
+                <dd>
+                  <span className="auth-rail-pill auth-rail-pill-ok">
+                    <span className="auth-rail-pill-dot" />
+                    OPERACIONAL
+                  </span>
+                </dd>
+              </div>
+            </dl>
+
+            <div className="auth-rail-foot">
+              <span>SESSÃO · NOVA</span>
+              <span className="auth-rail-marker">·</span>
+              <span>TLS 1.3</span>
+            </div>
+          </div>
+
+          <div className="auth-rail-tip">
+            <span className="auth-rail-kbd">TAB</span>
+            <span>navegar campos</span>
+            <br />
+            <span className="auth-rail-kbd">↵</span>
+            <span>enviar</span>
+          </div>
+        </aside>
       </section>
 
       {/* Footer */}
@@ -429,11 +523,17 @@ export default function Login() {
           <span className="auth-footer-dot">·</span>
           <span>v2.7</span>
           <span className="auth-footer-dot">·</span>
+          <span>{BUILD_HASH}</span>
+          <span className="auth-footer-dot">·</span>
           <span>RUST</span>
         </div>
-        <Link to="/register" className="auth-footer-link">
-          <span aria-hidden="true">+</span> CADASTRAR CONTA
-        </Link>
+        <nav className="auth-footer-nav" aria-label="Links auxiliares">
+          <a href="/status" className="auth-footer-link">STATUS</a>
+          <span className="auth-footer-dot">·</span>
+          <a href="https://docs.axiapanel.com" target="_blank" rel="noopener noreferrer" className="auth-footer-link">DOCS</a>
+          <span className="auth-footer-dot">·</span>
+          <Link to="/register" className="auth-footer-link auth-footer-link-cta">+ CADASTRAR</Link>
+        </nav>
       </footer>
     </main>
   );
@@ -442,12 +542,14 @@ export default function Login() {
 /* ─── Shared field row ─── */
 
 function FieldRow({
+  index,
   label,
   meta,
   sigil,
   input,
   trailing,
 }: {
+  index?: string;
   label: string;
   meta?: string;
   sigil: React.ReactNode;
@@ -457,8 +559,12 @@ function FieldRow({
   return (
     <div className="auth-field">
       <div className="auth-field-head">
-        <span className="auth-field-label">{label}</span>
-        {trailing ? trailing : meta ? <span className="auth-field-meta">{meta}</span> : null}
+        <span className="auth-field-label">
+          {index && <span className="auth-field-index">[{index}]</span>}
+          <span>{label}</span>
+          {meta && <span className="auth-field-meta-inline">· {meta}</span>}
+        </span>
+        {trailing}
       </div>
       <div className="auth-field-body">
         <span className="auth-field-sigil" aria-hidden="true">{sigil}</span>
